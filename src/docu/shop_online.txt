@@ -1,0 +1,5 @@
+1 chỉ SA được sử dụng tất cả api ở Categories, Items 
+2 WM được sử dụng tất cả api ở ware_house
+3 BM được sử dụng tất cả api ở item
+4 SA được tham gia cv của WM, BM
+5 SA được create or delete WM, BM nhưng k được delete User

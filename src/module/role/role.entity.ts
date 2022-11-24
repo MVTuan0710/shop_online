@@ -13,7 +13,7 @@ import {UserEntity} from "../users/user.entity"
 @Entity('role')
 export class RoleEntity extends BaseEntity{
     @Column({primary : true, generated : true})
-    id : number;
+    role_id : number;
 
     @Column({name : 'fullname', type : 'varchar', nullable : true})
     fullname : string;
@@ -28,6 +28,5 @@ export class RoleEntity extends BaseEntity{
     delete_at : Date;
 
     @OneToMany((type)=> UserEntity, (userEntity)=> userEntity.roleEntity)
-    @JoinColumn({name : 'role_id'})
     userEntity : UserEntity[];
 }

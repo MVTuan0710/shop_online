@@ -1,6 +1,5 @@
-import {IsEmpty, IsNotEmpty} from "class-validator";
+import {IsNotEmpty} from "class-validator";
 import { BodyLogin } from "../auth/auth.dto";
-import {RoleEntity} from "../role/role.entity";
 
 export class CreateAccountDTO extends BodyLogin{
     @IsNotEmpty()
@@ -9,8 +8,8 @@ export class CreateAccountDTO extends BodyLogin{
     @IsNotEmpty()
     phone : string;
 
-    @IsEmpty()
-    role_id : RoleEntity;
+    @IsNotEmpty()
+    role_id : number;
 
     is_active: boolean;
 

@@ -3,10 +3,11 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {UserEntity} from "./user.entity";
 import {Repository} from "typeorm";
 import {CreateAccountDTO, BodyActiveAccount} from "../users/user.dto";
-// import {RoleService} from "../role/role.service";
+import {RoleService} from "../role/role.service";
 import {v4 as uuidv4} from 'uuid';
-import * as bcrypt from 'bcryptjs'
-import {hashSync} from 'bcryptjs'
+import * as bcrypt from 'bcryptjs';
+import {hashSync} from 'bcryptjs';
+import { RolesGuard } from "../role/guards/role.guards";
 // import {MailerService} from "@nestjs-modules/mailer";
 // import { AppModule } from "../core/core.module"
 
@@ -14,38 +15,60 @@ import {hashSync} from 'bcryptjs'
 @Injectable()
 export class UserService {
     public userEntity = new UserEntity();
+    // public olesGuard = new RolesGuard();
     constructor(@InjectRepository(UserEntity) 
         private readonly userRepository: Repository<UserEntity>,
-                // private readonly roleService: RoleService,
-                // private readonly mailerService: MailerService
+                private readonly roleService: RoleService,
+
     ) {}
     async getByUsername(email: string): Promise<UserEntity> {
-        const accounts = await this.userRepository.findOne({where : {email :email}});
-        // delete accounts.password;
+        const accounts = await this.userRepository.findOne({
+            where: {email: email },
+            relations: { roleEntity : true }
+        });
+        delete accounts.password;
         return accounts;
-        throw new Error("Method not implemented.");
     }
     // Find All
     async find(): Promise<UserEntity[]> {
-        const accounts = await this.userRepository.find({
-            relations: ['role_entity']
-        });
-        console.log(accounts);
-        return accounts;
+        try{
+            const accounts = await this.userRepository.find({
+                relations: {roleEntity : true}
+            });
+            return accounts;
+
+        }catch(err){
+            throw err;
+        }
+        
     }
 
     // find by id
-    async getAccountById(user_id : string): Promise<UserEntity> {
-        const accounts = await this.userRepository.findOne({where : {user_id :user_id}});
-        // delete accounts.password;
+    async getByIdRelationRole(user_id : string): Promise<UserEntity> {
+        const accounts = await this.userRepository.findOne({
+            where: {user_id: user_id },
+            relations: { roleEntity : true }
+        })
+        delete accounts.password;
         return accounts;
     }
+    async getById(user_id : string): Promise<UserEntity> {
+        const accounts = await this.userRepository.findOne({
+            where: {user_id: user_id }
+        })
+        delete accounts.password;
+        return accounts;
+    }
+
 
     // find by email
     async getAccountByEmail(_email : string): Promise<UserEntity> {
         console.log(_email)
-        const accounts = await this.userRepository.findOne({where : {email :_email}});
-        // delete accounts.password;
+        const accounts = await this.userRepository.findOne({
+            where : {email :_email},
+            relations: { roleEntity : true }
+        });
+        delete accounts.password;
         return accounts;
     }
 
@@ -60,37 +83,37 @@ export class UserService {
     async findByUsernameAndSelectRole(email : string) : Promise<UserEntity>{
         return this.userRepository.findOne({
             where : {email : email},
-            // relations :['role'],
+            relations: { roleEntity : true }
         })
     }
 
     // create account
     async createAccount(data: CreateAccountDTO): Promise<UserEntity> {
         try {
+
+
             // check email exists
-            const email = await this.userRepository.findOne({where : {email :data.email}});
+            const email: UserEntity  = await this.userRepository.findOne({where : {email :data.email}});
             if (email){
                 throw console.log('The account is not found');
             }
-            const _password = hashSync(data.password, 6);
-            data.password= _password;
-            //check role valid
-            // const role = await this.roleService.findById(data.role);
-            // if (!role || role.id === 2) {
-            //     throw new HttpException('Role is incorrect', HttpStatus.NOT_FOUND);
-            // }
-            
-            // create verify_token
-            data.verify_token = uuidv4(); 
-            
-            // save account 
-            const result = await this.userRepository.save(data);
+            const role = await this.roleService.findById(data.role_id);
+
+            const userEntity = new UserEntity();
+            userEntity.name = data.name;
+            userEntity.password = hashSync(data.password, 6);
+            userEntity.phone = data.phone;
+            userEntity.roleEntity = role;
+            userEntity.verify_token = uuidv4();
+
+            // // save account 
+            const result = await this.userRepository.save(userEntity);
             return result;
         }catch(err){
+            console.log("errors",err);
              throw console.log('Can`t create Account');
         }
     }
-    
 
     async updateActiveAccount(user_id : string, data : BodyActiveAccount): Promise<any> {
         try {

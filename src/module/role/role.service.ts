@@ -14,16 +14,15 @@ export class RoleService{
     }
 
     async findById(id : number): Promise<RoleEntity> {
-        return this.roleRepository.findOne({where : { id : id }});
+        return this.roleRepository.findOne({where : { role_id : id }});
     }
 
     async createRole(_data: CreateRoleDTO): Promise<RoleEntity>{
-        const role = await this.roleRepository.findOne({where : {id : _data.id}});
+        const role = await this.roleRepository.findOne({where : {role_id : _data.role_id}});
             if (role){
                 throw console.log('The role is exsit');
             }
         const result = await this.roleRepository.save(_data);
         return result;
     }
-
 }

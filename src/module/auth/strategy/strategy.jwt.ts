@@ -21,27 +21,27 @@ export class StrategyJwt extends PassportStrategy(Strategy){
     // auto call
     // validate
     async validate(payload : any){
-        const payLoadUsername = payload.username;
-        const account = await this.accountService.findByUsernameAndSelectRole(payLoadUsername);
-        if(!account){
+        const payLoadUsername = payload.email;
+        const user = await this.userService.findByUsernameAndSelectRole(payLoadUsername);
+        if(!user){
             throw new UnauthorizedException();
         }
 
         // req.user
-        const {role} = account;
-        const _role : RoleEntity = <RoleEntity> role;
+        const { roleEntity } = user
+        const _role : RoleEntity = <RoleEntity> roleEntity;
         if(!_role){
             return{
-                id : payload.id,
-                username : payload.username,
-                roleId : null,
+                id : payload.user_id,
+                email : payload.email,
+                role_id : null,
             }
         }
-        const { id : roleId } = _role;
+        const { role_id : roleId } = _role;
         return {
-            id : payload.id,
-            username : payload.username,
-            roleId : roleId,
+            id : payload.user_id,
+            email : payload.email,
+            role_id : roleId,
         }
     }
 

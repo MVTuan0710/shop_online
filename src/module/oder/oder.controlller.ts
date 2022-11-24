@@ -1,24 +1,21 @@
 import {Body, Controller, Get, Param, Post, Res, UseGuards} from "@nestjs/common";
-import {RoleService} from "./role.service";
-import {Roles} from "../decorator/role.decorator";
+import {OderService} from "./oder.service";
 import {GuardsJwt} from "../auth/guard/guards.jwt";
-import {RolesGuard} from "./guards/role.guards";
+import {RolesGuard} from "../role/guards/role.guards";
 import {EnumRole} from "../constant/role/role.constant";
-import {ApiBearerAuth, ApiOkResponse, ApiTags} from "@nestjs/swagger";
-import {CreateRoleDTO} from "./role.dto"
-@ApiTags('role')
-@Controller('role')
-@UseGuards(GuardsJwt, RolesGuard)
-@ApiBearerAuth('JWT-auth')
-export class RoleController{
-    constructor(private roleService : RoleService) {}
+import {CreateOderDTO} from "./oder.dto"
 
-    // find all role
-    @ApiOkResponse({description : 'Get all role'})
-    @Roles(EnumRole.super_admin)
-    @Get('/')
-    async getAllRole(@Res() res){
-        return this.roleService.getAllRole().then(result =>{
+
+@Controller('oder-detail')
+@UseGuards(GuardsJwt, RolesGuard)
+export class OderController{
+    constructor(private oderService : OderService) {}
+
+    // find all oder-detail
+    // @Roles(EnumRole.super_admin)
+    @Get('get-all')
+    async getAll(@Res() res){
+        return this.oderService.find().then(result =>{
             res.status(200).json({
                 message : 'success',
                 result,
@@ -30,10 +27,11 @@ export class RoleController{
             });
         })
     }
-    @Roles(EnumRole.super_admin)
-    @Post('/create')
-    async createRole(@Res() res, @Body() body: CreateRoleDTO){
-        return this.roleService.createRole(body).then(result =>{
+
+    // @Roles(EnumRole.super_admin)
+    @Post('create')
+    async create(@Res() res, @Body() body: CreateOderDTO){
+        return this.oderService.create(body).then(result =>{
             res.status(200).json({
                 message : 'success',
                 result,
@@ -47,9 +45,9 @@ export class RoleController{
     }
 
     // find role by id
-    @Get('/:id')
-    async getRoleByID(@Res() res, @Param('id') id : number){
-        return this.roleService.findById(id).then(result =>{
+    @Get('get/:oder_detail_id')
+    async getById(@Res() res, @Param('oder_detail_id') oder_detail_id : string){
+        return this.oderService.getById(oder_detail_id).then(result =>{
             res.status(200).json({
                 message : 'success',
                 result,

@@ -1,0 +1,15 @@
+Các Guards có một single responsibility. 
+Họ xác định xem một request nhất định sẽ được xử lý bởi route handler hay không.
+Nhưng middleware, về bản chất nó không biết handler nào sẽ được thực thi sau khi gọi hàm next(). 
+Mặt khác, Guards có quyền truy cập vào instance ExecutionContext 
+và do đó biết chính xác những gì sẽ được thực thi tiếp theo.
+
+
+The forFeature(), you are expecting to use the configuration of a dynamic module's forRoot 
+but need to modify some configuration specific to the calling module's needs
+(i.e. which repository this module should have access to, or the context that a logger should use.)
+
+
+The forwardRef() utility to resolve the circular dependency. 
+Otherwise Nest won't instantiate them because all of the essential metadata won't be available
+

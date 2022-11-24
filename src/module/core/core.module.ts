@@ -2,13 +2,16 @@ import {Module} from "@nestjs/common";
 import {ConfigModule, ConfigService} from "@nestjs/config";
 import configuration from "../../config/configuration";
 import {TypeOrmModule} from "@nestjs/typeorm";
-import {join} from "path";
-import {MailerModule} from "@nestjs-modules/mailer";
-import {HandlebarsAdapter} from "@nestjs-modules/mailer/dist/adapters/handlebars.adapter";
 import {ScheduleModule} from "@nestjs/schedule";
 import {UserEntity} from "../users/user.entity";
 import {RoleEntity} from "../role/role.entity";
+import { WareHouseEntity } from "../ware-house/ware-house.entity";
+import { ItemEntity } from "../item/item.entity";
+import { CategoryEntity } from "../categories/category.entity";
+import { OderDetailEntity } from "../oder-detail/oder-detail.entity";
+import { OderEntity } from "../oder/oder.entity";
 const NODE_ENV = process.env.NODE_ENV;
+
 @Module({
     imports :[
         ScheduleModule.forRoot(),
@@ -29,7 +32,7 @@ const NODE_ENV = process.env.NODE_ENV;
                 password: '123',
                 database: 'test_db_shop_online',
                 // autoLoadEntities: true,
-                entities: [UserEntity, RoleEntity],
+                entities: [UserEntity, RoleEntity, WareHouseEntity, ItemEntity, CategoryEntity, OderDetailEntity, OderEntity],
                 // synchronize : true,
             }),
         })

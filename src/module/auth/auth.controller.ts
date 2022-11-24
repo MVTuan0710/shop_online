@@ -1,16 +1,14 @@
 import {Body, Controller, Get, Param, Post, Req, Res, UseGuards} from "@nestjs/common";
-import {CreateAccountDTO, BodyActiveAccount} from "../users/user.dto";
+import {CreateAccountDTO} from "../users/user.dto";
 import { BodyLogin } from "./auth.dto";
 import {AuthService} from "./auth.service";
 import {GuardsLocal} from "./guard/guards.local";
-// import {ApiBody, ApiCreatedResponse, ApiOkResponse, ApiTags, ApiUnauthorizedResponse} from "@nestjs/swagger";
-// import {ProductsService} from "../products/products.service";
+
 
 @Controller('auth')
 export class AuthController{
     constructor(
-        private authService : AuthService,
-        // private productService : ProductsService,
+        private authService : AuthService
     ) {}
 
     @Post('login')

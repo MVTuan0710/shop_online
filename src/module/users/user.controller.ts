@@ -1,19 +1,19 @@
-import {Body, Controller, Delete, Get, Param, Post, Put, Query, Req, Res, UseGuards} from "@nestjs/common";
+import {Body, Controller, Delete, Get, Param, Post, Put, Res, UseGuards} from "@nestjs/common";
 import {UserService} from "./user.service";
-import {CreateAccountDTO, BodyActiveAccount} from "../users/user.dto";
+import {CreateAccountDTO} from "../users/user.dto";
 import {GuardsJwt} from "../auth/guard/guards.jwt";
-import {ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiOkResponse, ApiTags} from "@nestjs/swagger";
-import {UserEntity} from "./user.entity";
+import { RolesGuard } from "../role/guards/role.guards";
+import { Roles } from '../decorator/role.decorator';
+import { EnumRole } from '../constant/role/role.constant';
 
-@ApiTags('user')
+
 @Controller('user')
-// @UseGuards(GuardsJwt)
-// @ApiBearerAuth('JWT-auth')
+@UseGuards(GuardsJwt, RolesGuard)
 export class UserController{
     constructor(private userService  : UserService) {}
 
     // get all account
-    // @Roles(EnumRole.ADMIN)
+    // @Roles(EnumRole.super_admin)
     @Get('get-all')
     async getAll(@Res() res) : Promise<any>{
         return this.userService.find().then(result =>{
@@ -30,10 +30,26 @@ export class UserController{
     }
 
     // get account by Id
-    // @Roles(EnumRole.ADMIN,EnumRole.SUPPORT)
+    // @Roles(EnumRole.super_admin)
     @Get('/id/:user_id')
-    async getAccountByID(@Res() res, @Param('user_id') user_id : string) : Promise<any>{
-        return this.userService.getAccountById(user_id).then(result =>{
+    async getByIdRelationRole(@Res() res, @Param('user_id') user_id : string) : Promise<any>{
+        return this.userService.getByIdRelationRole(user_id).then(result =>{
+            res.status(200).json({
+                message : 'success',
+                result,
+            });
+        }).catch(err =>{
+            res.status(500).json({
+                message : 'failed',
+                err,
+            })
+        })
+    }
+
+    @Roles(EnumRole.super_admin, EnumRole.user)
+    @Post('/create')
+    async create(@Res() res, @Body()data: CreateAccountDTO) : Promise<any>{
+        return this.userService.createAccount(data).then(result =>{
             res.status(200).json({
                 message : 'success',
                 result,
@@ -47,6 +63,7 @@ export class UserController{
     }
 
     // find account by Email
+    @Roles(EnumRole.super_admin)
     @Get('/email/:email')
     async getAccountByEmail(@Res() res, @Param('email') email : string) : Promise<any>{
         return this.userService.getAccountByEmail(email).then(result =>{
@@ -63,7 +80,7 @@ export class UserController{
     }
 
     // update account
-    // // @Roles(EnumRole.ADMIN)
+    @Roles(EnumRole.super_admin)
     @Put('/:account_id')
     async putAccount(@Body() body : CreateAccountDTO, @Res() res, @Param('account_id')
         account_id : string ): Promise<any> {
@@ -82,7 +99,7 @@ export class UserController{
     }
 
     // delete account
-    // @Roles(EnumRole.ADMIN)
+    @Roles(EnumRole.super_admin, EnumRole.user)
     @Delete('delete/:account_id')
     async deleteAccount(@Res() res , @Param('account_id') account_id : string) : Promise<any>{
         return this.userService.deleteAccount(account_id).then(result =>{

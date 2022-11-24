@@ -7,13 +7,13 @@ import {
     PrimaryGeneratedColumn,
     JoinColumn,
     ManyToOne,
-    UpdateDateColumn
+    UpdateDateColumn,
+    OneToMany
 } from "typeorm";
 import * as bcrypt from "bcryptjs";
 import {RoleEntity} from "../role/role.entity";
-// import {AccountEntity} from "../account/account.entity";
-// import {ProductsEntity} from "../products/products.entity";
-// import {PantryEntity} from "../pantry_management/pantry.entity";
+import { WareHouseEntity } from "../ware-house/ware-house.entity";
+import {OderEntity} from "../oder/oder.entity"
 
 @Entity({name: 'user'})
 export class UserEntity extends BaseEntity{
@@ -27,8 +27,17 @@ export class UserEntity extends BaseEntity{
     password : string;
 
     @ManyToOne((type) => RoleEntity, (roleEntity)=> roleEntity.userEntity)
+    // * JoinColumn decorator used on one-to-one relations to specify owner side of relationship.
+    // * It also can be used on both one-to-one and many-to-one relations to specify custom column name
+    // * or custom referenced column.
     @JoinColumn({name : 'role_id'})
     roleEntity : RoleEntity;
+
+    @OneToMany((type)=> OderEntity, (oderEntity)=>oderEntity.userEntity)
+    oderEntity : OderEntity;
+
+    @OneToMany((type)=>WareHouseEntity, (wareHouseEntity)=>wareHouseEntity.userEntity)
+    wareHouseEntity : WareHouseEntity[];
 
     @Column({name : 'name', type : 'varchar', nullable : true})
     name : string;
@@ -41,14 +50,6 @@ export class UserEntity extends BaseEntity{
 
     @Column({name : 'verify_token', type : 'varchar', nullable : true})
     verify_token : string;
-
-    // @ManyToOne((type) => RoleEntity, (role)=> role.account)
-    // @JoinColumn({name : 'role_id'})
-    // role : RoleEntity;
-
-    // @OneToOne(() => AccountEntity,(accountEntity) => accountEntity.account_id )// chỉ định mặt nghịch đảo làm tham số thứ hai
-    // @JoinColumn()
-    // accountEntity: AccountEntity
 
     @CreateDateColumn({name : 'created_at', type : 'timestamp with time zone', nullable : true})
     created_at: Date;
