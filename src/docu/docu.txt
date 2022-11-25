@@ -13,3 +13,5 @@ but need to modify some configuration specific to the calling module's needs
 The forwardRef() utility to resolve the circular dependency. 
 Otherwise Nest won't instantiate them because all of the essential metadata won't be available
 
+
+we define a provider. The @Injectable() decorator marks the CatsService class as a provider.

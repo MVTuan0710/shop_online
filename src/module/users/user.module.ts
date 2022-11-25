@@ -6,10 +6,24 @@ import {UserService} from "./user.service";
 import {AuthModule} from "../auth/auth.module"
 import { RoleModule } from "../role/role.module";
 import { OderModule } from "../oder/oder.module";
+import { JwtModule } from "@nestjs/jwt";
+import {ConfigModule, ConfigService} from "@nestjs/config";
+
 
 
 @Module({
     imports :[TypeOrmModule.forFeature([UserEntity]),
+    forwardRef(()=>JwtModule.registerAsync({
+        imports : [ConfigModule],
+        inject : [ConfigService],
+        useFactory: async(configService : ConfigService) =>({
+            secret : configService.get<string>('jwt.secret'),
+            // secret : 'dasdasd',
+            signOptions : {
+                expiresIn : configService.get<string>('jwt.expires_in'),
+            } 
+        }),
+    })),
     forwardRef(()=>AuthModule),forwardRef(()=> RoleModule),forwardRef(()=> OderModule)
     ],
     controllers : [UserController],

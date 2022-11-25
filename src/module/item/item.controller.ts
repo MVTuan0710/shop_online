@@ -12,7 +12,7 @@ export class ItemController{
     constructor(private itemService  : ItemService) {}
 
     // get all item
-    // @Roles(EnumRole.super_admin)
+    @Roles(EnumRole.user)
     @Get('get-all')
     async getAll(@Res() res) : Promise<any>{
         return this.itemService.find().then(result =>{

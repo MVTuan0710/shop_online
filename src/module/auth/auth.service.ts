@@ -15,7 +15,7 @@ export class AuthService{
     // create account
     async register(data : CreateAccountDTO) : Promise<UserEntity>{
         try {
-            const result: UserEntity =  await this.userService.createAccount(data);
+            const result: UserEntity =  await this.userService.register(data);
             return result;
         }catch (err){
             console.log('errors',err);
@@ -46,7 +46,7 @@ export class AuthService{
     // validate Account
     async validateAccount(email : string, password : string) : Promise<any>{
        try {
-           const account: UserEntity = await this.userService.getByUsername(email);
+           const account: UserEntity = await this.userService.getByEmail(email);
            if(account && account.isPasswordValid(password)){
                const { password, ...result} = account
                return result
@@ -61,7 +61,7 @@ export class AuthService{
     // login
     async LoginAccount(_data : BodyLogin) : Promise<any>{
         try {
-        const data : UserEntity = await this.userService.getByUsername(_data.email);
+        const data : UserEntity = await this.userService.getByEmail(_data.email);
         const payload ={
             email : data.email,
             id : data.user_id,

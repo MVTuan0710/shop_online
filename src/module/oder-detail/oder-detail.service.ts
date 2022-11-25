@@ -3,8 +3,8 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {OderDetailEntity} from "./oder-detail.entity";
 import {Repository} from "typeorm";
 import {CreateOderDetailDTO} from "./oder-detail.dto";
-import { CategoryService } from "../categories/category.service";
 import { ItemService} from "../item/item.service";
+import { OderService } from "../oder/oder.service";
 
 
 @Injectable()
@@ -12,7 +12,8 @@ export class OderDetailService {
     public oderDetailEntity = new OderDetailEntity();
     constructor(@InjectRepository(OderDetailEntity) 
         private readonly oderDetailRepository: Repository<OderDetailEntity>,
-                private readonly itemService: ItemService
+                private readonly itemService: ItemService, 
+                private readonly oderService: OderService
     ) {}
 
     // find oder-detail by id
@@ -44,7 +45,7 @@ export class OderDetailService {
         try {
             // check item exists
             const item  = await this.itemService.getById(data.item_id)
-
+            const oder = await this.oderService.getByOderId(data.oder_id)
             const _total_money = item.price * data.quantity;
 
             if (!item){
@@ -55,6 +56,7 @@ export class OderDetailService {
             oderDetailEntity.quantity = data.quantity;
             oderDetailEntity.itemEntity = item;
             oderDetailEntity.total_money = _total_money;
+            oderDetailEntity.oderEntity = oder
 
             // save item 
             const result = await this.oderDetailRepository.save(oderDetailEntity);
@@ -102,7 +104,7 @@ export class OderDetailService {
                 throw console.log('Can`t found Warehouse by id');
 
             // delete
-            const result = await this.oderDetailRepository.delete(oder_detail_id);
+            await this.oderDetailRepository.delete(oder_detail_id);
             return data;
         }catch (err){
             console.log('errors',err);

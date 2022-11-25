@@ -28,6 +28,10 @@ export class OderDetailEntity extends BaseEntity{
     @JoinColumn({name : 'item_id'})
     itemEntity : ItemEntity;
 
+    @ManyToOne((type)=> OderEntity, (oderEntity)=>oderEntity.oderEntity)
+    @JoinColumn({name : 'oder_id'})
+    oderEntity : OderEntity;
+
     @CreateDateColumn({name : 'created_at', type : 'timestamp with time zone', nullable : true})
     created_at: Date;
 
@@ -36,6 +40,4 @@ export class OderDetailEntity extends BaseEntity{
 
     @DeleteDateColumn({name : 'deleted_at', type : 'timestamp with time zone', nullable : true})
     deleted_at : Date;
-    
-    oderEntity: any;
 }

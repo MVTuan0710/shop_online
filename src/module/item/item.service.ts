@@ -39,7 +39,7 @@ export class ItemService {
     async find(): Promise<ItemEntity[]> {
         try{
             const data = await this.itemRepository.find({
-                 relations: { categoryEntity : true }
+                //  relations: { categoryEntity : true }
             });
             return data;
 

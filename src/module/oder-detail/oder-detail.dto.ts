@@ -6,5 +6,8 @@ export class CreateOderDetailDTO{
     item_id : string;
 
     @IsNotEmpty()
+    oder_id : string;
+
+    @IsNotEmpty()
     quantity : number;
 }

@@ -1,31 +1,48 @@
 import {HttpException, HttpStatus, Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {UserEntity} from "./user.entity";
-import {Repository} from "typeorm";
+import {DeleteResult, Repository, UpdateResult} from "typeorm";
 import {CreateAccountDTO, BodyActiveAccount} from "../users/user.dto";
 import {RoleService} from "../role/role.service";
 import {v4 as uuidv4} from 'uuid';
-import * as bcrypt from 'bcryptjs';
 import {hashSync} from 'bcryptjs';
-import { RolesGuard } from "../role/guards/role.guards";
-// import {MailerService} from "@nestjs-modules/mailer";
-// import { AppModule } from "../core/core.module"
+import {JwtService} from "@nestjs/jwt";
+import { HeaderObject } from "@nestjs/swagger/dist/interfaces/open-api-spec.interface";
 
 
 @Injectable()
 export class UserService {
     public userEntity = new UserEntity();
-    // public olesGuard = new RolesGuard();
     constructor(@InjectRepository(UserEntity) 
         private readonly userRepository: Repository<UserEntity>,
                 private readonly roleService: RoleService,
+                private readonly jwtService : JwtService
 
     ) {}
-    async getByUsername(email: string): Promise<UserEntity> {
+    async getByEmail(email: string): Promise<UserEntity> {
         const accounts = await this.userRepository.findOne({
             where: {email: email },
             relations: { roleEntity : true }
         });
+        delete accounts.password;
+        return accounts;
+    }
+
+    async getByName(name: string): Promise<UserEntity> {
+        const accounts = await this.userRepository.findOne({
+            where: {name: name },
+            relations: { roleEntity : true }
+        });
+        delete accounts.password;
+        return accounts;
+    }
+
+    
+    async getByPhone(phone : string, token: any): Promise<UserEntity> {
+
+        const accounts = await this.userRepository.findOne({
+            where: {phone: phone }
+        })
         delete accounts.password;
         return accounts;
     }
@@ -52,6 +69,9 @@ export class UserService {
         delete accounts.password;
         return accounts;
     }
+
+    
+
     async getById(user_id : string): Promise<UserEntity> {
         const accounts = await this.userRepository.findOne({
             where: {user_id: user_id }
@@ -59,7 +79,6 @@ export class UserService {
         delete accounts.password;
         return accounts;
     }
-
 
     // find by email
     async getAccountByEmail(_email : string): Promise<UserEntity> {
@@ -71,8 +90,6 @@ export class UserService {
         delete accounts.password;
         return accounts;
     }
-
-
    
     // find verifyToken
     async getByVerifyToken(token : string) : Promise<UserEntity>{
@@ -88,33 +105,96 @@ export class UserService {
     }
 
     // create account
-    async createAccount(data: CreateAccountDTO): Promise<UserEntity> {
+    async createAccount(data: CreateAccountDTO, token : any): Promise<UserEntity> {
         try {
-
-
             // check email exists
             const email: UserEntity  = await this.userRepository.findOne({where : {email :data.email}});
             if (email){
                 throw console.log('The account is not found');
             }
-            const role = await this.roleService.findById(data.role_id);
 
-            const userEntity = new UserEntity();
-            userEntity.name = data.name;
-            userEntity.password = hashSync(data.password, 6);
-            userEntity.phone = data.phone;
-            userEntity.roleEntity = role;
-            userEntity.verify_token = uuidv4();
+                const _token = token.authorization.split(" ");
+                const payload = this.jwtService.verify(_token[1]); 
+    
+    
+                if(payload.role.role_id === 1){
+                    if(data.role_id === 3 || data.role_id === 2){
+    
+                    const role = await this.roleService.findById(data.role_id);
+    
+                    const userEntity = new UserEntity();
+                    userEntity.email = data.email;
+                    userEntity.name = data.name;
+                    userEntity.password = hashSync(data.password, 6);
+                    userEntity.phone = data.phone;
+                    userEntity.roleEntity = role;
+                    userEntity.verify_token = uuidv4();
+    
+                    const result = await this.userRepository.save(userEntity);
+                    return result;
+    
+                    }else{
+                        throw console.log("failed");
+                    }
+                }else{
 
-            // // save account 
-            const result = await this.userRepository.save(userEntity);
-            return result;
+                    if(payload.role.role_id === 4 && data.role_id === 4){
+                
+                        const role = await this.roleService.findById(data.role_id);
+        
+                        const userEntity = new UserEntity();
+                        userEntity.email = data.email;
+                        userEntity.name = data.name;
+                        userEntity.password = hashSync(data.password, 6);
+                        userEntity.phone = data.phone;
+                        userEntity.roleEntity = role;
+                        userEntity.verify_token = uuidv4();
+        
+                        const result = await this.userRepository.save(userEntity);
+                        return result;
+        
+                    }else{
+                            throw console.log("failed");
+                    }
+                }
+            
+            
         }catch(err){
             console.log("errors",err);
              throw console.log('Can`t create Account');
         }
     }
-
+    
+    async register(data: CreateAccountDTO): Promise<UserEntity> {
+        try {
+            if(data.role_id == 4){
+                // check email exists
+                const email: UserEntity  = await this.userRepository.findOne({where : {email :data.email}});
+                if (email){
+                    throw console.log('The account is not found');
+                }
+    
+                const role = await this.roleService.findById(data.role_id);
+            
+                const userEntity = new UserEntity();
+                userEntity.email = data.email;
+                userEntity.name = data.name;
+                userEntity.password = hashSync(data.password, 6);
+                userEntity.phone = data.phone;
+                userEntity.roleEntity = role;
+                userEntity.verify_token = uuidv4();
+    
+                const result = await this.userRepository.save(userEntity);
+                return result;
+        }else{
+            throw console.log("failed");
+        }
+            
+        }catch(err){
+            console.log("errors",err);
+             throw console.log('Can`t create Account');
+        }
+    }
     async updateActiveAccount(user_id : string, data : BodyActiveAccount): Promise<any> {
         try {
             // check account exists
@@ -130,7 +210,7 @@ export class UserService {
             throw console.log('Can`t active Account');
         }
     }
-    async updateTokenAccount(user_id : string, data: CreateAccountDTO): Promise<any> {
+    async updateTokenAccount(user_id : string, data: CreateAccountDTO): Promise<UpdateResult> {
         try {
             // check account exists
             const account = await this.userRepository.findOne({where : {user_id : user_id}});
@@ -145,55 +225,24 @@ export class UserService {
             throw console.log('Can`t update token Account');
         }
     }
-    // create register
-    async register(data: CreateAccountDTO): Promise<any> {
-        try {
-            // check email exists
-            const email = await this.userRepository.findOne({where : {email : data.email}});
-            if (email) {
-                throw console.log('Can`t found Account by email');
-            }
-
-            // create
-            // const role = await this.roleService.findById(data.role);
-            // accountEntity.role = role;
-            // accountEntity.verify_token = uuidv4();
-            // accountEntity.allow_email = data.allow_email;
-
-            //const result = await this.accountRepository.save(this.accountEntity);
-
-            // const url = `${hostname}/auth/verify/${accountEntity.verify_token}`
-            // this.mailerService.sendMail({
-            //     from: '"Support Team" <tranvohoaian2k@gmail.com>',
-            //     to: data.username,
-            //     subject: 'Welcome to Food management App! Confirm your Email',
-            //     template: './gmail', // `.hbs` extension is appended automatically
-            //     context: {
-            //         fullname : data.fullname,
-            //         url
-            //     }
-            // })
-            // return result;
-        }catch (err){
-            throw console.log('Can`t register Account');
-        }
-
-    }
 
     // update Account
-    async updateAccount(user_id : string, data: CreateAccountDTO): Promise<any> {
+    async updateAccount(user_id : string, data: CreateAccountDTO): Promise<UpdateResult> {
        try {
            // check account exists
            const account = await this.userRepository.findOne({where : {user_id : user_id}});
            if (!account)
                throw console.log('Can`t found Account by account_id');
 
-            //  check role valid
-            //  const role = await this.roleService.findById(data.role);
-            //      if (!role || role.id === 2) {
-            //          throw new HttpException('Role is incorrect', HttpStatus.NOT_FOUND);
-            //      }
-
+            const role = await this.roleService.findById(data.role_id);
+            
+                const userEntity = new UserEntity();
+                userEntity.email = data.email;
+                userEntity.name = data.name;
+                userEntity.password = hashSync(data.password, 6);
+                userEntity.phone = data.phone;
+                userEntity.roleEntity = role;
+                userEntity.verify_token = uuidv4();
             // update account
            const result = await this.userRepository.update(user_id, data);
            return result;
@@ -204,16 +253,35 @@ export class UserService {
     }
 
     // delete Acount
-    async deleteAccount(user_id : string): Promise<any> {
+    async deleteAccount(user_id : string, token: any): Promise<DeleteResult> {
         try {
-            // check account exists
+              // check account exists
             const Account = await this.userRepository.findOne({where : {user_id : user_id}});
             if (!Account)
                 throw console.log('Can`t found Account by account_id');
+        
 
-            // delete
-            const result = await this.userRepository.delete(user_id);
-            return result;
+            const _token = token.authorization.split(" ");
+            const payload = this.jwtService.verify(_token[1]); 
+
+            const data = await this.userRepository.findOne({
+                where : {user_id :user_id},
+                relations: { roleEntity : true }
+            });
+
+            if(payload.role.role_id === 1){
+                if(data.roleEntity.role_id === 3 || data.roleEntity.role_id === 2){
+
+                    const result = await this.userRepository.delete(user_id);
+                    console.log(result);
+                    
+                    return result;
+
+                }else{
+                    throw console.log("failed");
+                }
+            }
+          
         }catch (err){
             console.log('errors',err);
             throw console.log('Can`t delete Account');

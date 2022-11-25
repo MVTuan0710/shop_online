@@ -7,7 +7,8 @@ import {
     PrimaryGeneratedColumn,
     JoinColumn,
     ManyToOne,OneToOne,
-    UpdateDateColumn
+    UpdateDateColumn,
+    OneToMany
 } from "typeorm";
 import { OderDetailEntity } from "../oder-detail/oder-detail.entity";
 import { UserEntity } from "../users/user.entity";
@@ -18,9 +19,8 @@ export class OderEntity extends BaseEntity{
     @PrimaryGeneratedColumn('uuid')
     oder_id : string;
 
-    @OneToOne((type)=> OderDetailEntity)
-    @JoinColumn({name : 'oder_detail_id'})
-    oderDetailEntity : OderDetailEntity;
+    @OneToMany((type)=> OderDetailEntity, (oderDetailEntity)=>oderDetailEntity.oderEntity)
+    oderEntity : OderEntity;
 
     @ManyToOne((type)=> UserEntity, (userEntity)=>userEntity.oderEntity)
     @JoinColumn({name : 'user_id'})
