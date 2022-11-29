@@ -8,6 +8,7 @@ import { ItemModule } from './module/item/item.module';
 import { CategoryModule } from './module/categories/category.module';
 import { OderDetailModule } from './module/oder-detail/oder-detail.module';
 import { OderModule } from './module/oder/oder.module';
+import { ShippingModule } from './module/shipping/shipping.module';
 
 @Module({
   imports: [
@@ -19,8 +20,8 @@ import { OderModule } from './module/oder/oder.module';
     ItemModule, 
     CategoryModule, 
     OderDetailModule,
-    OderModule
-
+    OderModule,
+    ShippingModule
   ]
 })
 export class AppModule {}

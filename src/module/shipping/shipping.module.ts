@@ -1,18 +1,15 @@
-import {forwardRef, Module} from "@nestjs/common";
+import {Module, forwardRef} from "@nestjs/common";
 import {TypeOrmModule} from "@nestjs/typeorm";
-import {UserEntity} from "./user.entity";
-import {UserController} from "./user.controller";
-import {UserService} from "./user.service";
-import {AuthModule} from "../auth/auth.module";
-import { RoleModule } from "../role/role.module";
+import { UserModule } from "../users/user.module";
+import { ShippingEntity } from "./shipping.entity";
+import { ShippingService } from "./shipping.service";
 import { OderModule } from "../oder/oder.module";
+import {ShippingController} from "./shipping.controller"
 import { JwtModule } from "@nestjs/jwt";
 import {ConfigModule, ConfigService} from "@nestjs/config";
 
-
-
 @Module({
-    imports :[TypeOrmModule.forFeature([UserEntity]),
+    imports : [TypeOrmModule.forFeature([ShippingEntity]),
     forwardRef(()=>JwtModule.registerAsync({
         imports : [ConfigModule],
         inject : [ConfigService],
@@ -23,11 +20,9 @@ import {ConfigModule, ConfigService} from "@nestjs/config";
                 expiresIn : configService.get<string>('jwt.expires_in'),
             } 
         }),
-    })),
-    forwardRef(()=>AuthModule),forwardRef(()=> RoleModule),forwardRef(()=> OderModule)
-    ],
-    controllers : [UserController],
-    providers : [UserService],
-    exports : [UserService,TypeOrmModule],
+    })), forwardRef(()=> UserModule), forwardRef(()=>OderModule),],
+    controllers : [ShippingController ],
+    providers : [ShippingService],
+    exports : [TypeOrmModule, ShippingService]
 })
-export class UserModule{}
+export class ShippingModule{}

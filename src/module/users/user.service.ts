@@ -2,7 +2,7 @@ import {HttpException, HttpStatus, Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {UserEntity} from "./user.entity";
 import {DeleteResult, Repository, UpdateResult} from "typeorm";
-import {CreateAccountDTO, BodyActiveAccount} from "../users/user.dto";
+import {CreateAccountDTO, BodyActiveAccount, BodyGetOneAccount} from "../users/user.dto";
 import {RoleService} from "../role/role.service";
 import {v4 as uuidv4} from 'uuid';
 import {hashSync} from 'bcryptjs';
@@ -19,33 +19,45 @@ export class UserService {
                 private readonly jwtService : JwtService
 
     ) {}
-    async getByEmail(email: string): Promise<UserEntity> {
-        const accounts = await this.userRepository.findOne({
-            where: {email: email },
-            relations: { roleEntity : true }
-        });
-        delete accounts.password;
-        return accounts;
-    }
+   
+    // Cau 6
+    async getOne(data: BodyGetOneAccount, token: any): Promise<UserEntity> {
+    try{
+        const _token = token.authorization.split(" ");
+        const payload = this.jwtService.verify(_token[1]); 
 
-    async getByName(name: string): Promise<UserEntity> {
-        const accounts = await this.userRepository.findOne({
-            where: {name: name },
-            relations: { roleEntity : true }
-        });
-        delete accounts.password;
-        return accounts;
-    }
+        
 
-    
-    async getByPhone(phone : string, token: any): Promise<UserEntity> {
+        if(payload.role.role_id === 1|| payload.role.role_id ===2){
 
-        const accounts = await this.userRepository.findOne({
-            where: {phone: phone }
-        })
-        delete accounts.password;
-        return accounts;
+                
+            const account = await this.userRepository.findOne({
+                where: {name: data.name, phone: data.phone}
+            });
+            delete account.password;
+            return account;
+        }else{
+            if(payload.role.role_id === 3){
+                const account = await this.userRepository.findOne({
+                    where: {name: data.name, phone: data.phone}
+                });
+                delete account.user_id;
+                delete account.email;
+                delete account.roleEntity;
+                delete account.is_active;
+                delete account.password;
+                delete account.verify_token;
+
+                return account;
+            }
+        }
+
+    }catch(err){
+        throw console.log("failed");
     }
+}
+
+
     // Find All
     async find(): Promise<UserEntity[]> {
         try{
@@ -60,18 +72,6 @@ export class UserService {
         
     }
 
-    // find by id
-    async getByIdRelationRole(user_id : string): Promise<UserEntity> {
-        const accounts = await this.userRepository.findOne({
-            where: {user_id: user_id },
-            relations: { roleEntity : true }
-        })
-        delete accounts.password;
-        return accounts;
-    }
-
-    
-
     async getById(user_id : string): Promise<UserEntity> {
         const accounts = await this.userRepository.findOne({
             where: {user_id: user_id }
@@ -81,10 +81,9 @@ export class UserService {
     }
 
     // find by email
-    async getAccountByEmail(_email : string): Promise<UserEntity> {
-        console.log(_email)
+    async getByEmail(email: string): Promise<UserEntity> {
         const accounts = await this.userRepository.findOne({
-            where : {email :_email},
+            where: {email: email },
             relations: { roleEntity : true }
         });
         delete accounts.password;
@@ -167,7 +166,7 @@ export class UserService {
     
     async register(data: CreateAccountDTO): Promise<UserEntity> {
         try {
-            if(data.role_id == 4){
+                // if(data.role_id === 4){
                 // check email exists
                 const email: UserEntity  = await this.userRepository.findOne({where : {email :data.email}});
                 if (email){
@@ -186,10 +185,10 @@ export class UserService {
     
                 const result = await this.userRepository.save(userEntity);
                 return result;
-        }else{
-            throw console.log("failed");
-        }
-            
+                // }else{
+                //     throw console.log(`Can't create Account`)
+                // }
+                
         }catch(err){
             console.log("errors",err);
              throw console.log('Can`t create Account');

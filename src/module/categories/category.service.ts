@@ -55,7 +55,7 @@ export class CategoryService {
             return result;
         }catch(err){
             console.log("errors",err);
-             throw console.log('Can`t create Account');
+             throw console.log('Can`t create Category');
         }
     }
     
@@ -88,7 +88,7 @@ export class CategoryService {
             return result;
         }catch (err){
             console.log('errors',err);
-            throw console.log('Can`t delete Warehouse');
+            throw console.log('Can`t delete Category');
         }
     }
 }

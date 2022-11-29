@@ -1,5 +1,4 @@
 import {IsEmpty, IsNotEmpty} from "class-validator";
-import { BodyLogin } from "../auth/auth.dto";
 
 
 export class CreateItemDTO {

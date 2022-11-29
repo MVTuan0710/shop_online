@@ -5,10 +5,25 @@ import {OderDetailEntity} from "./oder-detail.entity";
 import {OderDetailService} from "./oder-detail.service";
 import { ItemModule } from "../item/item.module";
 import { OderModule } from "../oder/oder.module";
+import { WareHouseModule } from "../ware-house/ware-house.module";
+import {ConfigModule, ConfigService} from "@nestjs/config";
+import { JwtModule } from "@nestjs/jwt";
 
 @Module({
     imports : [TypeOrmModule.forFeature([OderDetailEntity]),
-    forwardRef(()=> ItemModule),forwardRef(()=> OderModule)],
+    forwardRef(()=> ItemModule),forwardRef(()=> OderModule),forwardRef(()=> WareHouseModule),
+    forwardRef(()=>JwtModule.registerAsync({
+        imports : [ConfigModule],
+        inject : [ConfigService],
+        useFactory: async(configService : ConfigService) =>({
+            secret : configService.get<string>('jwt.secret'),
+            // secret : 'dasdasd',
+            signOptions : {
+                expiresIn : configService.get<string>('jwt.expires_in'),
+            } 
+        }),
+    }))
+    ],
     controllers : [OderDetailController],
     providers : [OderDetailService],
     exports : [TypeOrmModule, OderDetailService]

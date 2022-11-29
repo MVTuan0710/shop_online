@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Param, Post, Res, Delete, UseGuards} from "@nestjs/common";
+import {Body, Controller, Get, Param, Post, Res, Delete, UseGuards, Headers} from "@nestjs/common";
 import {OderDetailService} from "./oder-detail.service";
 // import {GuardsJwt} from "../auth/guard/guards.jwt";
 // import {RolesGuard} from "./guards/role.guards";
@@ -31,13 +31,14 @@ export class OderDetailController{
 
     // @Roles(EnumRole.super_admin)
     @Post('create')
-    async create(@Res() res, @Body() body: CreateOderDetailDTO){
-        return this.oderDetailService.create(body).then(result =>{
+    async create(@Res() res, @Body() body: CreateOderDetailDTO,@Headers()token: string){
+        return this.oderDetailService.create(body,token).then(result =>{
             res.status(200).json({
                 message : 'success',
                 result,
             });
         }).catch(err =>{
+
             res.status(500).json({
                 message : 'failed',
                 err,
@@ -56,7 +57,7 @@ export class OderDetailController{
         }).catch(err =>{
             res.status(500).json({
                 message : 'failed',
-                err,
+                err
             });
         })
     }

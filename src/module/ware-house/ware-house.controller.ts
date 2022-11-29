@@ -7,12 +7,12 @@ import { Roles } from '../decorator/role.decorator';
 import { EnumRole } from '../constant/role/role.constant'
 
 @Controller('ware-house')
-@UseGuards(GuardsJwt, RolesGuard)
+// @UseGuards(GuardsJwt, RolesGuard)
 export class WareHouseController{
     constructor(private wareHouseService  : WareHouseService) {}
 
     // get all ware house
-    @Roles(EnumRole.warehouse_manager, EnumRole.super_admin)
+    // @Roles(EnumRole.warehouse_manager, EnumRole.super_admin)
     @Get('get-all')
     async getAll(@Res() res) : Promise<any>{
         return this.wareHouseService.find().then(result =>{
@@ -29,7 +29,7 @@ export class WareHouseController{
     }
 
     // get account by Id
-    @Roles(EnumRole.warehouse_manager, EnumRole.super_admin)
+    // @Roles(EnumRole.warehouse_manager, EnumRole.super_admin)
     @Get('/id/:ware_house_id')
     async getWareHouseByID(@Res() res, @Param('ware_house_id') ware_house_id : string) : Promise<any>{
         return this.wareHouseService.getById(ware_house_id).then(result =>{
@@ -45,7 +45,7 @@ export class WareHouseController{
         })
     }
 
-    @Roles(EnumRole.warehouse_manager, EnumRole.super_admin)
+    // @Roles(EnumRole.warehouse_manager, EnumRole.super_admin)
     @Post('create')
     async createWareHouse(@Res() res, @Body()data: CreateWareHouseDTO) : Promise<any>{
         return this.wareHouseService.create(data).then(result =>{
@@ -63,12 +63,12 @@ export class WareHouseController{
 
 
     // update ware house
-    @Roles(EnumRole.warehouse_manager, EnumRole.super_admin)
-    @Put('update/:account_id')
-    async putAccount(@Body() data : UpdateWareHouseDTO, @Res() res): Promise<any> {
+    // @Roles(EnumRole.warehouse_manager, EnumRole.super_admin)
+    @Put('update')
+    async updateAccount(@Body() data : UpdateWareHouseDTO, @Res() res): Promise<any> {
         return this.wareHouseService.update(data).then(result =>{
             res.status(200).json({
-                message : 'Account is updated',
+                message : 'success',
                 result,
             });
         }).catch(err =>{
@@ -81,7 +81,7 @@ export class WareHouseController{
     }
 
     // delete ware house
-    @Roles(EnumRole.warehouse_manager, EnumRole.super_admin)
+    // @Roles(EnumRole.warehouse_manager, EnumRole.super_admin)
     @Delete('delete/:ware_house_id')
     async delete(@Res() res , @Param('ware_house_id') ware_house_id : string) : Promise<any>{
         return this.wareHouseService.delete(ware_house_id).then(result =>{

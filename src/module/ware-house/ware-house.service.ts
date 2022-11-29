@@ -23,9 +23,7 @@ export class WareHouseService {
         const accounts = await this.wareHouseRepository.findOne({
             where: {ware_house_id: ware_house_id },
             relations: { itemEntity: true, userEntity: true },
-            // relations: { userEntity: true }
         });
-        // delete accounts.password;
         return accounts;
     }
 
@@ -54,11 +52,6 @@ export class WareHouseService {
                 throw console.log('The account is not found');
             }
 
-            const item  = await this.itemService.getById(data.item_id);
-            // if (item){
-            //     throw console.log('The item is exist');
-
-            // }
             const _user = await this.userService.getById(data.user_id);
             const _item = await this.itemService.getById(data.item_id)
 
@@ -77,19 +70,13 @@ export class WareHouseService {
         }
     }
     
-    // update Account
+    // update ware house
     async update( data: UpdateWareHouseDTO): Promise<any> {
        try {
            // check account exists
            const account = await this.wareHouseRepository.findOne({where : {ware_house_id : data.ware_house_id}});
            if (!account)
                throw console.log('Can`t found Account by account_id');
-
-            //  check role valid
-            //  const role = await this.roleService.findById(data.role);
-            //      if (!role || role.id === 2) {
-            //          throw new HttpException('Role is incorrect', HttpStatus.NOT_FOUND);
-            //      }
 
             const _user = await this.userService.getById(data.user_id);
             const _item = await this.itemService.getById(data.item_id);
@@ -99,13 +86,13 @@ export class WareHouseService {
             wareHouseEntity.quantity = data.quantity;
             wareHouseEntity.userEntity = _user;
             wareHouseEntity.itemEntity = _item;
-            // console.log(wareHouseEntity)
-            // update account
-           const result = await this.wareHouseRepository.update(data.ware_house_id, wareHouseEntity);
+
+           const update = await this.wareHouseRepository.update(data.ware_house_id, wareHouseEntity);
+           const result = await this.wareHouseRepository.findOne({where: {ware_house_id: data.ware_house_id}})
            return result;
        }catch (err){
            console.log('error',err);
-           throw console.log('Can`t update Account');
+           throw console.log('Can`t update ware-house');
        }
     }
 

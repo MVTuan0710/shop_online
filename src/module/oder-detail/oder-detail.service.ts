@@ -1,11 +1,14 @@
-import {Injectable} from "@nestjs/common";
+import {HttpException, Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {OderDetailEntity} from "./oder-detail.entity";
 import {Repository} from "typeorm";
 import {CreateOderDetailDTO} from "./oder-detail.dto";
 import { ItemService} from "../item/item.service";
 import { OderService } from "../oder/oder.service";
-
+import { WareHouseService } from "../ware-house/ware-house.service";
+import {UpdateWareHouseDTO}  from "../ware-house/ware-house.dto";
+import { JwtService } from "@nestjs/jwt";
+import moment from "moment";
 
 @Injectable()
 export class OderDetailService {
@@ -13,7 +16,9 @@ export class OderDetailService {
     constructor(@InjectRepository(OderDetailEntity) 
         private readonly oderDetailRepository: Repository<OderDetailEntity>,
                 private readonly itemService: ItemService, 
-                private readonly oderService: OderService
+                private readonly oderService: OderService, 
+                private readonly wareHouseService: WareHouseService,
+                private readonly jwtService : JwtService
     ) {}
 
     // find oder-detail by id
@@ -39,14 +44,65 @@ export class OderDetailService {
         }
         
     }
-    
+    //cau 9
     // create oder-detail
-    async create(data: CreateOderDetailDTO): Promise<OderDetailEntity> {
+    async create(data: CreateOderDetailDTO, token: any): Promise<OderDetailEntity> {
         try {
             // check item exists
-            const item  = await this.itemService.getById(data.item_id)
-            const oder = await this.oderService.getByOderId(data.oder_id)
-            const _total_money = item.price * data.quantity;
+            const item  = await this.itemService.getById(data.item_id);
+            if(!item){
+                throw console.error(`Can't found Item`);
+            }
+            const a = moment(item.wareHouseEntity.expiry);
+            a.format();
+             
+            const word =  String().split(" ")
+            console.log(word[1]);
+            console.log(word[2]);
+            
+            //get ware house
+            const warehouse = await this.wareHouseService.getById(item.wareHouseEntity.ware_house_id)
+            //quantity
+            if(item.wareHouseEntity.quantity === 0){
+                throw new HttpException('Out of stock', 500);
+
+            }else{
+                if(data.quantity > item.wareHouseEntity.quantity){
+                    throw new HttpException(`Stock only ${item.wareHouseEntity.quantity}`, 500);
+
+                }else{
+                    const wareHouseQuantity = item.wareHouseEntity.quantity
+                    const result = wareHouseQuantity - data.quantity;
+
+                    //update ware-house
+                    const _data = new UpdateWareHouseDTO();
+                    _data.user_id = warehouse.userEntity.user_id;
+                    _data.expiry = item.wareHouseEntity.expiry
+                    _data.item_id = data.item_id;
+                    _data.quantity =result;
+                    _data.ware_house_id= item.wareHouseEntity.ware_house_id;
+                    
+                    await this.wareHouseService.update(_data)
+
+                }
+            }
+            
+            const _token = token.authorization.split(" ");
+            const payload = this.jwtService.verify(_token[1]); 
+            console.log(payload);
+            
+            if(payload.role.role_id === 1 || payload.role.role_id === 2 || payload.role.role_id === 3){
+
+                var _total_money = item.price * data.quantity - (((item.price * data.quantity)/100)*20)
+                
+            }else{
+                
+                var _total_money = item.price * data.quantity ;
+            }
+
+            const oder = await this.oderService.getByOderId(data.oder_id);
+            //check oder
+            
 
             if (!item){
                 throw console.log(`The item don't exist`);
@@ -56,14 +112,14 @@ export class OderDetailService {
             oderDetailEntity.quantity = data.quantity;
             oderDetailEntity.itemEntity = item;
             oderDetailEntity.total_money = _total_money;
-            oderDetailEntity.oderEntity = oder
+            oderDetailEntity.oderEntity = oder;
 
-            // save item 
+            // save oder detail
             const result = await this.oderDetailRepository.save(oderDetailEntity);
             return result;
         }catch(err){
             console.log("errors",err);
-             throw console.log('Can`t create Account');
+             throw console.log('Can`t create Oder detail');
         }
     }
     

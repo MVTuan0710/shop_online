@@ -18,7 +18,7 @@ export class WareHouseEntity extends BaseEntity{
     @PrimaryGeneratedColumn('uuid')
     ware_house_id : string;
 
-    @Column({name : 'quantity',  type : 'numeric' , nullable : true})
+    @Column({name : 'quantity',  type : 'integer' , nullable : true})
     quantity : number;
 
     @Column({name : 'expiry', type : 'timestamp with time zone', nullable : true})

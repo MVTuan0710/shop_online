@@ -1,4 +1,6 @@
 import {IsEmpty, IsNotEmpty} from "class-validator";
+import { ItemEntity } from "../item/item.entity";
+import { UserEntity } from "../users/user.entity";
 
 
 

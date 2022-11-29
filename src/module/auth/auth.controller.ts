@@ -2,7 +2,7 @@ import {Body, Controller, Get, Param, Post, Req, Res, UseGuards} from "@nestjs/c
 import {CreateAccountDTO} from "../users/user.dto";
 import { BodyLogin } from "./auth.dto";
 import {AuthService} from "./auth.service";
-import {GuardsLocal} from "./guard/guards.local";
+
 
 
 @Controller('auth')
@@ -12,7 +12,6 @@ export class AuthController{
     ) {}
 
     @Post('login')
-    // @UseGuards(GuardsLocal)
     async logIn(@Body() _data : BodyLogin, @Res() res) : Promise<any>{
         return this.authService.LoginAccount(_data).then(result =>{
             res.status(200).json({

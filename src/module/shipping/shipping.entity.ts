@@ -3,24 +3,29 @@ import {
     Column,
     CreateDateColumn,
     DeleteDateColumn,
-    Entity,
+    Entity,OneToOne,
     PrimaryGeneratedColumn,
+    JoinColumn,
+    ManyToOne,
     UpdateDateColumn,
     OneToMany
 } from "typeorm";
-import { ItemEntity } from "../item/item.entity";
+import {OderEntity} from "../oder/oder.entity";
 
-
-@Entity({name: 'category'})
-export class CategoryEntity extends BaseEntity{
+@Entity({name: 'shipping'})
+export class ShippingEntity extends BaseEntity{
     @PrimaryGeneratedColumn('uuid')
-    category_id : string;
-
+    id : string;
+    
     @Column({name : 'name', type : 'varchar', nullable : true})
     name : string;
 
-    @OneToMany((type)=> ItemEntity, (itemEntity)=>itemEntity.wareHouseEntity)
-    itemEntity : ItemEntity;
+    @Column({name : 'phone', type : 'varchar', nullable : true})
+    phone : string;
+
+    @OneToOne((type)=> OderEntity, (oderEntity)=>oderEntity.shippingEntity)
+    @JoinColumn({name: 'oder_id'})
+    oderEntity : OderEntity;
 
     @CreateDateColumn({name : 'created_at', type : 'timestamp with time zone', nullable : true})
     created_at: Date;

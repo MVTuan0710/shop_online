@@ -18,10 +18,10 @@ export class OderDetailEntity extends BaseEntity{
     @PrimaryGeneratedColumn('uuid')
     oder_detail_id : string;
 
-    @Column({name : 'quantity',  type : 'numeric' , nullable : true})
+    @Column({name : 'quantity',  type : 'integer' , nullable : true})
     quantity : number;
 
-    @Column({name : 'total_money',  type : 'numeric' , nullable : true})
+    @Column({name : 'total_money',  type : 'integer' , nullable : true})
     total_money : number;
 
     @ManyToOne((type)=> ItemEntity, (itemEntity)=>itemEntity.oderDetailEntity)

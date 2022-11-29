@@ -16,11 +16,6 @@ export class GuardsJwt extends AuthGuard('jwt'){
         }
         return super.canActivate(context)
     }
-
-    // getRequest(context : ExecutionContext){
-    //     const ctx = GqlExecutionContext.create(context);
-    //     return ctx.getContext().req;
-    // }
 }
 
 export const IS_PUBLIC_KEY = 'isPublic';

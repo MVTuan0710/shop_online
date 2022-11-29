@@ -7,12 +7,12 @@ import { Roles } from '../decorator/role.decorator';
 import { EnumRole } from '../constant/role/role.constant'
 
 @Controller('item')
-@UseGuards(GuardsJwt, RolesGuard)
+// @UseGuards(GuardsJwt, RolesGuard)
 export class ItemController{
     constructor(private itemService  : ItemService) {}
 
     // get all item
-    @Roles(EnumRole.user)
+    // @Roles(EnumRole.user)
     @Get('get-all')
     async getAll(@Res() res) : Promise<any>{
         return this.itemService.find().then(result =>{
@@ -46,7 +46,7 @@ export class ItemController{
     }
 
     //create item
-    @Roles(EnumRole.super_admin, EnumRole.business_manager)
+    // @Roles(EnumRole.super_admin, EnumRole.business_manager)
     @Post('create')
     async createWareHouse(@Res() res, @Body()data: CreateItemDTO) : Promise<any>{
         return this.itemService.create(data).then(result =>{
@@ -64,7 +64,7 @@ export class ItemController{
 
 
     // update item
-    @Roles(EnumRole.super_admin, EnumRole.business_manager)
+    // @Roles(EnumRole.super_admin, EnumRole.business_manager)
     @Put('update/:item_id')
     async putAccount(@Body() body : CreateItemDTO, @Res() res, @Param('item_id')
     item_id : string ): Promise<any> {
@@ -83,7 +83,7 @@ export class ItemController{
     }
 
     // delete item
-    @Roles(EnumRole.super_admin)
+    // @Roles(EnumRole.super_admin)
     @Delete('delete/:item_id')
     async delete(@Res() res , @Param('item_id') item_id : string) : Promise<any>{
         return this.itemService.delete(item_id).then(result =>{

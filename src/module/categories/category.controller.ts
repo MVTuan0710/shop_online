@@ -1,8 +1,7 @@
-import {Body, Controller, Delete, Get, Param, Post, Put, Query, Req, Res, UseGuards} from "@nestjs/common";
+import {Body, Controller, Delete, Get, Param, Post, Put, Res, UseGuards} from "@nestjs/common";
 import {CategoryService} from "./category.service";
 import {CreateCategoryDTO} from "./category.dto";
 import {GuardsJwt} from "../auth/guard/guards.jwt";
-import {CategoryEntity} from "../categories/category.entity";
 import { RolesGuard } from "../role/guards/role.guards";
 import { Roles } from '../decorator/role.decorator';
 import { EnumRole } from '../constant/role/role.constant'
@@ -30,7 +29,6 @@ export class CategoryController{
     }
 
     // get category by Id
-    // ????
     @Roles(EnumRole.super_admin)
     @Get('/id/:category_id')
     async getById(@Res() res, @Param('category_id') category_id : string) : Promise<any>{

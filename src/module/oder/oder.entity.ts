@@ -1,3 +1,4 @@
+import { join } from "path";
 import {
     BaseEntity,
     Column,
@@ -11,6 +12,7 @@ import {
     OneToMany
 } from "typeorm";
 import { OderDetailEntity } from "../oder-detail/oder-detail.entity";
+import { ShippingEntity } from "../shipping/shipping.entity";
 import { UserEntity } from "../users/user.entity";
 
 
@@ -21,6 +23,9 @@ export class OderEntity extends BaseEntity{
 
     @OneToMany((type)=> OderDetailEntity, (oderDetailEntity)=>oderDetailEntity.oderEntity)
     oderEntity : OderEntity;
+
+    @OneToOne ((type)=> ShippingEntity, (shippingEntity)=>shippingEntity.oderEntity)
+    shippingEntity: ShippingEntity
 
     @ManyToOne((type)=> UserEntity, (userEntity)=>userEntity.oderEntity)
     @JoinColumn({name : 'user_id'})

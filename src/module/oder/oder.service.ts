@@ -4,8 +4,7 @@ import {OderEntity} from "./oder.entity";
 import {Repository} from "typeorm";
 import {CreateOderDTO} from "./oder.dto";
 import { UserService } from "../users/user.service";
-import { OderDetailService } from "../oder-detail/oder-detail.service";
-// import { ItemService} from "../item/item.service";
+
 
 
 @Injectable()
@@ -56,7 +55,7 @@ export class OderService {
             const oderEntity = new OderEntity();
             oderEntity.userEntity = user;
 
-            // save item 
+            // save oder 
             const result = await this.oderRepository.save(oderEntity);
             return result;
         }catch(err){
@@ -65,33 +64,27 @@ export class OderService {
         }
     }
     
-    // // update oder-detail
-    // async update(item_id : string, data: CreateItemDTO): Promise<any> {
-    //    try {
-    //        // check category exists
-    //        const _category = await this.categoryService.getById(data.category_id);
-    //        if (!_category)
-    //            throw console.log('Can`t found Category by category_id');
+    // update oder-detail
+    async update(oder_id : string, data: CreateOderDTO): Promise<any> {
+       try {
+           // user
+           const user  = await this.userService.getById(data.user_id)
 
-  
-    //            const category = await this.categoryService.getById(data.category_id);
+           if (!user){
+               throw console.log(`Oder_detail don't exist`);
+           }
 
-    //            const itemEntity = new ItemEntity();
-    //            itemEntity.name = data.name;
-    //            itemEntity.price = data.price;
-    //            itemEntity.height = data.height;
-    //            itemEntity.weight = data.weight;
-    //            itemEntity.usage = data.usage;
-    //            itemEntity.categoryEntity =category;
+           const oderEntity = new OderEntity();
+            oderEntity.userEntity = user;
 
-    //         // update account
-    //        const result = await this.itemRepository.update(item_id, itemEntity);
-    //        return result;
-    //    }catch (err){
-    //        console.log('error',err);
-    //        throw console.log('Can`t update item');
-    //    }
-    // }
+            // update account
+            const result = await this.oderRepository.update(oder_id,oderEntity);
+            return result;
+       }catch (err){
+           console.log('error',err);
+           throw console.log('Can`t update item');
+       }
+    }
 
     // delete oder-detail
     async delete(oder_id : string): Promise<any> {

@@ -22,13 +22,13 @@ export class ItemEntity extends BaseEntity{
     @Column({name : 'name', type : 'varchar', nullable : true})
     name : string;
 
-    @Column({name : 'price', type : 'numeric', nullable : true})
+    @Column({name : 'price', type : 'integer', nullable : true})
     price : number;
 
-    @Column({name : 'height', type : 'numeric', nullable : true})
+    @Column({name : 'height', type : 'integer', nullable : true})
     height : number;
 
-    @Column({name : 'weight', type : 'numeric', nullable : true})
+    @Column({name : 'weight', type : 'integer', nullable : true})
     weight : number;
 
     @Column({name : 'usage', type : 'varchar', nullable : true})

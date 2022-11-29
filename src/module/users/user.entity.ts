@@ -15,6 +15,7 @@ import {RoleEntity} from "../role/role.entity";
 import { WareHouseEntity } from "../ware-house/ware-house.entity";
 import {OderEntity} from "../oder/oder.entity"
 
+
 @Entity({name: 'user'})
 export class UserEntity extends BaseEntity{
     @PrimaryGeneratedColumn('uuid')
@@ -27,9 +28,6 @@ export class UserEntity extends BaseEntity{
     password : string;
 
     @ManyToOne((type) => RoleEntity, (roleEntity)=> roleEntity.userEntity)
-    // * JoinColumn decorator used on one-to-one relations to specify owner side of relationship.
-    // * It also can be used on both one-to-one and many-to-one relations to specify custom column name
-    // * or custom referenced column.
     @JoinColumn({name : 'role_id'})
     roleEntity : RoleEntity;
 

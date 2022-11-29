@@ -36,6 +36,7 @@
     "class-validator": "^0.13.2",
     "init": "^0.1.2",
     "lodash": "^4.17.21",
+    "moment": "^2.29.4",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
     "pg": "^8.8.0",
