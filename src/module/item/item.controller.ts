@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, Param, Post, Put, Query, Req, Res, UseGuards} from "@nestjs/common";
+import {Body, Controller, Delete, Get, Headers, Param, Post, Put, Query, Req, Res, UseGuards} from "@nestjs/common";
 import {ItemService} from "./item.service";
 import {CreateItemDTO} from "./item.dto";
 import {GuardsJwt} from "../auth/guard/guards.jwt";
@@ -7,8 +7,9 @@ import { Roles } from '../decorator/role.decorator';
 import { EnumRole } from '../constant/role/role.constant'
 
 @Controller('item')
-// @UseGuards(GuardsJwt, RolesGuard)
+@UseGuards(GuardsJwt,RolesGuard)
 export class ItemController{
+    // const shopkeeperRepository = getRepository(Shopkeeper);
     constructor(private itemService  : ItemService) {}
 
     // get all item
@@ -31,8 +32,8 @@ export class ItemController{
     // get item by Id
     // @Roles(EnumRole.super_admin)
     @Get('/id/:item_id')
-    async getWareHouseByID(@Res() res, @Param('item_id') item_id : string) : Promise<any>{
-        return this.itemService.getById(item_id).then(result =>{
+    async getByID(@Res() res, @Param('item_id') item_id : string, @Headers()token:string) : Promise<any>{
+        return this.itemService.getById(item_id,token).then(result =>{
             res.status(200).json({
                 message : 'success',
                 result,
@@ -46,9 +47,10 @@ export class ItemController{
     }
 
     //create item
-    // @Roles(EnumRole.super_admin, EnumRole.business_manager)
+    @Roles(EnumRole.super_admin, EnumRole.business_manager)
     @Post('create')
-    async createWareHouse(@Res() res, @Body()data: CreateItemDTO) : Promise<any>{
+    async create(@Res() res, @Body()data: CreateItemDTO, @Req() req) : Promise<any>{
+        data.email = req.user.email;
         return this.itemService.create(data).then(result =>{
             res.status(200).json({
                 message : 'success',
@@ -66,9 +68,10 @@ export class ItemController{
     // update item
     // @Roles(EnumRole.super_admin, EnumRole.business_manager)
     @Put('update/:item_id')
-    async putAccount(@Body() body : CreateItemDTO, @Res() res, @Param('item_id')
+    async put(@Body() data : CreateItemDTO, @Res() res, @Req() req, @Param('item_id')
     item_id : string ): Promise<any> {
-        return this.itemService.update(item_id, body).then(result =>{
+        data.email = req.user.email;
+        return this.itemService.update(item_id, data).then(result =>{
             res.status(200).json({
                 message : 'Account is updated',
                 result,

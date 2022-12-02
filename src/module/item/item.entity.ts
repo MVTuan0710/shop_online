@@ -5,7 +5,7 @@ import {
     DeleteDateColumn,
     Entity,
     UpdateDateColumn,
-    JoinColumn,OneToOne,
+    JoinColumn,
     PrimaryGeneratedColumn,
     ManyToOne,
     OneToMany
@@ -13,6 +13,8 @@ import {
 import { CategoryEntity } from "../categories/category.entity";
 import {WareHouseEntity} from "../ware-house/ware-house.entity"
 import {OderDetailEntity} from "../oder-detail/oder-detail.entity"
+import { UserEntity } from "../users/user.entity";
+import { ItemLogEntity } from "../item-log/item_log.entity";
 
 @Entity('item')
 export class ItemEntity extends BaseEntity{
@@ -34,12 +36,19 @@ export class ItemEntity extends BaseEntity{
     @Column({name : 'usage', type : 'varchar', nullable : true})
     usage : string;
 
-    @OneToOne((type)=> WareHouseEntity, (wareHouseEntity)=>wareHouseEntity.itemEntity)
+    @OneToMany((type)=> WareHouseEntity, (wareHouseEntity)=>wareHouseEntity.itemEntity)
     wareHouseEntity : WareHouseEntity;
+
+    @OneToMany((type) => ItemLogEntity, (itemLogEntity) => itemLogEntity.itemEntity)
+    itemLogEntity: ItemLogEntity;
 
     @ManyToOne((type)=> CategoryEntity, (categoryEntity)=>categoryEntity.itemEntity)
     @JoinColumn({name : 'category_id'})
     categoryEntity : CategoryEntity;
+
+    @ManyToOne((type)=> UserEntity, (userEntity)=> userEntity.itemEntity)
+    @JoinColumn({name: "user_id"})
+    userEntity: UserEntity;
 
     @OneToMany((type)=> OderDetailEntity, (oderDetailEntity)=>oderDetailEntity.itemEntity)
     oderDetailEntity : OderDetailEntity;

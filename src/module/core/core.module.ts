@@ -11,6 +11,7 @@ import { CategoryEntity } from "../categories/category.entity";
 import { OderDetailEntity } from "../oder-detail/oder-detail.entity";
 import { OderEntity } from "../oder/oder.entity";
 import { ShippingEntity } from "../shipping/shipping.entity";
+import { ItemLogEntity } from "../item-log/item_log.entity";
 const NODE_ENV = process.env.NODE_ENV;
 
 @Module({
@@ -32,7 +33,7 @@ const NODE_ENV = process.env.NODE_ENV;
                 username: 'postgres',
                 password: '123',
                 database: 'test_db_shop_online',
-                entities: [UserEntity, RoleEntity, WareHouseEntity, ItemEntity, CategoryEntity, OderDetailEntity, OderEntity, ShippingEntity]
+                entities: [UserEntity, RoleEntity, WareHouseEntity, ItemEntity, CategoryEntity, OderDetailEntity, OderEntity, ShippingEntity, ItemLogEntity]
             }),
         })
     ],

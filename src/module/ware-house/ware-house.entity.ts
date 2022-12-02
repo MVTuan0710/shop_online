@@ -28,7 +28,7 @@ export class WareHouseEntity extends BaseEntity{
     @JoinColumn({name : 'user_id'})
     userEntity : UserEntity;
 
-    @OneToOne((type)=> ItemEntity, (itemEntity)=>itemEntity.wareHouseEntity)
+    @ManyToOne((type)=> ItemEntity, (itemEntity)=>itemEntity.wareHouseEntity)
     @JoinColumn({name : 'item_id'})
     itemEntity : ItemEntity;
 

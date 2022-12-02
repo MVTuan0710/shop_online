@@ -43,7 +43,7 @@ export class WareHouseService {
     }
     
     // create warehouse
-    async create(data: CreateWareHouseDTO): Promise<WareHouseEntity> {
+    async create(data: CreateWareHouseDTO, token: any): Promise<WareHouseEntity> {
         try {
             // check id exists
             console.log(data)
@@ -53,7 +53,7 @@ export class WareHouseService {
             }
 
             const _user = await this.userService.getById(data.user_id);
-            const _item = await this.itemService.getById(data.item_id)
+            const _item = await this.itemService.getById(data.item_id,token)
 
             const wareHouseEntity = new WareHouseEntity();
             wareHouseEntity.expiry = data.expiry;
@@ -71,7 +71,7 @@ export class WareHouseService {
     }
     
     // update ware house
-    async update( data: UpdateWareHouseDTO): Promise<any> {
+    async update( data: UpdateWareHouseDTO,token?: any): Promise<any> {
        try {
            // check account exists
            const account = await this.wareHouseRepository.findOne({where : {ware_house_id : data.ware_house_id}});
@@ -79,15 +79,17 @@ export class WareHouseService {
                throw console.log('Can`t found Account by account_id');
 
             const _user = await this.userService.getById(data.user_id);
-            const _item = await this.itemService.getById(data.item_id);
+            const _item = await this.itemService.getById(data.item_id,token);
+
+            const new_quantity = _item.wareHouseEntity.quantity + data.quantity;
 
             const wareHouseEntity = new WareHouseEntity();
             wareHouseEntity.expiry = data.expiry;
-            wareHouseEntity.quantity = data.quantity;
+            wareHouseEntity.quantity = new_quantity;
             wareHouseEntity.userEntity = _user;
             wareHouseEntity.itemEntity = _item;
 
-           const update = await this.wareHouseRepository.update(data.ware_house_id, wareHouseEntity);
+           await this.wareHouseRepository.update(data.ware_house_id, wareHouseEntity);
            const result = await this.wareHouseRepository.findOne({where: {ware_house_id: data.ware_house_id}})
            return result;
        }catch (err){

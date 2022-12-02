@@ -1,4 +1,4 @@
-import {IsEmpty, IsNotEmpty} from "class-validator";
+import {IsNotEmpty} from "class-validator";
 
 
 export class CreateItemDTO {
@@ -19,4 +19,7 @@ export class CreateItemDTO {
 
     @IsNotEmpty()
     category_id : string;
+
+    
+    email : string;
 }

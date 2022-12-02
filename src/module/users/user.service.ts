@@ -7,7 +7,7 @@ import {RoleService} from "../role/role.service";
 import {v4 as uuidv4} from 'uuid';
 import {hashSync} from 'bcryptjs';
 import {JwtService} from "@nestjs/jwt";
-import { HeaderObject } from "@nestjs/swagger/dist/interfaces/open-api-spec.interface";
+
 
 
 @Injectable()
@@ -21,14 +21,11 @@ export class UserService {
     ) {}
    
     // Cau 6
-    async getOne(data: BodyGetOneAccount, token: any): Promise<UserEntity> {
+    async getOne(data: BodyGetOneAccount): Promise<UserEntity> {
     try{
-        const _token = token.authorization.split(" ");
-        const payload = this.jwtService.verify(_token[1]); 
-
-        
-
-        if(payload.role.role_id === 1|| payload.role.role_id ===2){
+        const user = await this.userRepository.findOne({where: {email: data.email}})
+    
+        if(user.roleEntity.role_id === 1|| user.roleEntity.role_id === 1){
 
                 
             const account = await this.userRepository.findOne({
@@ -37,7 +34,7 @@ export class UserService {
             delete account.password;
             return account;
         }else{
-            if(payload.role.role_id === 3){
+            if(user.roleEntity.role_id === 1){
                 const account = await this.userRepository.findOne({
                     where: {name: data.name, phone: data.phone}
                 });
@@ -47,7 +44,6 @@ export class UserService {
                 delete account.is_active;
                 delete account.password;
                 delete account.verify_token;
-
                 return account;
             }
         }

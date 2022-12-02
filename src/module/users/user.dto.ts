@@ -28,4 +28,6 @@ export class BodyGetOneAccount{
     @IsNotEmpty()
     name: string;
 
+    email: string
+
 }

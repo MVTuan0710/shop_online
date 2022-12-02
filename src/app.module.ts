@@ -9,10 +9,13 @@ import { CategoryModule } from './module/categories/category.module';
 import { OderDetailModule } from './module/oder-detail/oder-detail.module';
 import { OderModule } from './module/oder/oder.module';
 import { ShippingModule } from './module/shipping/shipping.module';
+import { ItemLogModule } from './module/item-log/item_log.module';
 
 @Module({
   imports: [
+    //core
     CoreModule,
+
     UserModule,
     RoleModule,
     AuthModule, 
@@ -21,7 +24,8 @@ import { ShippingModule } from './module/shipping/shipping.module';
     CategoryModule, 
     OderDetailModule,
     OderModule,
-    ShippingModule
+    ShippingModule,
+    ItemLogModule
   ]
 })
 export class AppModule {}

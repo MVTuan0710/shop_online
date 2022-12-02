@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, Param, Post, Put, Query, Req, Res, UseGuards} from "@nestjs/common";
+import {Body, Controller, Delete, Get, Headers, Param, Post, Put, Query, Req, Res, UseGuards} from "@nestjs/common";
 import {WareHouseService} from "./ware-house.service";
 import {CreateWareHouseDTO, UpdateWareHouseDTO} from "./ware-house.dto";
 import {GuardsJwt} from "../auth/guard/guards.jwt";
@@ -47,8 +47,8 @@ export class WareHouseController{
 
     // @Roles(EnumRole.warehouse_manager, EnumRole.super_admin)
     @Post('create')
-    async createWareHouse(@Res() res, @Body()data: CreateWareHouseDTO) : Promise<any>{
-        return this.wareHouseService.create(data).then(result =>{
+    async createWareHouse(@Res() res, @Body()data: CreateWareHouseDTO, @Headers()token: string) : Promise<any>{
+        return this.wareHouseService.create(data,token).then(result =>{
             res.status(200).json({
                 message : 'success',
                 result,
@@ -65,8 +65,8 @@ export class WareHouseController{
     // update ware house
     // @Roles(EnumRole.warehouse_manager, EnumRole.super_admin)
     @Put('update')
-    async updateAccount(@Body() data : UpdateWareHouseDTO, @Res() res): Promise<any> {
-        return this.wareHouseService.update(data).then(result =>{
+    async updateAccount(@Body() data : UpdateWareHouseDTO, @Res() res, @Headers()token: string): Promise<any> {
+        return this.wareHouseService.update(data,token).then(result =>{
             res.status(200).json({
                 message : 'success',
                 result,

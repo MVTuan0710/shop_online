@@ -14,6 +14,8 @@ import * as bcrypt from "bcryptjs";
 import {RoleEntity} from "../role/role.entity";
 import { WareHouseEntity } from "../ware-house/ware-house.entity";
 import {OderEntity} from "../oder/oder.entity"
+import { ItemEntity } from "../item/item.entity";
+import { ItemLogEntity } from "../item-log/item_log.entity";
 
 
 @Entity({name: 'user'})
@@ -27,16 +29,6 @@ export class UserEntity extends BaseEntity{
     @Column({name : 'password', type : 'varchar', nullable : true})
     password : string;
 
-    @ManyToOne((type) => RoleEntity, (roleEntity)=> roleEntity.userEntity)
-    @JoinColumn({name : 'role_id'})
-    roleEntity : RoleEntity;
-
-    @OneToMany((type)=> OderEntity, (oderEntity)=>oderEntity.userEntity)
-    oderEntity : OderEntity;
-
-    @OneToMany((type)=>WareHouseEntity, (wareHouseEntity)=>wareHouseEntity.userEntity)
-    wareHouseEntity : WareHouseEntity[];
-
     @Column({name : 'name', type : 'varchar', nullable : true})
     name : string;
 
@@ -49,6 +41,26 @@ export class UserEntity extends BaseEntity{
     @Column({name : 'verify_token', type : 'varchar', nullable : true})
     verify_token : string;
 
+    @ManyToOne((type) => RoleEntity, (roleEntity)=> roleEntity.userEntity)
+    @JoinColumn({name : 'role_id'})
+    roleEntity : RoleEntity;
+
+    @OneToMany((type)=> OderEntity, (oderEntity)=>oderEntity.userEntity)
+    oderEntity : OderEntity[];
+
+    @OneToMany((type)=> ItemEntity, (itemEntity)=> itemEntity.userEntity)
+    itemEntity: ItemEntity[];
+
+    @OneToMany((type)=>WareHouseEntity, (wareHouseEntity)=>wareHouseEntity.userEntity)
+    wareHouseEntity : WareHouseEntity[];
+
+    @OneToMany((type)=> ItemLogEntity, (itemLogEntity)=> itemLogEntity.userEntity)
+    itemLogEntity: ItemLogEntity;
+
+    isPasswordValid(password: string): boolean {
+        return bcrypt.compareSync(password, this.password)
+    }
+
     @CreateDateColumn({name : 'created_at', type : 'timestamp with time zone', nullable : true})
     created_at: Date;
 
@@ -57,8 +69,4 @@ export class UserEntity extends BaseEntity{
 
     @DeleteDateColumn({name : 'deleted_at', type : 'timestamp with time zone', nullable : true})
     deleted_at : Date;
-
-    isPasswordValid(password: string): boolean {
-        return bcrypt.compareSync(password, this.password)
-    }
 }

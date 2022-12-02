@@ -49,16 +49,14 @@ export class OderDetailService {
     async create(data: CreateOderDetailDTO, token: any): Promise<OderDetailEntity> {
         try {
             // check item exists
-            const item  = await this.itemService.getById(data.item_id);
+            const item  = await this.itemService.getById(data.item_id,token);
             if(!item){
                 throw console.error(`Can't found Item`);
             }
-            const a = moment(item.wareHouseEntity.expiry);
-            a.format();
-             
-            const word =  String().split(" ")
-            console.log(word[1]);
-            console.log(word[2]);
+            // const a = String(item.wareHouseEntity.expiry);
+            // moment(a).format('DD/MM/YYYY')
+            // console.log(a);
+            
             
             //get ware house
             const warehouse = await this.wareHouseService.getById(item.wareHouseEntity.ware_house_id)

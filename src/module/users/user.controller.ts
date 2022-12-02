@@ -10,7 +10,7 @@ import { EnumRole } from '../constant/role/role.constant';
 
 
 @Controller('user')
-// @UseGuards(GuardsJwt, RolesGuard)
+@UseGuards(GuardsJwt, RolesGuard)
 export class UserController{
     constructor(private userService  : UserService) {}
 
@@ -34,8 +34,9 @@ export class UserController{
     // Cau 6
     // @Roles(EnumRole.super_admin,EnumRole.warehouse_manager)
     @Get('/get-one')
-    async getByName(@Res() res, @Body() data : BodyGetOneAccount, @Headers()token: string) : Promise<any>{
-        return this.userService.getOne(data,token).then(result =>{
+    async getByName(@Res() res, @Req() req,@Body() data : BodyGetOneAccount) : Promise<any>{
+        data.email = req.user.email
+        return this.userService.getOne(data).then(result =>{
             res.status(200).json({
                 message : 'success',
                 result,
