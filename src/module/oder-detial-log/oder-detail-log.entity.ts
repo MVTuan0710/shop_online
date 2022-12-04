@@ -5,7 +5,7 @@ import {
     Entity,
     PrimaryGeneratedColumn,
     JoinColumn,
-    ManyToOne,
+    ManyToOne, UpdateDateColumn,
 } from "typeorm";
 import { OderEntity } from "../oder/oder.entity";
 import { ItemEntity } from "../item/item.entity";
@@ -27,14 +27,9 @@ export class OderDetailLogEntity extends BaseEntity{
     @JoinColumn({name: 'oder_detail_id'})
     oderDetailEntity: OderDetailEntity;
 
-    @ManyToOne((type)=> ItemEntity, (itemEntity)=>itemEntity.oderDetailEntity)
-    @JoinColumn({name : 'item_id'})
-    itemEntity : ItemEntity;
-
-    @ManyToOne((type)=> OderEntity, (oderEntity)=>oderEntity.oderEntity)
-    @JoinColumn({name : 'oder_id'})
-    oderEntity : OderEntity;
-
     @CreateDateColumn({name : 'created_at', type : 'timestamp with time zone', nullable : true})
     created_at: Date;
+
+    @UpdateDateColumn({name : 'update_at', type : 'timestamp with time zone', nullable : true})
+    update_at: Date;
 }

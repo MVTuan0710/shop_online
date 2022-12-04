@@ -7,6 +7,7 @@ import { OderModule } from "../oder/oder.module";
 import {ShippingController} from "./shipping.controller"
 import { JwtModule } from "@nestjs/jwt";
 import {ConfigModule, ConfigService} from "@nestjs/config";
+import {ShippingLogModule} from "../shipping-log/shipping-log.module";
 
 @Module({
     imports : [TypeOrmModule.forFeature([ShippingEntity]),
@@ -20,7 +21,7 @@ import {ConfigModule, ConfigService} from "@nestjs/config";
                 expiresIn : configService.get<string>('jwt.expires_in'),
             } 
         }),
-    })), forwardRef(()=> UserModule), forwardRef(()=>OderModule),],
+    })), forwardRef(()=> UserModule), forwardRef(()=>OderModule), forwardRef(()=>ShippingLogModule)],
     controllers : [ShippingController ],
     providers : [ShippingService],
     exports : [TypeOrmModule, ShippingService]

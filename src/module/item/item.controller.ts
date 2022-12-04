@@ -9,7 +9,6 @@ import { EnumRole } from '../constant/role/role.constant'
 @Controller('item')
 @UseGuards(GuardsJwt,RolesGuard)
 export class ItemController{
-    // const shopkeeperRepository = getRepository(Shopkeeper);
     constructor(private itemService  : ItemService) {}
 
     // get all item

@@ -126,9 +126,11 @@ export class ItemService {
                 const new_itemLogEntity = new ItemLogEntity();
                 new_itemLogEntity.name = itemEntity.name;
                 new_itemLogEntity.price = itemEntity.price;
-                new_itemLogEntity.userEntity = itemEntity.userEntity;
+                new_itemLogEntity.height= itemEntity.height;
+                new_itemLogEntity.weight =itemEntity.weight;
+                new_itemLogEntity.usage= itemEntity.usage;
                 new_itemLogEntity.itemEntity = result;
-                new_itemLogEntity.categoryEntity = itemEntity.categoryEntity;
+
 
             await this.itemLogService.create(new_itemLogEntity)
             return result;
@@ -167,9 +169,11 @@ export class ItemService {
                 const new_itemLogEntity = new ItemLogEntity();
                 new_itemLogEntity.name = itemEntity.name;
                 new_itemLogEntity.price = itemEntity.price;
-                new_itemLogEntity.userEntity = itemEntity.userEntity;
+                new_itemLogEntity.height= itemEntity.height;
+                new_itemLogEntity.weight =itemEntity.weight;
+                new_itemLogEntity.usage= itemEntity.usage;
                 new_itemLogEntity.itemEntity = createItemEntity;
-                new_itemLogEntity.categoryEntity = itemEntity.categoryEntity;
+
 
             await this.itemLogService.create(new_itemLogEntity)
 

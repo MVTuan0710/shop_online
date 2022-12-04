@@ -24,9 +24,6 @@ export class CategoryEntity extends BaseEntity{
     @OneToMany((type)=> ItemEntity, (itemEntity)=>itemEntity.wareHouseEntity)
     itemEntity : ItemEntity;
 
-    @OneToMany((type) => ItemLogEntity, (itemLogEntity) => itemLogEntity.categoryEntity)
-    @JoinColumn({ name: 'category_id' })
-    itemLogEntity: ItemLogEntity
 
     @CreateDateColumn({name : 'created_at', type : 'timestamp with time zone', nullable : true})
     created_at: Date;

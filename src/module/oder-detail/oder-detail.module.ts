@@ -8,10 +8,11 @@ import { OderModule } from "../oder/oder.module";
 import { WareHouseModule } from "../ware-house/ware-house.module";
 import {ConfigModule, ConfigService} from "@nestjs/config";
 import { JwtModule } from "@nestjs/jwt";
+import {OderDetailLogModule} from "../oder-detial-log/oder-detail.module";
 
 @Module({
     imports : [TypeOrmModule.forFeature([OderDetailEntity]),
-    forwardRef(()=> ItemModule),forwardRef(()=> OderModule),forwardRef(()=> WareHouseModule),
+    forwardRef(()=> ItemModule),forwardRef(()=> OderModule),forwardRef(()=> WareHouseModule),forwardRef(()=>OderDetailLogModule),
     forwardRef(()=>JwtModule.registerAsync({
         imports : [ConfigModule],
         inject : [ConfigService],

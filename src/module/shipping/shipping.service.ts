@@ -6,6 +6,8 @@ import {UserService} from "../users/user.service";
 import {JwtService} from "@nestjs/jwt";
 import { CreateShippingDTO } from "./shipping.dto";
 import { OderService } from "../oder/oder.service";
+import {ShippingLogEntity} from "../shipping-log/shipping-log.entity";
+import {ShippingLogService} from "../shipping-log/shipping-log.service";
 
 
 @Injectable()
@@ -14,7 +16,8 @@ export class ShippingService {
         private readonly shippingRepository: Repository<ShippingEntity>,
                 private readonly userService: UserService,
                 private readonly oderService: OderService,
-                private readonly jwtService : JwtService
+                private readonly jwtService : JwtService,
+                private readonly shippingLogService: ShippingLogService
 
     ) {}
    
@@ -48,6 +51,14 @@ export class ShippingService {
 
 
                 const result = await this.shippingRepository.save(shippingEntity);
+
+                const new_shippingLogEntity = new ShippingLogEntity();
+                new_shippingLogEntity.name = result.name;
+                new_shippingLogEntity.phone = result.phone;
+                new_shippingLogEntity.shippingEntity = result;
+
+                await this.shippingLogService.create(new_shippingLogEntity)
+
                 return result;
             }else{
                 if(data.name || data.phone){
@@ -57,6 +68,14 @@ export class ShippingService {
                     shippingEntity.oderEntity = oder;
 
                     const result = await this.shippingRepository.save(shippingEntity);
+
+                    const new_shippingLogEntity = new ShippingLogEntity();
+                    new_shippingLogEntity.name = result.name;
+                    new_shippingLogEntity.phone = result.phone;
+                    new_shippingLogEntity.shippingEntity = result;
+
+                    await this.shippingLogService.create(new_shippingLogEntity)
+
                     return result;
     
                 }else{

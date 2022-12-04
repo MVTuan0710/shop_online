@@ -54,9 +54,6 @@ export class UserEntity extends BaseEntity{
     @OneToMany((type)=>WareHouseEntity, (wareHouseEntity)=>wareHouseEntity.userEntity)
     wareHouseEntity : WareHouseEntity[];
 
-    @OneToMany((type)=> ItemLogEntity, (itemLogEntity)=> itemLogEntity.userEntity)
-    itemLogEntity: ItemLogEntity;
-
     isPasswordValid(password: string): boolean {
         return bcrypt.compareSync(password, this.password)
     }

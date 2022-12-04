@@ -9,6 +9,8 @@ import { WareHouseService } from "../ware-house/ware-house.service";
 import {UpdateWareHouseDTO}  from "../ware-house/ware-house.dto";
 import { JwtService } from "@nestjs/jwt";
 import moment from "moment";
+import {OderDetailLogEntity} from "../oder-detial-log/oder-detail-log.entity";
+import {OderDetailLogService} from "../oder-detial-log/oder-detail.service";
 
 @Injectable()
 export class OderDetailService {
@@ -18,7 +20,8 @@ export class OderDetailService {
                 private readonly itemService: ItemService, 
                 private readonly oderService: OderService, 
                 private readonly wareHouseService: WareHouseService,
-                private readonly jwtService : JwtService
+                private readonly jwtService : JwtService,
+                private readonly oderDetailLogService: OderDetailLogService
     ) {}
 
     // find oder-detail by id
@@ -51,14 +54,10 @@ export class OderDetailService {
             // check item exists
             const item  = await this.itemService.getById(data.item_id,token);
             if(!item){
-                throw console.error(`Can't found Item`);
+                throw new HttpException('failed',500)
             }
-            // const a = String(item.wareHouseEntity.expiry);
-            // moment(a).format('DD/MM/YYYY')
-            // console.log(a);
-            
-            
-            //get ware house
+
+            //get oder-detail
             const warehouse = await this.wareHouseService.getById(item.wareHouseEntity.ware_house_id)
             //quantity
             if(item.wareHouseEntity.quantity === 0){
@@ -72,7 +71,7 @@ export class OderDetailService {
                     const wareHouseQuantity = item.wareHouseEntity.quantity
                     const result = wareHouseQuantity - data.quantity;
 
-                    //update ware-house
+                    //update oder-detail
                     const _data = new UpdateWareHouseDTO();
                     _data.user_id = warehouse.userEntity.user_id;
                     _data.expiry = item.wareHouseEntity.expiry
@@ -103,7 +102,7 @@ export class OderDetailService {
             
 
             if (!item){
-                throw console.log(`The item don't exist`);
+                throw new HttpException('failed',500)
             }
 
             const oderDetailEntity = new OderDetailEntity();
@@ -112,26 +111,33 @@ export class OderDetailService {
             oderDetailEntity.total_money = _total_money;
             oderDetailEntity.oderEntity = oder;
 
-            // save oder detail
             const result = await this.oderDetailRepository.save(oderDetailEntity);
+
+            const new_oderDetailLogEntity = new OderDetailLogEntity();
+            new_oderDetailLogEntity.quantity = result.quantity;
+            new_oderDetailLogEntity.total_money = result.total_money;
+            new_oderDetailLogEntity.oderDetailEntity = result;
+
+            await this.oderDetailLogService.create(new_oderDetailLogEntity)
+            // save oder detail
+
             return result;
         }catch(err){
-            console.log("errors",err);
-             throw console.log('Can`t create Oder detail');
+            throw new HttpException('failed',500)
         }
     }
     
-    // // update oder-detail
+    // update oder-detail
     // async update(item_id : string, data: CreateItemDTO): Promise<any> {
     //    try {
     //        // check category exists
     //        const _category = await this.categoryService.getById(data.category_id);
     //        if (!_category)
     //            throw console.log('Can`t found Category by category_id');
-
-  
+    //
+    //
     //            const category = await this.categoryService.getById(data.category_id);
-
+    //
     //            const itemEntity = new ItemEntity();
     //            itemEntity.name = data.name;
     //            itemEntity.price = data.price;
@@ -139,7 +145,7 @@ export class OderDetailService {
     //            itemEntity.weight = data.weight;
     //            itemEntity.usage = data.usage;
     //            itemEntity.categoryEntity =category;
-
+    //
     //         // update account
     //        const result = await this.itemRepository.update(item_id, itemEntity);
     //        return result;

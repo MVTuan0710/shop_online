@@ -6,11 +6,12 @@ import {
     Entity,
     PrimaryGeneratedColumn,
     JoinColumn,
-    ManyToOne,OneToOne,
-    UpdateDateColumn
+    ManyToOne, OneToOne,
+    UpdateDateColumn, OneToMany
 } from "typeorm";
 import { UserEntity } from "../users/user.entity";
 import { ItemEntity } from "../item/item.entity";
+import {WareHouseLogEntity} from "../ware-house-log/ware-house-log.entity";
 
 
 @Entity({name: 'ware_house'})
@@ -28,9 +29,13 @@ export class WareHouseEntity extends BaseEntity{
     @JoinColumn({name : 'user_id'})
     userEntity : UserEntity;
 
+    @OneToMany((type)=>WareHouseLogEntity, (wareHouseLogEntity)=>wareHouseLogEntity.wareHouseEntity)
+    wareHouseLogEntity: WareHouseLogEntity
+
     @ManyToOne((type)=> ItemEntity, (itemEntity)=>itemEntity.wareHouseEntity)
     @JoinColumn({name : 'item_id'})
     itemEntity : ItemEntity;
+
 
     @CreateDateColumn({name : 'created_at', type : 'timestamp with time zone', nullable : true})
     created_at: Date;

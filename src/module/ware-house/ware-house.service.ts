@@ -5,7 +5,8 @@ import {Repository} from "typeorm";
 import {CreateWareHouseDTO, UpdateWareHouseDTO} from "./ware-house.dto";
 import { UserService } from "../users/user.service";
 import { ItemService } from "../item/item.service";
-import { ItemEntity } from "../item/item.entity";
+import {WareHouseLogEntity} from "../ware-house-log/ware-house-log.entity";
+import {WareHouseLogService} from "../ware-house-log/ware-house-log.servic";
 
 
 @Injectable()
@@ -14,7 +15,8 @@ export class WareHouseService {
     constructor(@InjectRepository(WareHouseEntity) 
         private readonly wareHouseRepository: Repository<WareHouseEntity>,
                 private readonly userService: UserService,
-                private readonly itemService: ItemService
+                private readonly itemService: ItemService,
+                private readonly wareHouseLogService: WareHouseLogService
 
     ) {}
 
@@ -61,8 +63,16 @@ export class WareHouseService {
             wareHouseEntity.userEntity = _user;
             wareHouseEntity.itemEntity = _item;
 
-            // // save account 
+            // // save warehouse
             const _result = await this.wareHouseRepository.save(wareHouseEntity);
+
+            const new_wareHouseLogEntity = new WareHouseLogEntity();
+            new_wareHouseLogEntity.expiry = wareHouseEntity.expiry;
+            new_wareHouseLogEntity.quantity= wareHouseEntity.quantity;
+            new_wareHouseLogEntity.wareHouseEntity = _result
+
+            await this.wareHouseLogService.create(new_wareHouseLogEntity)
+
             return _result;
         }catch(err){
             console.log("errors",err);
@@ -91,6 +101,14 @@ export class WareHouseService {
 
            await this.wareHouseRepository.update(data.ware_house_id, wareHouseEntity);
            const result = await this.wareHouseRepository.findOne({where: {ware_house_id: data.ware_house_id}})
+
+           const new_wareHouseLogEntity = new WareHouseLogEntity();
+           new_wareHouseLogEntity.expiry = wareHouseEntity.expiry;
+           new_wareHouseLogEntity.quantity= wareHouseEntity.quantity;
+           new_wareHouseLogEntity.wareHouseEntity = result
+
+           await this.wareHouseLogService.create(new_wareHouseLogEntity)
+
            return result;
        }catch (err){
            console.log('error',err);

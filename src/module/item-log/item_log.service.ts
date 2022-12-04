@@ -1,6 +1,6 @@
 import {HttpException, Injectable,HttpStatus} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
-import {Repository} from "typeorm";
+import {Repository, UpdateDateColumn} from "typeorm";
 import { CreateItemLogDTO } from "./item_log.dto";
 import { ItemLogEntity } from "./item_log.entity";
 
@@ -14,10 +14,6 @@ export class ItemLogService{
     async getAll(): Promise<ItemLogEntity[]> {
         return await this.itemLogRepository.find()
       }
-
-    // async getById(id: number): Promise<ItemLogEntity> {
-    // return await this.itemRepository.findOne(id)
-    // }
 
     async create(data: CreateItemLogDTO): Promise<any> {
         await this.itemLogRepository.save(data)

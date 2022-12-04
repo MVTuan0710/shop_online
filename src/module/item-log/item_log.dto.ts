@@ -4,8 +4,15 @@ import { UserEntity } from "../users/user.entity"
 
 export class CreateItemLogDTO{
     name:string
+
     price:number
-    userEntity: UserEntity
+
+    height:number
+
+    weight:number
+
+    usage: string
+
     itemEntity: ItemEntity
-    categoryEntity: CategoryEntity
 }
+

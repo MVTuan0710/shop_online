@@ -20,6 +20,5 @@ export class CreateItemDTO {
     @IsNotEmpty()
     category_id : string;
 
-    
     email : string;
 }

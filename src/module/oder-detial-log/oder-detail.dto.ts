@@ -1,9 +1,11 @@
 import {IsNotEmpty} from "class-validator";
+import {OderDetailEntity} from "../oder-detail/oder-detail.entity";
 
 
-export class CreateOderDetailDTO{
-    oder_detail_id: string;
-    item_id : string;
-    oder_id : string;
+export class CreateOderDetailLogDTO{
+    oderDetailEntity: OderDetailEntity;
+
+    total_money : number;
+
     quantity : number;
 }
