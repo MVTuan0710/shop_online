@@ -50,7 +50,7 @@ export class ItemService {
                     }
                 }
             }else{
-                const expiry = moment(String(item.wareHouseEntity.expiry)).format('DD/MM/YYYY')
+                    const expiry = moment(String(item.wareHouseEntity.expiry)).format('DD/MM/YYYY')
                     const month = moment().add(30, 'days').calendar();
     
                     console.log(expiry,month);

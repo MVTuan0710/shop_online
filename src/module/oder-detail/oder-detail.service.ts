@@ -56,33 +56,36 @@ export class OderDetailService {
             if(!item){
                 throw new HttpException('failed',500)
             }
-
+            console.log(item.wareHouseEntity)
             //get oder-detail
-            const warehouse = await this.wareHouseService.getById(item.wareHouseEntity.ware_house_id)
+            // const warehouse = await this.wareHouseService.getById(item.wareHouseEntity.ware_house_id)
             //quantity
-            if(item.wareHouseEntity.quantity === 0){
-                throw new HttpException('Out of stock', 500);
-
-            }else{
-                if(data.quantity > item.wareHouseEntity.quantity){
-                    throw new HttpException(`Stock only ${item.wareHouseEntity.quantity}`, 500);
+            for (let i = 0; i < item.wareHouseEntity.length; i++) {
+                if(item.wareHouseEntity[i].quantity === 0){
+                    throw new HttpException('Out of stock', 500);
 
                 }else{
-                    const wareHouseQuantity = item.wareHouseEntity.quantity
-                    const result = wareHouseQuantity - data.quantity;
+                    if(data.quantity > item.wareHouseEntity[i].quantity){
+                        throw new HttpException(`Stock only ${item.wareHouseEntity[i].quantity}`, 500);
 
-                    //update oder-detail
-                    const _data = new UpdateWareHouseDTO();
-                    _data.user_id = warehouse.userEntity.user_id;
-                    _data.expiry = item.wareHouseEntity.expiry
-                    _data.item_id = data.item_id;
-                    _data.quantity =result;
-                    _data.ware_house_id= item.wareHouseEntity.ware_house_id;
-                    
-                    await this.wareHouseService.update(_data)
+                    }else{
+                        const wareHouseQuantity = item.wareHouseEntity[i].quantity
+                        const result = wareHouseQuantity - data.quantity;
 
+                        //update oder-detail
+                        const _data = new UpdateWareHouseDTO();
+                        _data.user_id = item.userEntity.user_id;
+                        _data.expiry = item.wareHouseEntity[i].expiry
+                        _data.item_id = data.item_id;
+                        _data.quantity =result;
+                        _data.ware_house_id= item.wareHouseEntity[i].ware_house_id;
+
+                        await this.wareHouseService.update(_data)
+
+                    }
                 }
             }
+
             
             const _token = token.authorization.split(" ");
             const payload = this.jwtService.verify(_token[1]); 
@@ -99,7 +102,6 @@ export class OderDetailService {
 
             const oder = await this.oderService.getByOderId(data.oder_id);
             //check oder
-            
 
             if (!item){
                 throw new HttpException('failed',500)

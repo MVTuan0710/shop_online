@@ -1,4 +1,4 @@
-import {Injectable} from "@nestjs/common";
+import {HttpException, Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {WareHouseEntity} from "./ware-house.entity";
 import {Repository} from "typeorm";
@@ -22,12 +22,28 @@ export class WareHouseService {
 
     // find warehouse by id
     async getById(ware_house_id: string): Promise<WareHouseEntity> {
-        const accounts = await this.wareHouseRepository.findOne({
-            where: {ware_house_id: ware_house_id },
-            relations: { itemEntity: true, userEntity: true },
-        });
-        return accounts;
+        try{
+            const result = await this.wareHouseRepository.findOne({
+                where: {ware_house_id: ware_house_id },
+                relations: { itemEntity: true, userEntity: true },
+            });
+            return result;
+        }catch(err){
+            throw new HttpException('failed',500)
+        }
+
     }
+
+    // async  getByItemId(item_id: string): Promise<WareHouseEntity>{
+    //     try{
+    //         const result = await this.wareHouseRepository.findOne({
+    //             where: {itemEntity: ware_house_id },
+    //             relations: { itemEntity: true, userEntity: true },
+    //         });
+    //     }catch (err){
+    //         throw new HttpException('failed',500)
+    //     }
+    // }
 
     // Find All warehouse
     async find(): Promise<WareHouseEntity[]> {
@@ -39,7 +55,7 @@ export class WareHouseService {
             return accounts;
 
         }catch(err){
-            throw err;
+            throw new HttpException('failed',500)
         }
         
     }
