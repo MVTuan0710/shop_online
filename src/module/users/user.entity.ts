@@ -15,7 +15,7 @@ import {RoleEntity} from "../role/role.entity";
 import { WareHouseEntity } from "../ware-house/ware-house.entity";
 import {OderEntity} from "../oder/oder.entity"
 import { ItemEntity } from "../item/item.entity";
-import { ItemLogEntity } from "../item-log/item_log.entity";
+import { UserLogEntity } from "../user-log/user-log.entity";
 
 
 @Entity({name: 'user'})
@@ -40,6 +40,9 @@ export class UserEntity extends BaseEntity{
 
     @Column({name : 'verify_token', type : 'varchar', nullable : true})
     verify_token : string;
+
+    @ManyToOne((type)=>UserLogEntity, (userLogEntity)=>userLogEntity.userEntity)
+    userLogEntity: UserLogEntity[];
 
     @ManyToOne((type) => RoleEntity, (roleEntity)=> roleEntity.userEntity)
     @JoinColumn({name : 'role_id'})

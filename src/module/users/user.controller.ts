@@ -35,7 +35,7 @@ export class UserController{
     // @Roles(EnumRole.super_admin,EnumRole.warehouse_manager)
     @Get('/get-one')
     async getByName(@Res() res, @Req() req,@Body() data : BodyGetOneAccount) : Promise<any>{
-        data.email = req.user.email
+        data.id = req.user.id
         return this.userService.getOne(data).then(result =>{
             res.status(200).json({
                 message : 'success',
@@ -67,10 +67,10 @@ export class UserController{
 
     // update account
     // @Roles(EnumRole.super_admin)
-    @Put('/:account_id')
-    async putAccount(@Body() body : CreateAccountDTO, @Res() res, @Param('account_id')
+    @Put('update/:account_id')
+    async putAccount(@Body() data : CreateAccountDTO, @Res() res, @Param('account_id')
         account_id : string ): Promise<any> {
-        return this.userService.updateAccount(account_id, body).then(result =>{
+        return this.userService.updateAccount(account_id, data).then(result =>{
             res.status(200).json({
                 message : 'Account is updated',
                 result,

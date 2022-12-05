@@ -1,4 +1,3 @@
-import {IsNotEmpty} from "class-validator";
 import {OderDetailEntity} from "../oder-detail/oder-detail.entity";
 
 

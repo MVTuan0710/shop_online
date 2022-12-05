@@ -12,7 +12,8 @@ import { UserModule } from "../users/user.module";
 
 @Module({
     imports :[TypeOrmModule.forFeature([ItemEntity]),
-        forwardRef(()=>CategoryModule),forwardRef(()=>ItemLogModule),forwardRef(()=> UserModule),
+        forwardRef(()=>CategoryModule),forwardRef(()=>ItemLogModule),
+        forwardRef(()=> UserModule),
         forwardRef(()=>JwtModule.registerAsync({
             imports : [ConfigModule],
             inject : [ConfigService],

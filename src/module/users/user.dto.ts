@@ -11,6 +11,8 @@ export class CreateAccountDTO extends BodyLogin{
     @IsNotEmpty()
     role_id : number;
 
+    id: string;
+
     is_active: boolean;
 
     verify_token : string;
@@ -28,6 +30,8 @@ export class BodyGetOneAccount{
     @IsNotEmpty()
     name: string;
 
+    id:string;
+    
     email: string
 
 }

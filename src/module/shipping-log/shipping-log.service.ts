@@ -1,4 +1,4 @@
-import {Injectable} from "@nestjs/common";
+import {HttpException, Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import {ShippingLogEntity} from "./shipping-log.entity";
@@ -12,10 +12,23 @@ export class ShippingLogService{
     ){}
 
     async getAll(): Promise<ShippingLogEntity[]> {
-        return await this.shippingLogRepository.find()
+        
+        try{
+            return await this.shippingLogRepository.find();
+        }catch(err){
+            console.log(err);
+            throw new HttpException('failed', 500);
+        }
     }
 
     async create(data: CreateShippngLogDTO): Promise<any> {
-        await this.shippingLogRepository.save(data)
+       
+
+        try{
+            await this.shippingLogRepository.save(data);
+        }catch(err){
+            console.log(err);
+            throw new HttpException('failed', 500);
+        }
     }
 }

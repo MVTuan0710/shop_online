@@ -9,6 +9,7 @@ import { OderModule } from "../oder/oder.module";
 import { JwtModule } from "@nestjs/jwt";
 import {ConfigModule, ConfigService} from "@nestjs/config";
 import { ItemModule } from "../item/item.module";
+import { UserLogModule } from "../user-log/user-log.module";
 
 
 
@@ -25,7 +26,9 @@ import { ItemModule } from "../item/item.module";
             } 
         }),
     })),
-    forwardRef(()=>AuthModule),forwardRef(()=> RoleModule),forwardRef(()=> OderModule),forwardRef(()=> ItemModule)
+    forwardRef(()=>AuthModule),forwardRef(()=> RoleModule),
+    forwardRef(()=> OderModule),forwardRef(()=> ItemModule),
+    forwardRef(()=> UserLogModule)
     ],
     controllers : [UserController],
     providers : [UserService],

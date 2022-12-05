@@ -12,10 +12,20 @@ export class OderDetailLogService{
     ){}
 
     async getAll(): Promise<OderDetailLogEntity[]> {
-        return await this.oderDetailLogRepository.find()
+        try{
+            return await this.oderDetailLogRepository.find()
+        }catch(err){
+            console.log(err);
+            throw new HttpException('failed', 500)
+        }
     }
 
     async create(data: CreateOderDetailLogDTO): Promise<any> {
-        await this.oderDetailLogRepository.save(data)
+        try{
+            await this.oderDetailLogRepository.save(data)
+        }catch(err){
+            console.log(err);
+            throw new HttpException('failed', 500)
+        }
     }
 }

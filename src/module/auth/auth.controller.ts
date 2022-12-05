@@ -26,7 +26,6 @@ export class AuthController{
         })
     }
 
-
     @Post('register')
     async register(@Body() body : CreateAccountDTO, @Res() res, @Req() req) :  Promise<any>{
         return this.authService.register(body).then(result =>{
@@ -41,7 +40,6 @@ export class AuthController{
             });
         })
     }
-
 
     @Get('verify/:token')
     async verify(@Res() res, @Param('token') token : string) : Promise<any>{

@@ -100,15 +100,23 @@ export class WareHouseService {
     async update( data: UpdateWareHouseDTO,token?: any): Promise<any> {
        try {
            // check account exists
-           const account = await this.wareHouseRepository.findOne({where : {ware_house_id : data.ware_house_id}});
-           if (!account)
+           const warehouse = await this.wareHouseRepository.findOne({where : {ware_house_id : data.ware_house_id}});
+           if (!warehouse)
                throw console.log('Can`t found Account by account_id');
 
             const _user = await this.userService.getById(data.user_id);
             const _item = await this.itemService.getById(data.item_id,token);
-
-            const new_quantity = _item.wareHouseEntity.quantity + data.quantity;
-
+            
+            if(data.quantity < 0){
+                var new_quantity = -data.quantity;
+            }else{
+                if(data.quantity == 0){
+                    var new_quantity = 0;
+                }else{
+                    var new_quantity = data.quantity;
+                }
+            }
+            
             const wareHouseEntity = new WareHouseEntity();
             wareHouseEntity.expiry = data.expiry;
             wareHouseEntity.quantity = new_quantity;

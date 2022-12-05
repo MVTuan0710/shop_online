@@ -8,9 +8,9 @@ import { OderService } from "../oder/oder.service";
 import { WareHouseService } from "../ware-house/ware-house.service";
 import {UpdateWareHouseDTO}  from "../ware-house/ware-house.dto";
 import { JwtService } from "@nestjs/jwt";
-import moment from "moment";
 import {OderDetailLogEntity} from "../oder-detial-log/oder-detail-log.entity";
 import {OderDetailLogService} from "../oder-detial-log/oder-detail.service";
+
 
 @Injectable()
 export class OderDetailService {
@@ -49,82 +49,108 @@ export class OderDetailService {
     }
     //cau 9
     // create oder-detail
-    async create(data: CreateOderDetailDTO, token: any): Promise<OderDetailEntity> {
+    async create(data: CreateOderDetailDTO, token: any): Promise<any> {
         try {
             // check item exists
             const item  = await this.itemService.getById(data.item_id,token);
             if(!item){
                 throw new HttpException('failed',500)
             }
-            console.log(item.wareHouseEntity)
-            //get oder-detail
-            // const warehouse = await this.wareHouseService.getById(item.wareHouseEntity.ware_house_id)
-            //quantity
-            for (let i = 0; i < item.wareHouseEntity.length; i++) {
-                if(item.wareHouseEntity[i].quantity === 0){
-                    throw new HttpException('Out of stock', 500);
+        
 
-                }else{
-                    if(data.quantity > item.wareHouseEntity[i].quantity){
-                        throw new HttpException(`Stock only ${item.wareHouseEntity[i].quantity}`, 500);
-
-                    }else{
-                        const wareHouseQuantity = item.wareHouseEntity[i].quantity
-                        const result = wareHouseQuantity - data.quantity;
-
-                        //update oder-detail
-                        const _data = new UpdateWareHouseDTO();
-                        _data.user_id = item.userEntity.user_id;
-                        _data.expiry = item.wareHouseEntity[i].expiry
-                        _data.item_id = data.item_id;
-                        _data.quantity =result;
-                        _data.ware_house_id= item.wareHouseEntity[i].ware_house_id;
-
-                        await this.wareHouseService.update(_data)
-
-                    }
-                }
-            }
-
-            
             const _token = token.authorization.split(" ");
             const payload = this.jwtService.verify(_token[1]); 
             console.log(payload);
+
+
+            let quantity = data.quantity 
+            //quantity
+            for (let i = 0; i < item.wareHouseEntity.length; i++) {
+                if(item.wareHouseEntity[i].quantity === 0){
+                   console.log(`Out of Stock ${item.wareHouseEntity[i]}`);
+                }else{
+                    if(quantity > item.wareHouseEntity[i].quantity){
+                        const hieu = quantity - item.wareHouseEntity[i].quantity;
+                            
+
+                        const _data = new UpdateWareHouseDTO();
+                        _data.user_id = payload.id;
+                        _data.expiry = item.wareHouseEntity[i].expiry;
+                        _data.item_id = data.item_id;
+                        _data.quantity = 0;
+                        _data.ware_house_id= item.wareHouseEntity[i].ware_house_id;
+        
+                        await this.wareHouseService.update(_data);                                                                            
+                        quantity  =  hieu;
+                }else{
+            if(item.wareHouseEntity[i].quantity === quantity){
+    
+                        //update oder-detail
+                        const _data = new UpdateWareHouseDTO();
+                        _data.user_id = payload.id;
+                        _data.expiry = item.wareHouseEntity[i].expiry
+                        _data.item_id = data.item_id;
+                        _data.quantity =0;
+                        _data.ware_house_id= item.wareHouseEntity[i].ware_house_id;
+    
+                        await this.wareHouseService.update(_data)
+            }else{
+                const wareHouseQuantity = item.wareHouseEntity[i].quantity
+                        const result = wareHouseQuantity - data.quantity;
+    
+                        //update oder-detail
+                        const _data = new UpdateWareHouseDTO();
+                        _data.user_id = payload.id;
+                        _data.expiry = item.wareHouseEntity[i].expiry
+                        _data.item_id = data.item_id;
+                        _data.quantity = -result;
+                        _data.ware_house_id= item.wareHouseEntity[i].ware_house_id;
+    
+                        await this.wareHouseService.update(_data)
+            }
+                        
+    
+                    }
+                }
+            }
+    
             
             if(payload.role.role_id === 1 || payload.role.role_id === 2 || payload.role.role_id === 3){
-
+    
                 var _total_money = item.price * data.quantity - (((item.price * data.quantity)/100)*20)
                 
             }else{
                 
                 var _total_money = item.price * data.quantity ;
             }
-
+    
             const oder = await this.oderService.getByOderId(data.oder_id);
             //check oder
-
-            if (!item){
+    
+            if (!oder){
                 throw new HttpException('failed',500)
             }
-
+    
             const oderDetailEntity = new OderDetailEntity();
             oderDetailEntity.quantity = data.quantity;
             oderDetailEntity.itemEntity = item;
             oderDetailEntity.total_money = _total_money;
             oderDetailEntity.oderEntity = oder;
 
-            const result = await this.oderDetailRepository.save(oderDetailEntity);
-
+            // save oder detail
+            const result = await this.oderDetailRepository.save(oderDetailEntity)
+    
             const new_oderDetailLogEntity = new OderDetailLogEntity();
             new_oderDetailLogEntity.quantity = result.quantity;
             new_oderDetailLogEntity.total_money = result.total_money;
             new_oderDetailLogEntity.oderDetailEntity = result;
-
+    
             await this.oderDetailLogService.create(new_oderDetailLogEntity)
-            // save oder detail
-
+   
+    
             return result;
         }catch(err){
+            console.log(err)
             throw new HttpException('failed',500)
         }
     }

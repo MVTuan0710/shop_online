@@ -12,10 +12,20 @@ export class ItemLogService{
     ){}
 
     async getAll(): Promise<ItemLogEntity[]> {
-        return await this.itemLogRepository.find()
+        try{
+            return await this.itemLogRepository.find();
+        }catch(err){
+            console.log(err);
+            throw new HttpException('failed', 500);
+        }
       }
 
     async create(data: CreateItemLogDTO): Promise<any> {
-        await this.itemLogRepository.save(data)
+        try{
+           await this.itemLogRepository.save(data);
+        }catch(err){
+            console.log(err);
+            throw new HttpException('failed', 500);
+        }
     }
 }

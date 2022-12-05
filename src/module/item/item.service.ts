@@ -19,7 +19,7 @@ export class ItemService {
                 private readonly categoryService: CategoryService,
                 private readonly userService: UserService,
                 private readonly itemLogService: ItemLogService,
-                private readonly jwtService : JwtService,
+                private readonly jwtService : JwtService
 
     ) {}
 
@@ -30,27 +30,32 @@ export class ItemService {
                 where: {item_id: item_id },
                 relations: { wareHouseEntity : true }
             });
-            if(token.authorization){
+            if(token){
                 const _token = token.authorization.split(" ");
                 const payload = this.jwtService.verify(_token[1]); 
-                console.log(payload);
-    
-                if(payload.role.role_id === 1 || payload.role.role_id === 2|| payload.role.role_id === 3){
-                    return item
-                }else{
-                    const expiry = moment(String(item.wareHouseEntity.expiry)).format('DD/MM/YYYY')
-                    const month = moment().add(30, 'days').calendar();
-    
-                    console.log(expiry,month);
-                    
-                    if(month == expiry){
-                        throw new HttpException('Out of stock', 500);
+
+                for(let i =0; item.wareHouseEntity.length ; i++){
+                    if(payload.role.role_id === 1 || payload.role.role_id === 2|| payload.role.role_id === 3){
+                        return item
                     }else{
-                        return item;
+                        const a = moment().format('L');
+                        const expiry = moment().format('DD/MM/YYYY')
+                        const month = moment().add(30, 'days').calendar();
+                        
+                        String(item.wareHouseEntity[i].expiry)
+                         
+                        if(month == expiry && month > expiry){
+                            throw new HttpException('Out of stock', 500);
+                        }else{
+                            return item;
+                        }
                     }
                 }
+               
+
             }else{
-                    const expiry = moment(String(item.wareHouseEntity.expiry)).format('DD/MM/YYYY')
+                for(let j =0; item.wareHouseEntity.length ; j++){
+                    const expiry = moment(String(item.wareHouseEntity[j].expiry)).format('DD/MM/YYYY')
                     const month = moment().add(30, 'days').calendar();
     
                     console.log(expiry,month);
@@ -60,6 +65,7 @@ export class ItemService {
                     }else{
                         return item;
                     }
+                }     
             }
             
         }catch(err){
@@ -71,18 +77,26 @@ export class ItemService {
     }
 
     async getByName(name: string): Promise<ItemEntity> {
-        const item = await this.itemRepository.findOne({
-            where: {name: name },
-            relations: { wareHouseEntity : true }
-        });
-        const expiry = moment(String(item.wareHouseEntity.expiry)).format('DD/MM/YYYY')
-        const month = moment().add(30, 'days').calendar();
-
-        if(month <= expiry){
-            throw new HttpException('Out of stock', 500);
-        }else{
-            return item;
+        try{
+            const item = await this.itemRepository.findOne({
+                where: {name: name },
+                relations: { wareHouseEntity : true }
+            });
+            for(let i=0; item.wareHouseEntity.length; i++){
+                const expiry = moment(String(item.wareHouseEntity[i].expiry)).format('DD/MM/YYYY')
+                const month = moment().add(30, 'days').calendar();
+    
+                if(month <= expiry){
+                    throw new HttpException('Out of stock', 500);
+                }else{
+                    return item;
+                }
+            }
+            
+        }catch(err){
+            throw new HttpException('failed',500)
         }
+       
 
 
     }

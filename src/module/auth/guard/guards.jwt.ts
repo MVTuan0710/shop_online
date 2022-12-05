@@ -1,7 +1,7 @@
 import {ExecutionContext, Injectable, SetMetadata} from "@nestjs/common";
 import {AuthGuard} from "@nestjs/passport";
 import {Reflector} from "@nestjs/core";
-import {GqlExecutionContext} from "@nestjs/graphql";
+
 
 @Injectable()
 export class GuardsJwt extends AuthGuard('jwt'){

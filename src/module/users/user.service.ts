@@ -7,6 +7,8 @@ import {RoleService} from "../role/role.service";
 import {v4 as uuidv4} from 'uuid';
 import {hashSync} from 'bcryptjs';
 import {JwtService} from "@nestjs/jwt";
+import { UserLogEntity } from "../user-log/user-log.entity";
+import { UserLogService } from "../user-log/user-log.service";
 
 
 
@@ -16,7 +18,8 @@ export class UserService {
     constructor(@InjectRepository(UserEntity) 
         private readonly userRepository: Repository<UserEntity>,
                 private readonly roleService: RoleService,
-                private readonly jwtService : JwtService
+                private readonly jwtService : JwtService,
+                private readonly userLogService: UserLogService,
 
     ) {}
    
@@ -126,6 +129,15 @@ export class UserService {
                     userEntity.verify_token = uuidv4();
     
                     const result = await this.userRepository.save(userEntity);
+
+    
+                    const userLogEntity = new UserLogEntity();
+                    userLogEntity.email = result.email;
+                    userLogEntity.phone = result.phone;
+                    userLogEntity.name = result.name;
+                    userLogEntity.userEntity = result;
+            
+                    await this.userLogService.create(userLogEntity );
                     return result;
     
                     }else{
@@ -146,6 +158,14 @@ export class UserService {
                         userEntity.verify_token = uuidv4();
         
                         const result = await this.userRepository.save(userEntity);
+
+                        const userLogEntity = new UserLogEntity();
+                        userLogEntity.email = result.email;
+                        userLogEntity.phone = result.phone;
+                        userLogEntity.name = result.name;
+                        userLogEntity.userEntity = result;
+                
+                        await this.userLogService.create(userLogEntity );
                         return result;
         
                     }else{
@@ -180,11 +200,16 @@ export class UserService {
                 userEntity.verify_token = uuidv4();
     
                 const result = await this.userRepository.save(userEntity);
-                return result;
-                // }else{
-                //     throw console.log(`Can't create Account`)
-                // }
-                
+
+                const userLogEntity = new UserLogEntity();
+                userLogEntity.email = result.email;
+                userLogEntity.name = result.name;
+                userLogEntity.phone = result.phone;
+                userLogEntity.userEntity = result; 
+
+                await this.userLogService.create(userLogEntity);
+
+                return result;  
         }catch(err){
             console.log("errors",err);
              throw console.log('Can`t create Account');
@@ -238,11 +263,23 @@ export class UserService {
                 userEntity.phone = data.phone;
                 userEntity.roleEntity = role;
                 userEntity.verify_token = uuidv4();
+    
             // update account
-           const result = await this.userRepository.update(user_id, data);
+           const result = await this.userRepository.update(user_id, userEntity);
+
+           const user = await this.userRepository.findOne({where:{user_id: user_id}});
+
+                const userLogEntity = new UserLogEntity();
+                userLogEntity.email = data.email;
+                userLogEntity.name = data.name;
+                userLogEntity.phone = data.phone;
+                userLogEntity.userEntity = user; 
+
+                await this.userLogService.create(userLogEntity);
            return result;
        }catch (err){
-           console.log('error',err);
+           
+        console.log('error',err);
            throw console.log('Can`t update Account');
        }
     }

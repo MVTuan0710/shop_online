@@ -12,10 +12,22 @@ export class WareHouseLogService{
     ){}
 
     async getAll(): Promise<WareHouseLogEntity[]> {
-        return await this.wareHouseLogRepository.find()
+        try{
+            return await this.wareHouseLogRepository.find();
+        }catch(err){
+            console.log(err);
+            throw new HttpException('failed', 500);
+        }
+        
     }
 
     async create(data: CreateWareHouseLogDTO): Promise<any> {
-        await this.wareHouseLogRepository.save(data)
+        
+        try{
+            await this.wareHouseLogRepository.save(data);
+        }catch(err){
+            console.log(err);
+            throw new HttpException('failed', 500);
+        }
     }
 }

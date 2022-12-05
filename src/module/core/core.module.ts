@@ -15,7 +15,8 @@ import { ItemLogEntity } from "../item-log/item_log.entity";
 import {OderDetailLogEntity} from "../oder-detial-log/oder-detail-log.entity";
 import {WareHouseLogEntity} from "../ware-house-log/ware-house-log.entity";
 import {ShippingLogEntity} from "../shipping-log/shipping-log.entity";
-const NODE_ENV = process.env.NODE_ENV;
+import { UserLogEntity } from "../user-log/user-log.entity";
+
 
 @Module({
     imports :[
@@ -39,7 +40,8 @@ const NODE_ENV = process.env.NODE_ENV;
                 entities: [UserEntity, RoleEntity, WareHouseEntity,
                             ItemEntity, CategoryEntity, OderDetailEntity,
                             OderDetailLogEntity, OderEntity, ShippingEntity,
-                            ItemLogEntity, WareHouseLogEntity, ShippingLogEntity]
+                            ItemLogEntity, WareHouseLogEntity, ShippingLogEntity,
+                            UserLogEntity]
             }),
         })
     ],

@@ -13,6 +13,7 @@ import { ItemLogModule } from './module/item-log/item_log.module';
 import {WareHouseLogModule} from "./module/ware-house-log/ware-house-log.module";
 import {ShippingLogModule} from "./module/shipping-log/shipping-log.module";
 import {OderDetailLogModule} from "./module/oder-detial-log/oder-detail.module";
+import { UserLogModule } from './module/user-log/user-log.module';
 
 @Module({
   imports: [
@@ -33,7 +34,8 @@ import {OderDetailLogModule} from "./module/oder-detial-log/oder-detail.module";
     ItemLogModule,
     WareHouseLogModule,
     ShippingLogModule,
-    OderDetailLogModule
+    OderDetailLogModule,
+    UserLogModule
   ]
 })
 export class AppModule {}

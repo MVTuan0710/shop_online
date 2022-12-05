@@ -7,7 +7,8 @@ import {
     PrimaryGeneratedColumn,
     JoinColumn,
     ManyToOne,OneToOne,
-    UpdateDateColumn
+    UpdateDateColumn,
+    OneToMany
 } from "typeorm";
 import { OderEntity } from "../oder/oder.entity";
 import { ItemEntity } from "../item/item.entity";
@@ -33,9 +34,8 @@ export class OderDetailEntity extends BaseEntity{
     @JoinColumn({name : 'oder_id'})
     oderEntity : OderEntity;
 
-    @OneToOne((type)=>OderDetailLogEntity, (oderDetailLogEntity)=>oderDetailLogEntity.oderDetailEntity)
-    @JoinColumn({name: 'oder_detail_id'})
-    oderDetailLogEntity: OderDetailLogEntity;
+    @OneToMany((type)=>OderDetailLogEntity, (oderDetailLogEntity)=>oderDetailLogEntity.oderDetailEntity)
+    oderDetailLogEntity: OderDetailLogEntity[];
 
     @CreateDateColumn({name : 'created_at', type : 'timestamp with time zone', nullable : true})
     created_at: Date;
