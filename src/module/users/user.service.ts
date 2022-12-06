@@ -30,13 +30,14 @@ export class UserService {
     
         if(user.roleEntity.role_id === 1|| user.roleEntity.role_id === 1){
 
-                
             const account = await this.userRepository.findOne({
                 where: {name: data.name, phone: data.phone}
             });
             delete account.password;
             return account;
+
         }else{
+
             if(user.roleEntity.role_id === 1){
                 const account = await this.userRepository.findOne({
                     where: {name: data.name, phone: data.phone}
@@ -85,6 +86,7 @@ export class UserService {
             where: {email: email },
             relations: { roleEntity : true }
         });
+
         delete accounts.password;
         return accounts;
     }
@@ -114,7 +116,6 @@ export class UserService {
                 const _token = token.authorization.split(" ");
                 const payload = this.jwtService.verify(_token[1]); 
     
-    
                 if(payload.role.role_id === 1){
                     if(data.role_id === 3 || data.role_id === 2){
     
@@ -130,7 +131,6 @@ export class UserService {
     
                     const result = await this.userRepository.save(userEntity);
 
-    
                     const userLogEntity = new UserLogEntity();
                     userLogEntity.email = result.email;
                     userLogEntity.phone = result.phone;
@@ -186,7 +186,7 @@ export class UserService {
                 // check email exists
                 const email: UserEntity  = await this.userRepository.findOne({where : {email :data.email}});
                 if (email){
-                    throw console.log('The account is not found');
+                    throw console.log('The account is exist');
                 }
     
                 const role = await this.roleService.findById(data.role_id);

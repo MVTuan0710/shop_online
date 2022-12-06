@@ -16,6 +16,7 @@ import { WareHouseEntity } from "../ware-house/ware-house.entity";
 import {OderEntity} from "../oder/oder.entity"
 import { ItemEntity } from "../item/item.entity";
 import { UserLogEntity } from "../user-log/user-log.entity";
+import { SaleEntity } from "../sale/sale.entity";
 
 
 @Entity({name: 'user'})
@@ -50,6 +51,9 @@ export class UserEntity extends BaseEntity{
 
     @OneToMany((type)=> OderEntity, (oderEntity)=>oderEntity.userEntity)
     oderEntity : OderEntity[];
+
+    @OneToMany((type)=> SaleEntity, (saleEntity)=>saleEntity.userEntity)
+    saleEntity : SaleEntity[];
 
     @OneToMany((type)=> ItemEntity, (itemEntity)=> itemEntity.userEntity)
     itemEntity: ItemEntity[];

@@ -1,9 +1,11 @@
-import {Body, Controller, Get, Param, Post, Res, Delete, UseGuards, Headers} from "@nestjs/common";
+import {Body, Controller, Get, Param, Post, Res, Delete, UseGuards, Headers, Req} from "@nestjs/common";
 import {OderDetailService} from "./oder-detail.service";
 // import {GuardsJwt} from "../auth/guard/guards.jwt";
 // import {RolesGuard} from "./guards/role.guards";
 // import {EnumRole} from "../constant/role/role.constant";
 import {CreateOderDetailDTO} from "./oder-detail.dto"
+import { Request } from "express";
+
 
 
 @Controller('oder-detail')
@@ -31,8 +33,9 @@ export class OderDetailController{
 
     // @Roles(EnumRole.super_admin)
     @Post('create')
-    async create(@Res() res, @Body() body: CreateOderDetailDTO,@Headers()token: string){
-        return this.oderDetailService.create(body,token).then(result =>{
+    async create(@Res() res, @Body() data: CreateOderDetailDTO,@Req() req: Request){
+        data.user_id = req['user'].id;
+        return this.oderDetailService.create(data).then(result =>{
             res.status(200).json({
                 message : 'success',
                 result,

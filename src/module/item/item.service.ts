@@ -2,7 +2,7 @@ import {HttpException, Injectable,HttpStatus} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {ItemEntity} from "./item.entity";
 import {Repository} from "typeorm";
-import {CreateItemDTO} from "../item/item.dto";
+import {CreateItemDTO,GetItemDTO} from "../item/item.dto";
 import { CategoryService } from "../categories/category.service";
 import { JwtService } from "@nestjs/jwt";
 import { UserService } from "../users/user.service";
@@ -24,57 +24,70 @@ export class ItemService {
     ) {}
 
     // find item by id
-    async getById(item_id: string, token?: any): Promise<ItemEntity> {
+    async getById(data: GetItemDTO): Promise<ItemEntity> {
         try{
             const item = await this.itemRepository.findOne({
-                where: {item_id: item_id },
+                where: {item_id: data.item_id },
                 relations: { wareHouseEntity : true }
             });
-            if(token){
-                const _token = token.authorization.split(" ");
-                const payload = this.jwtService.verify(_token[1]); 
+            if(data.user_id){
+                const user = await this.userService.getById(data.user_id) 
 
-                for(let i =0; item.wareHouseEntity.length ; i++){
-                    if(payload.role.role_id === 1 || payload.role.role_id === 2|| payload.role.role_id === 3){
-                        return item
+                for(let i= 0;i < item.wareHouseEntity.length ; i++){
+                    if(user.roleEntity.role_id === 1 || user.roleEntity.role_id === 2|| user.roleEntity.role_id === 3){
+                        return item;
                     }else{
-                        const a = moment().format('L');
-                        const expiry = moment().format('DD/MM/YYYY')
-                        const month = moment().add(30, 'days').calendar();
-                        
-                        String(item.wareHouseEntity[i].expiry)
+                        const month = moment().add(30, 'days').format('DD/MM/YYYY');
+                        const expiry = moment(item.wareHouseEntity[i].expiry).format('DD/MM/YYYY');
                          
-                        if(month == expiry && month > expiry){
-                            throw new HttpException('Out of stock', 500);
+                       
+                        if(item.wareHouseEntity[i].quantity <= 5){
+                            if(month <= expiry){
+                                throw new HttpException('Out of stock', 500);
+                            }else{
+                                return item;
+                            }
                         }else{
-                            return item;
+                            delete item.wareHouseEntity[i].quantity;
+                            if(month <= expiry){
+                                throw new HttpException('Out of stock', 500);
+                            }else{
+                                return item;
+                            }
                         }
                     }
                 }
                
 
             }else{
-                for(let j =0; item.wareHouseEntity.length ; j++){
-                    const expiry = moment(String(item.wareHouseEntity[j].expiry)).format('DD/MM/YYYY')
-                    const month = moment().add(30, 'days').calendar();
+                for(let j= 0;j < item.wareHouseEntity.length ; j++){
+                    const month = moment().add(30, 'days').format('DD/MM/YYYY');
+                    const expiry = moment(item.wareHouseEntity[j].expiry).format('DD/MM/YYYY');
     
+                    console.log(Number(item.wareHouseEntity[j].expiry));
                     console.log(expiry,month);
                     
-                    if(month == expiry){
-                        throw new HttpException('Out of stock', 500);
+                    if(item.wareHouseEntity[j].quantity <= 5){
+                        if(month <= expiry){
+                            throw new HttpException('Out of stock', 500);
+                        }else{
+                            return item;
+                        }
                     }else{
-                        return item;
+                        delete item.wareHouseEntity[j].quantity;
+                        if(month <= expiry){
+                            throw new HttpException('Out of stock', 500);
+                        }else{
+                            return item;
+                        }
                     }
                 }     
             }
             
         }catch(err){
             throw new HttpException('failed',500)
-        }
-        
-
-        
-    }
+        }        
+}
 
     async getByName(name: string): Promise<ItemEntity> {
         try{
@@ -82,14 +95,23 @@ export class ItemService {
                 where: {name: name },
                 relations: { wareHouseEntity : true }
             });
-            for(let i=0; item.wareHouseEntity.length; i++){
+            for(let i=0;i < item.wareHouseEntity.length; i++){
                 const expiry = moment(String(item.wareHouseEntity[i].expiry)).format('DD/MM/YYYY')
                 const month = moment().add(30, 'days').calendar();
     
-                if(month <= expiry){
-                    throw new HttpException('Out of stock', 500);
+                if(item.wareHouseEntity[i].quantity <= 5){
+                    if(month <= expiry){
+                        throw new HttpException('Out of stock', 500);
+                    }else{
+                        return item;
+                    }
                 }else{
-                    return item;
+                    delete item.wareHouseEntity[i].quantity;
+                    if(month <= expiry){
+                        throw new HttpException('Out of stock', 500);
+                    }else{
+                        return item;
+                    }
                 }
             }
             
@@ -104,10 +126,33 @@ export class ItemService {
     //Find All item
     async find(): Promise<ItemEntity[]> {
         try{
+            const result: ItemEntity[] = []
             const item = await this.itemRepository.find({
                  relations: { categoryEntity : true }
-            });
-            return item;
+            }); 
+            for(let i = 0; i < item.length; i++){
+               for(let j=0;j< item[i].wareHouseEntity.length; i++){
+                const expiry = moment(String(item[i].wareHouseEntity[j].expiry)).format('DD/MM/YYYY')
+                const month = moment().add(30, 'days').calendar();
+                
+                if(item[i].wareHouseEntity[j].quantity <= 5){
+                    if(month <= expiry){
+                        throw new HttpException('Out of stock', 500);
+                    }else{
+                        result.push(item[i]);
+                    }
+                }else{
+                    delete item[i].wareHouseEntity[j].quantity;
+                    if(month <= expiry){
+                        throw new HttpException('Out of stock', 500);
+                    }else{
+                        result.push(item[i]);
+                    }
+                }
+                
+            } 
+            }
+            return result;
         }catch(err){
             throw err;
         }
@@ -216,6 +261,4 @@ export class ItemService {
     }
 }
 
-function define(arg0: string[], arg1: (moment: any) => void) {
-    throw new Error("Function not implemented.");
-}
+

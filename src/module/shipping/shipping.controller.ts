@@ -1,6 +1,7 @@
-import {Body, Controller, Delete, Get, Headers, Param, Post, Res, UseGuards} from "@nestjs/common";
+import {Body, Controller, Delete, Get, Headers, Param, Post, Req, Res, UseGuards} from "@nestjs/common";
 import {ShippingService} from "./shipping.service";
 import {CreateShippingDTO} from "./shipping.dto"
+import dataSource from "ormconfig";
 
 
 
@@ -26,8 +27,9 @@ export class ShippingController{
 
     // create 
     @Post('create')
-    async create(@Res() res, @Body() body: CreateShippingDTO, @Headers()token: string){
-        return this.shippingService.create(body,token).then(result =>{
+    async create(@Res() res, @Body() data: CreateShippingDTO,@Req()req){
+        data.user_id = req['user'].id;
+        return this.shippingService.create(data).then(result =>{
             res.status(200).json({
                 message : 'success',
                 result,

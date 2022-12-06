@@ -16,7 +16,6 @@ export class ShippingService {
         private readonly shippingRepository: Repository<ShippingEntity>,
                 private readonly userService: UserService,
                 private readonly oderService: OderService,
-                private readonly jwtService : JwtService,
                 private readonly shippingLogService: ShippingLogService
 
     ) {}
@@ -31,18 +30,14 @@ export class ShippingService {
             throw err;
         }
     }
-    async create(data: CreateShippingDTO, token: any): Promise<ShippingEntity>{
+    async create(data: CreateShippingDTO): Promise<ShippingEntity>{
         const oder = await this.oderService.getByOderId(data.oder_id);
-            
         if(!oder){
                throw console.log("Can't found user or oder");
             }   
         
-        if(token.authorization){
-                const _token = token.authorization.split(" ");
-                const payload = this.jwtService.verify(_token[1]);
-
-                const user = await this.userService.getById(payload.user_id);
+        if(data.user_id){
+                const user = await this.userService.getById(data.user_id);
 
                 const shippingEntity = new ShippingEntity();
                 shippingEntity.name= user.name;

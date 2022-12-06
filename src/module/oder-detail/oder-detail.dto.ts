@@ -10,4 +10,6 @@ export class CreateOderDetailDTO{
 
     @IsNotEmpty()
     quantity : number;
+
+    user_id: string;
 }

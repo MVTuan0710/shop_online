@@ -15,6 +15,7 @@ import {WareHouseEntity} from "../ware-house/ware-house.entity"
 import {OderDetailEntity} from "../oder-detail/oder-detail.entity"
 import { UserEntity } from "../users/user.entity";
 import { ItemLogEntity } from "../item-log/item_log.entity";
+import { SaleItemEntity } from "../sale-item/sale-item.entity";
 
 @Entity('item')
 export class ItemEntity extends BaseEntity{
@@ -36,6 +37,9 @@ export class ItemEntity extends BaseEntity{
     @Column({name : 'usage', type : 'varchar', nullable : true})
     usage : string;
 
+    @OneToMany((type)=> SaleItemEntity, (saleItemEntity)=>saleItemEntity.itemEntity)
+    saleItemEntity : SaleItemEntity[];
+
     @OneToMany((type)=> WareHouseEntity, (wareHouseEntity)=>wareHouseEntity.itemEntity)
     wareHouseEntity : WareHouseEntity[];
 
@@ -51,7 +55,7 @@ export class ItemEntity extends BaseEntity{
     userEntity: UserEntity;
 
     @OneToMany((type)=> OderDetailEntity, (oderDetailEntity)=>oderDetailEntity.itemEntity)
-    oderDetailEntity : OderDetailEntity;
+    oderDetailEntity : OderDetailEntity[];
 
     @CreateDateColumn({name : 'created_at', type : 'timestamp with time zone', nullable : true})
     created_at: Date;

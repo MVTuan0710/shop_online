@@ -22,3 +22,9 @@ export class CreateItemDTO {
 
     email : string;
 }
+export class GetItemDTO{
+    
+    item_id : string;
+    name: string;
+    user_id: string;
+}

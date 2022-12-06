@@ -32,14 +32,14 @@ export class StrategyJwt extends PassportStrategy(Strategy){
         const _role : RoleEntity = <RoleEntity> roleEntity;
         if(!_role){
             return{
-                id : payload.user_id,
+                id : payload.id,
                 email : payload.email,
                 role_id : null,
             }
         }
         const { role_id : roleId } = _role;
         return {
-            id : payload.user_id,
+            id : payload.id,
             email : payload.email,
             role_id : roleId,
         }

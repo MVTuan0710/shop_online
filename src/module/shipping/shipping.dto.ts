@@ -9,4 +9,6 @@ export class CreateShippingDTO{
     
     @IsNotEmpty()
     oder_id : string;
+    
+    user_id: string;
 }

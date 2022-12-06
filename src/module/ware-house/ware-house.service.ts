@@ -7,6 +7,7 @@ import { UserService } from "../users/user.service";
 import { ItemService } from "../item/item.service";
 import {WareHouseLogEntity} from "../ware-house-log/ware-house-log.entity";
 import {WareHouseLogService} from "../ware-house-log/ware-house-log.servic";
+import { GetItemDTO } from "../item/item.dto";
 
 
 @Injectable()
@@ -71,7 +72,11 @@ export class WareHouseService {
             }
 
             const _user = await this.userService.getById(data.user_id);
-            const _item = await this.itemService.getById(data.item_id,token)
+            
+            const DataGetItem = new GetItemDTO();
+                DataGetItem.item_id = data.item_id;
+                DataGetItem.user_id =  data.user_id 
+            const _item = await this.itemService.getById(DataGetItem);
 
             const wareHouseEntity = new WareHouseEntity();
             wareHouseEntity.expiry = data.expiry;
@@ -105,7 +110,11 @@ export class WareHouseService {
                throw console.log('Can`t found Account by account_id');
 
             const _user = await this.userService.getById(data.user_id);
-            const _item = await this.itemService.getById(data.item_id,token);
+
+            const DataGetItem = new GetItemDTO();
+                DataGetItem.item_id = data.item_id;
+                DataGetItem.user_id =  data.user_id 
+            const _item = await this.itemService.getById(DataGetItem);
             
             if(data.quantity < 0){
                 var new_quantity = -data.quantity;
