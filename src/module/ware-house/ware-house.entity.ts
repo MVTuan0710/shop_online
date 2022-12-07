@@ -36,7 +36,6 @@ export class WareHouseEntity extends BaseEntity{
     @JoinColumn({name : 'item_id'})
     itemEntity : ItemEntity;
 
-
     @CreateDateColumn({name : 'created_at', type : 'timestamp with time zone', nullable : true})
     created_at: Date;
 

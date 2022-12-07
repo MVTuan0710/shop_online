@@ -11,6 +11,7 @@ import {
     DeleteDateColumn
 } from 'typeorm';
 import { SaleItemEntity } from '../sale-item/sale-item.entity';
+import { SaleLogEntity } from '../sale-log/sale-log.entity';
 import { UserEntity } from '../users/user.entity';
 
 @Entity({name: 'sale'})
@@ -18,7 +19,7 @@ export class SaleEntity extends BaseEntity{
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-   @Column({name : 'name', type : 'varchar', nullable : true})
+    @Column({name : 'name', type : 'varchar', nullable : true})
     name : string;
 
     @Column({
@@ -41,6 +42,9 @@ export class SaleEntity extends BaseEntity{
 
     @OneToMany((type)=> SaleItemEntity, (saleItemEntity)=>saleItemEntity.saleEntity)
     saleItemEntity : SaleItemEntity[];
+    
+    @OneToMany((type)=> SaleLogEntity, (saleLogEntity)=>saleLogEntity.saleEntity)
+    saleLogEntity : SaleLogEntity[];
 
     @ManyToOne((type) => UserEntity, (userEntity) => userEntity.saleEntity)
     @JoinColumn({ name: 'created_by' })
