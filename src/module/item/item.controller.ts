@@ -8,7 +8,7 @@ import { EnumRole } from '../constant/role/role.constant'
 import { Request, Response } from "express";
 
 @Controller('item')
-@UseGuards(GuardsJwt,RolesGuard)
+// @UseGuards(GuardsJwt,RolesGuard)
 export class ItemController{
     constructor(private itemService  : ItemService) {}
 
@@ -48,10 +48,10 @@ export class ItemController{
     }
 
     //create item
-    @Roles(EnumRole.super_admin, EnumRole.business_manager)
+    // @Roles(EnumRole.super_admin, EnumRole.business_manager)
     @Post('create')
     async create(@Res() res, @Body()data: CreateItemDTO, @Req() req) : Promise<any>{
-        data.email = req.user.email;
+        // data.user_id = req['user'].id;
         return this.itemService.create(data).then(result =>{
             res.status(200).json({
                 message : 'success',
@@ -71,7 +71,7 @@ export class ItemController{
     @Put('update/:item_id')
     async put(@Body() data : CreateItemDTO, @Res() res, @Req() req, @Param('item_id')
     item_id : string ): Promise<any> {
-        data.email = req.user.email;
+        data.user_id = req['user'].id;
         return this.itemService.update(item_id, data).then(result =>{
             res.status(200).json({
                 message : 'Account is updated',

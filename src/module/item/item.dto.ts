@@ -20,7 +20,7 @@ export class CreateItemDTO {
     @IsNotEmpty()
     category_id : string;
 
-    email : string;
+    user_id : string;
 }
 export class GetItemDTO{
     

@@ -8,12 +8,11 @@ import {
     JoinColumn,
     PrimaryGeneratedColumn,
     ManyToOne,
-    OneToMany
+    OneToMany,
+    OneToOne
 } from "typeorm";
 import { CategoryEntity } from "../categories/category.entity";
 import {WareHouseEntity} from "../ware-house/ware-house.entity"
-import {OderDetailEntity} from "../oder-detail/oder-detail.entity"
-import { UserEntity } from "../users/user.entity";
 import { ItemLogEntity } from "../item-log/item_log.entity";
 import { SaleItemEntity } from "../sale-item/sale-item.entity";
 
@@ -37,8 +36,8 @@ export class ItemEntity extends BaseEntity{
     @Column({name : 'usage', type : 'varchar', nullable : true})
     usage : string;
 
-    @OneToMany((type)=> SaleItemEntity, (saleItemEntity)=>saleItemEntity.itemEntity)
-    saleItemEntity : SaleItemEntity[];
+    @OneToOne((type)=> SaleItemEntity, (saleItemEntity)=>saleItemEntity.itemEntity)
+    saleItemEntity : SaleItemEntity;
 
     @OneToMany((type)=> WareHouseEntity, (wareHouseEntity)=>wareHouseEntity.itemEntity)
     wareHouseEntity : WareHouseEntity[];
@@ -49,13 +48,6 @@ export class ItemEntity extends BaseEntity{
     @ManyToOne((type)=> CategoryEntity, (categoryEntity)=>categoryEntity.itemEntity)
     @JoinColumn({name : 'category_id'})
     categoryEntity : CategoryEntity;
-
-    @ManyToOne((type)=> UserEntity, (userEntity)=> userEntity.itemEntity)
-    @JoinColumn({name: "user_id"})
-    userEntity: UserEntity;
-
-    @OneToMany((type)=> OderDetailEntity, (oderDetailEntity)=>oderDetailEntity.itemEntity)
-    oderDetailEntity : OderDetailEntity[];
 
     @CreateDateColumn({name : 'created_at', type : 'timestamp with time zone', nullable : true})
     created_at: Date;

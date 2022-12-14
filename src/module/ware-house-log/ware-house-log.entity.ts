@@ -10,7 +10,6 @@ import {
 } from "typeorm";
 
 import {WareHouseEntity} from "../ware-house/ware-house.entity";
-import {UserEntity} from "../users/user.entity";
 
 
 @Entity({name: 'ware_house_log'})

@@ -11,7 +11,6 @@ import {
     OneToMany
 } from "typeorm";
 import { OderEntity } from "../oder/oder.entity";
-import { ItemEntity } from "../item/item.entity";
 import { OderDetailLogEntity } from "../oder-detial-log/oder-detail-log.entity";
 
 
@@ -23,14 +22,19 @@ export class OderDetailEntity extends BaseEntity{
     @Column({name : 'quantity',  type : 'integer' , nullable : true})
     quantity : number;
 
-    @Column({name : 'total_money',  type : 'integer' , nullable : true})
-    total_money : number;
+    @Column({name : 'oder_price',  type : 'integer' , nullable : true})
+    oder_price : number;
 
-    @ManyToOne((type)=> ItemEntity, (itemEntity)=>itemEntity.oderDetailEntity)
-    @JoinColumn({name : 'item_id'})
-    itemEntity : ItemEntity;
+    @Column({name : 'item_info',  type : 'varchar' , nullable : true})
+    item_info : string;
 
-    @ManyToOne((type)=> OderEntity, (oderEntity)=>oderEntity.oderEntity)
+    @Column({name : 'origin_price',  type : 'integer' , nullable : true})
+    origin_price : number;
+
+    @Column({name : 'item_id',  type : 'varchar' , nullable : true})
+    item_id : string;
+
+    @ManyToOne((type)=> OderEntity, (oderEntity)=>oderEntity.oderDetailEntity)
     @JoinColumn({name : 'oder_id'})
     oderEntity : OderEntity;
 

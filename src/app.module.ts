@@ -14,6 +14,9 @@ import {WareHouseLogModule} from "./module/ware-house-log/ware-house-log.module"
 import {ShippingLogModule} from "./module/shipping-log/shipping-log.module";
 import {OderDetailLogModule} from "./module/oder-detial-log/oder-detail.module";
 import { UserLogModule } from './module/user-log/user-log.module';
+import { SaleLogModule } from './module/sale-log/sale-log.module';
+import { SaleItemModule } from './module/sale-item/sale-item.module';
+import { SaleModule } from './module/sale/sale.module';
 
 @Module({
   imports: [
@@ -26,16 +29,19 @@ import { UserLogModule } from './module/user-log/user-log.module';
     WareHouseModule,
     ItemModule, 
     CategoryModule, 
-    OderDetailModule,
     OderModule,
+    OderDetailModule,
     ShippingModule,
+    SaleItemModule,
+    SaleModule,
 
     //log
     ItemLogModule,
     WareHouseLogModule,
     ShippingLogModule,
     OderDetailLogModule,
-    UserLogModule
+    UserLogModule, 
+    SaleLogModule
   ]
 })
 export class AppModule {}

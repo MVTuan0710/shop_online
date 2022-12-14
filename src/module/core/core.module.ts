@@ -16,6 +16,9 @@ import {OderDetailLogEntity} from "../oder-detial-log/oder-detail-log.entity";
 import {WareHouseLogEntity} from "../ware-house-log/ware-house-log.entity";
 import {ShippingLogEntity} from "../shipping-log/shipping-log.entity";
 import { UserLogEntity } from "../user-log/user-log.entity";
+import { SaleEntity } from "../sale/sale.entity";
+import { SaleLogEntity } from "../sale-log/sale-log.entity";
+import { SaleItemEntity } from "../sale-item/sale-item.entity";
 
 
 @Module({
@@ -41,7 +44,7 @@ import { UserLogEntity } from "../user-log/user-log.entity";
                             ItemEntity, CategoryEntity, OderDetailEntity,
                             OderDetailLogEntity, OderEntity, ShippingEntity,
                             ItemLogEntity, WareHouseLogEntity, ShippingLogEntity,
-                            UserLogEntity]
+                            UserLogEntity,SaleEntity, SaleLogEntity, SaleItemEntity]
             }),
         })
     ],

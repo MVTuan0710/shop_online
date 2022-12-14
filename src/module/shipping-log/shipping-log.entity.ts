@@ -2,15 +2,14 @@ import {
     BaseEntity,
     Column,
     CreateDateColumn,
-    DeleteDateColumn,
-    Entity, OneToOne,
+    Entity, 
     PrimaryGeneratedColumn,
     JoinColumn,
     UpdateDateColumn, ManyToOne,
 } from "typeorm";
 import {ShippingEntity} from "../shipping/shipping.entity";
 
-@Entity({name: 'shipping'})
+@Entity({name: 'shipping_log'})
 export class ShippingLogEntity extends BaseEntity{
     @PrimaryGeneratedColumn('uuid')
     id : string;

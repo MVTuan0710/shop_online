@@ -8,17 +8,19 @@ import { ItemService } from "../item/item.service";
 import {WareHouseLogEntity} from "../ware-house-log/ware-house-log.entity";
 import {WareHouseLogService} from "../ware-house-log/ware-house-log.servic";
 import { GetItemDTO } from "../item/item.dto";
+import { resourceLimits } from "worker_threads";
+import { ItemEntity } from "../item/item.entity";
 
 
 @Injectable()
 export class WareHouseService {
     public wareHouseEntity = new WareHouseEntity();
+    public itemEntity = new ItemEntity();
     constructor(@InjectRepository(WareHouseEntity) 
         private readonly wareHouseRepository: Repository<WareHouseEntity>,
                 private readonly userService: UserService,
                 private readonly itemService: ItemService,
                 private readonly wareHouseLogService: WareHouseLogService
-
     ) {}
 
     // find warehouse by id
@@ -35,6 +37,19 @@ export class WareHouseService {
 
     }
 
+    async getByItemId(item_id: string): Promise<WareHouseEntity[]>{
+        try{
+            const result = await this.wareHouseRepository.find(({
+                where: {itemEntity: {item_id: item_id}},
+                relations: { itemEntity: true},
+            }))
+
+            return result;
+        }catch(err){
+
+        }
+    }
+
     // async  getByItemId(item_id: string): Promise<WareHouseEntity>{
     //     try{
     //         const result = await this.wareHouseRepository.findOne({
@@ -49,11 +64,10 @@ export class WareHouseService {
     // Find All warehouse
     async find(): Promise<WareHouseEntity[]> {
         try{
-            const accounts = await this.wareHouseRepository.find({
-                relations: { itemEntity: true, userEntity: true }
-                
+            const result = await this.wareHouseRepository.find({
+                relations: { itemEntity: true, userEntity: true } 
             });
-            return accounts;
+            return result;
 
         }catch(err){
             throw new HttpException('failed',500)
@@ -72,11 +86,7 @@ export class WareHouseService {
             }
 
             const _user = await this.userService.getById(data.user_id);
-            
-            const DataGetItem = new GetItemDTO();
-                DataGetItem.item_id = data.item_id;
-                DataGetItem.user_id =  data.user_id 
-            const _item = await this.itemService.getById(DataGetItem);
+            const _item = await this.itemService.getByIdNormal(data.item_id);
 
             const wareHouseEntity = new WareHouseEntity();
             wareHouseEntity.expiry = data.expiry;
@@ -101,8 +111,8 @@ export class WareHouseService {
         }
     }
     
-    // update ware house
-    async update( data: UpdateWareHouseDTO,token?: any): Promise<any> {
+    // update ware house, update ca user tao ra ware house
+    async update( data: UpdateWareHouseDTO): Promise<any> {
        try {
            // check account exists
            const warehouse = await this.wareHouseRepository.findOne({where : {ware_house_id : data.ware_house_id}});
@@ -110,25 +120,11 @@ export class WareHouseService {
                throw console.log('Can`t found Account by account_id');
 
             const _user = await this.userService.getById(data.user_id);
-
-            const DataGetItem = new GetItemDTO();
-                DataGetItem.item_id = data.item_id;
-                DataGetItem.user_id =  data.user_id 
-            const _item = await this.itemService.getById(DataGetItem);
-            
-            if(data.quantity < 0){
-                var new_quantity = -data.quantity;
-            }else{
-                if(data.quantity == 0){
-                    var new_quantity = 0;
-                }else{
-                    var new_quantity = data.quantity;
-                }
-            }
+            const _item = await this.itemService.getByIdNormal(data.item_id);
             
             const wareHouseEntity = new WareHouseEntity();
             wareHouseEntity.expiry = data.expiry;
-            wareHouseEntity.quantity = new_quantity;
+            wareHouseEntity.quantity = data.quantity;
             wareHouseEntity.userEntity = _user;
             wareHouseEntity.itemEntity = _item;
 
@@ -147,6 +143,45 @@ export class WareHouseService {
            console.log('error',err);
            throw console.log('Can`t update ware-house');
        }
+    }
+
+    // cap nhat nay se khong cap nhat lai user da tao record ware house
+    // => kh co truong user_id
+    async updateByOderDetail( data: UpdateWareHouseDTO): Promise<any> {
+        try{
+            const _item = await this.itemService.getByIdNormal(data.item_id);
+            const warehouse = await this.wareHouseRepository.findOne({where : {ware_house_id : data.ware_house_id}});
+            
+            if (!warehouse)
+            throw console.log('Can`t found Account by account_id');
+
+            if(data.quantity < 0){
+                var new_quantity = -data.quantity;
+            }else{
+                if(data.quantity == 0){
+                    var new_quantity = 0;
+                }
+            }
+
+            const wareHouseEntity = new WareHouseEntity();
+            wareHouseEntity.expiry = data.expiry;
+            wareHouseEntity.quantity = new_quantity;
+            wareHouseEntity.itemEntity = _item;
+
+           await this.wareHouseRepository.update(data.ware_house_id, wareHouseEntity);
+           const result = await this.wareHouseRepository.findOne({where: {ware_house_id: data.ware_house_id}})
+
+           const new_wareHouseLogEntity = new WareHouseLogEntity();
+           new_wareHouseLogEntity.expiry = wareHouseEntity.expiry;
+           new_wareHouseLogEntity.quantity= wareHouseEntity.quantity;
+           new_wareHouseLogEntity.wareHouseEntity = result
+
+           await this.wareHouseLogService.create(new_wareHouseLogEntity)
+
+        }catch(err){
+            console.log(err)
+            throw new HttpException('Bad req',500)
+        }
     }
 
     // delete ware house

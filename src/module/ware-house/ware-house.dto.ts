@@ -22,7 +22,6 @@ export class UpdateWareHouseDTO{
     @IsEmpty()
     item_id : string;
 
-    @IsEmpty()
     user_id : string;
 
     @IsEmpty()

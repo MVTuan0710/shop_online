@@ -5,7 +5,6 @@ import {
     DeleteDateColumn,
     Entity, OneToMany,
     UpdateDateColumn,
-    JoinColumn
 } from "typeorm";
 import {UserEntity} from "../users/user.entity"
 

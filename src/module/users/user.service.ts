@@ -9,6 +9,7 @@ import {hashSync} from 'bcryptjs';
 import {JwtService} from "@nestjs/jwt";
 import { UserLogEntity } from "../user-log/user-log.entity";
 import { UserLogService } from "../user-log/user-log.service";
+import { RoleEntity } from "../role/role.entity";
 
 
 
@@ -17,9 +18,12 @@ export class UserService {
     public userEntity = new UserEntity();
     constructor(@InjectRepository(UserEntity) 
         private readonly userRepository: Repository<UserEntity>,
-                private readonly roleService: RoleService,
-                private readonly jwtService : JwtService,
-                private readonly userLogService: UserLogService,
+                
+        private readonly roleService: RoleService,
+                
+        private readonly jwtService : JwtService,
+                
+        private readonly userLogService: UserLogService,
 
     ) {}
    
@@ -74,7 +78,8 @@ export class UserService {
 
     async getById(user_id : string): Promise<UserEntity> {
         const accounts = await this.userRepository.findOne({
-            where: {user_id: user_id }
+            where: {user_id: user_id }, 
+            relations: { roleEntity : true }
         })
         delete accounts.password;
         return accounts;

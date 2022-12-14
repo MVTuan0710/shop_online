@@ -8,8 +8,7 @@ import {
   PrimaryGeneratedColumn, UpdateDateColumn
 } from 'typeorm'
 import { ItemEntity } from '../item/item.entity'
-import { CategoryEntity } from '../categories/category.entity'
-import { UserEntity } from '../users/user.entity'
+
 
 @Entity({ name: 'item_log' })
 export class ItemLogEntity extends BaseEntity {
@@ -29,7 +28,10 @@ export class ItemLogEntity extends BaseEntity {
   usage : string;
 
   @Column({name : 'name', type : 'varchar', nullable : true})
-  name: string
+  name: string;
+
+  @Column({name : 'category_id', type : 'varchar', nullable : true})
+  category_id: string;
 
   @ManyToOne((type) => ItemEntity, (itemEntity) => itemEntity.itemLogEntity)
   @JoinColumn({ name: 'item_id' })

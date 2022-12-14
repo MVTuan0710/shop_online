@@ -23,6 +23,16 @@ export class ItemService {
 
     ) {}
 
+    async getByIdNormal(item_id:string): Promise<ItemEntity>{
+        try{
+            const result = await this.itemRepository.findOne({where: {item_id: item_id}});
+            return result;
+        }catch(err){
+            console.log('errors',err);
+            throw new HttpException('Bad req',400);
+        }
+    }
+
     // find item by id
     async getById(data: GetItemDTO): Promise<ItemEntity> {
         try{
@@ -63,9 +73,6 @@ export class ItemService {
                 for(let j= 0;j < item.wareHouseEntity.length ; j++){
                     const month = moment().add(30, 'days').format('DD/MM/YYYY');
                     const expiry = moment(item.wareHouseEntity[j].expiry).format('DD/MM/YYYY');
-    
-                    console.log(Number(item.wareHouseEntity[j].expiry));
-                    console.log(expiry,month);
                     
                     if(item.wareHouseEntity[j].quantity <= 5){
                         if(month <= expiry){
@@ -85,7 +92,8 @@ export class ItemService {
             }
             
         }catch(err){
-            throw new HttpException('failed',500)
+            console.log('errors',err);
+            throw new HttpException('Bad req',400);
         }        
 }
 
@@ -116,7 +124,8 @@ export class ItemService {
             }
             
         }catch(err){
-            throw new HttpException('failed',500)
+            console.log('errors',err);
+            throw new HttpException('Bad req',400);
         }
        
 
@@ -154,7 +163,8 @@ export class ItemService {
             }
             return result;
         }catch(err){
-            throw err;
+            console.log('errors',err);
+            throw new HttpException('Bad req',400);
         }
         
     }
@@ -167,7 +177,6 @@ export class ItemService {
             if (isItemExists) throw new HttpException('The item already in use', HttpStatus.CONFLICT)
         
             const category = await this.categoryService.getById(data.category_id);
-            const user = await this.userService.getByEmail(data.email);
     
             // Create item
                 const itemEntity = new ItemEntity();
@@ -177,7 +186,7 @@ export class ItemService {
                 itemEntity.weight = data.weight;
                 itemEntity.usage = data.usage;
                 itemEntity.categoryEntity =category;
-                itemEntity.userEntity= user;
+                
 
             const result = await this.itemRepository.save(itemEntity);
 
@@ -195,7 +204,8 @@ export class ItemService {
             return result;
 
         }catch(err){
-            throw new HttpException('The item cannot create', HttpStatus.INTERNAL_SERVER_ERROR);
+            console.log('errors',err);
+            throw new HttpException('Bad req',400);
         }
       }
     
@@ -209,7 +219,6 @@ export class ItemService {
 
   
                 const category = await this.categoryService.getById(data.category_id);
-                const user = await this.userService.getByEmail(data.email)
     
                 const itemEntity = new ItemEntity();
                 itemEntity.name = data.name;
@@ -218,7 +227,6 @@ export class ItemService {
                 itemEntity.weight = data.weight;
                 itemEntity.usage = data.usage;
                 itemEntity.categoryEntity =category;
-                itemEntity.userEntity= user;
                     
             // update item
             const createItemEntity = await this.itemRepository.create(itemEntity);
@@ -238,8 +246,8 @@ export class ItemService {
 
            return result;
        }catch (err){
-           console.log('error',err);
-           throw console.log('Can`t update item');
+            console.log('errors',err);
+            throw new HttpException('Bad req',400);
        }
     }
 
@@ -256,7 +264,7 @@ export class ItemService {
             return item;
         }catch (err){
             console.log('errors',err);
-            throw console.log('Can`t delete Warehouse');
+            throw new HttpException('Bad req',400);
         }
     }
 }

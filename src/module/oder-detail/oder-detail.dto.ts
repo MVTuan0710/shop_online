@@ -11,5 +11,9 @@ export class CreateOderDetailDTO{
     @IsNotEmpty()
     quantity : number;
 
+
     user_id: string;
+    oder_price: number;
+    origin_price: number;
+    item_info: string;
 }

@@ -4,6 +4,7 @@ import {OderEntity} from "./oder.entity";
 import {Repository} from "typeorm";
 import {CreateOderDTO} from "./oder.dto";
 import { UserService } from "../users/user.service";
+import { OderDetailService } from "../oder-detail/oder-detail.service";
 
 
 
@@ -11,7 +12,8 @@ import { UserService } from "../users/user.service";
 export class OderService {
     constructor(@InjectRepository(OderEntity) 
         private readonly oderRepository: Repository<OderEntity>,
-                private readonly userService: UserService
+        private readonly userService: UserService,
+        private readonly oderDetailService: OderDetailService
     ) {}
 
     // find oder-detail by id
@@ -42,27 +44,33 @@ export class OderService {
 
     
     // create oder-detail
-    async create(data: CreateOderDTO): Promise<OderEntity> {
-        try {
-           // user
-            const user  = await this.userService.getById(data.user_id)
+    // async create(data: CreateOderDTO): Promise<OderEntity> {
+    //     try {
+    //        // user
+    //         const user  = await this.userService.getById(data.user_id)
 
-            if (!user){
-                throw console.log(`Oder_detail don't exist`);
-            }
+    //         if (!user){
+    //             throw console.log(`Oder_detail don't exist`);
+    //         }
             
 
-            const oderEntity = new OderEntity();
-            oderEntity.userEntity = user;
+    //         const oderEntity = new OderEntity();
+    //         // oderEntity.oder_item = data.oder_item
+    //         oderEntity.userEntity = user;
 
-            // save oder 
-            const result = await this.oderRepository.save(oderEntity);
-            return result;
-        }catch(err){
-            console.log("errors",err);
-             throw console.log('Can`t create Oder');
-        }
-    }
+    //         for(let i = 0; i<data.oder_item.length; i++){
+    //             await this.oderDetailService.create(data[i].oder_item)
+    //         }
+
+    //         // save oder 
+    //         const result = await this.oderRepository.save(oderEntity);
+
+    //         return result;
+    //     }catch(err){
+    //         console.log("errors",err);
+    //          throw console.log('Can`t create Oder');
+    //     }
+    // }
     
     // update oder-detail
     async update(oder_id : string, data: CreateOderDTO): Promise<any> {

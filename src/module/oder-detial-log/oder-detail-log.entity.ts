@@ -7,8 +7,6 @@ import {
     JoinColumn,
     ManyToOne, UpdateDateColumn,
 } from "typeorm";
-import { OderEntity } from "../oder/oder.entity";
-import { ItemEntity } from "../item/item.entity";
 import { OderDetailEntity } from "../oder-detail/oder-detail.entity";
 
 
@@ -17,12 +15,18 @@ export class OderDetailLogEntity extends BaseEntity{
     @PrimaryGeneratedColumn('uuid')
     id : string;
 
+    @Column({name : 'item_info',  type : 'varchar' , nullable : true})
+    item_info : string;
+
     @Column({name : 'quantity',  type : 'integer' , nullable : true})
     quantity : number;
 
-    @Column({name : 'total_money',  type : 'integer' , nullable : true})
-    total_money : number;
+    @Column({name : 'oder_price',  type : 'integer' , nullable : true})
+    oder_price : number;
 
+    @Column({name : 'origin_price',  type : 'integer' , nullable : true})
+    origin_price : number;
+    
     @ManyToOne((type)=>OderDetailEntity, (oderDetailEntity)=>oderDetailEntity.oderDetailLogEntity)
     @JoinColumn({name: 'oder_detail_id'})
     oderDetailEntity: OderDetailEntity;

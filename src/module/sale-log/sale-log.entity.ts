@@ -6,38 +6,29 @@ import {
     BaseEntity, 
     Column, 
     Entity,
-    PrimaryGeneratedColumn,
-    DeleteDateColumn
+    PrimaryGeneratedColumn
 } from 'typeorm';
 import { SaleEntity } from '../sale/sale.entity';
 
-@Entity({name: 'sale_item'})
+@Entity({name: 'sale_log'})
 export class SaleLogEntity extends BaseEntity{
     @PrimaryGeneratedColumn('uuid')
-    id: string;
+    sale_log_id: string;
 
-    @Column({name : 'name', type : 'string', nullable : true})
+    @Column({name : 'name', type : 'varchar', nullable : true})
     name: string;
 
-    @Column({name : 'amoubt', type : 'string', nullable : true})
-    amount: string;
+    @Column({name : 'voucher_code', type : 'varchar', nullable : true})
+    voucher_code: string;
 
-    @Column({name : 'discount', type : 'integer', nullable : true})
-    discount: number;
+    @Column({name : 'value', type : 'integer', nullable : true})
+    value: number;
 
-    @Column({name : 'start_date', type : 'timestamp with time zone', nullable : true})
-    start_date : Date;
+    @Column({name : 'start_date', type : 'date', nullable : true})
+    start_date: Date;
 
-    @Column({ name : 'start_date', type : 'timestamp with time zone', default: null })
-    end_date: Date
-
-    @Column({name : 'code', type : 'string', nullable : true})
-    code: string;
-
-    @Column({ default : false, name : 'applied'})
-    applied : boolean;
-
-
+    @Column({name : 'end_date', type : 'date', nullable : true})
+    end_date: Date;
 
     @ManyToOne((type) => SaleEntity, (saleEntity) => saleEntity.saleItemEntity)
     @JoinColumn({ name: 'sale_id' })

@@ -7,7 +7,8 @@ import {
     Column, 
     Entity,
     PrimaryGeneratedColumn,
-    DeleteDateColumn
+    DeleteDateColumn,
+    OneToOne
 } from 'typeorm';
 import { ItemEntity } from '../item/item.entity';
 import { SaleEntity } from '../sale/sale.entity';
@@ -15,12 +16,12 @@ import { SaleEntity } from '../sale/sale.entity';
 @Entity({name: 'sale_item'})
 export class SaleItemEntity extends BaseEntity{
     @PrimaryGeneratedColumn('uuid')
-    id: string;
+    sale_item_id: string;
 
     @Column({name : 'amount', type : 'integer', nullable : true})
     amount: number;
 
-    @ManyToOne((type) => ItemEntity, (itemEntity) => itemEntity.saleItemEntity)
+    @OneToOne((type) => ItemEntity, (itemEntity) => itemEntity.saleItemEntity)
     @JoinColumn({ name: 'item_id' })
     itemEntity: ItemEntity;
 

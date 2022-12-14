@@ -7,7 +7,8 @@ import {
     JoinColumn,
     ManyToOne,OneToOne,
     UpdateDateColumn,
-    OneToMany
+    OneToMany,
+    Column
 } from "typeorm";
 import { OderDetailEntity } from "../oder-detail/oder-detail.entity";
 import { ShippingEntity } from "../shipping/shipping.entity";
@@ -19,8 +20,23 @@ export class OderEntity extends BaseEntity{
     @PrimaryGeneratedColumn('uuid')
     oder_id : string;
 
+    // @Column({name : 'oder_item', type : 'jsonb', nullable : true})
+    // oder_item: OderDetailEntity[];
+
+    @Column({name : 'voucher_code', type : 'varchar', nullable : true})
+    voucher_code : string;
+
+    @Column({name : 'discount', type : 'integer', nullable : true})
+    discount : number;
+
+    @Column({name : 'original_total_money', type : 'integer', nullable : true})
+    original_total_money : number;
+
+    @Column({name : 'total_money', type : 'integer', nullable : true})
+    total_money : number;
+
     @OneToMany((type)=> OderDetailEntity, (oderDetailEntity)=>oderDetailEntity.oderEntity)
-    oderEntity : OderEntity;
+    oderDetailEntity: OderDetailEntity[];
 
     @OneToOne ((type)=> ShippingEntity, (shippingEntity)=>shippingEntity.oderEntity)
     shippingEntity: ShippingEntity

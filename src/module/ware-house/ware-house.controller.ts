@@ -66,7 +66,7 @@ export class WareHouseController{
     // @Roles(EnumRole.warehouse_manager, EnumRole.super_admin)
     @Put('update')
     async updateAccount(@Body() data : UpdateWareHouseDTO, @Res() res, @Headers()token: string): Promise<any> {
-        return this.wareHouseService.update(data,token).then(result =>{
+        return this.wareHouseService.update(data).then(result =>{
             res.status(200).json({
                 message : 'success',
                 result,

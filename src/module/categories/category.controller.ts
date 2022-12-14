@@ -7,7 +7,7 @@ import { Roles } from '../decorator/role.decorator';
 import { EnumRole } from '../constant/role/role.constant'
 
 @Controller('category')
-@UseGuards(GuardsJwt, RolesGuard)
+// @UseGuards(GuardsJwt, RolesGuard)
 export class CategoryController{
     constructor(private categoryService  : CategoryService) {}
 
@@ -46,7 +46,7 @@ export class CategoryController{
     }
 
     //create category
-    @Roles(EnumRole.super_admin)
+    // @Roles(EnumRole.super_admin)
     @Post('create')
     async create(@Res() res, @Body()data: CreateCategoryDTO) : Promise<any>{
         return this.categoryService.create(data).then(result =>{

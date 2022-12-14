@@ -31,20 +31,20 @@ export class OderController{
 
 
     // @Roles(EnumRole.super_admin)
-    @Post('create')
-    async create(@Res() res, @Body() body: CreateOderDTO){
-        return this.oderService.create(body).then(result =>{
-            res.status(200).json({
-                message : 'success',
-                result,
-            });
-        }).catch(err =>{
-            res.status(500).json({
-                message : 'failed',
-                err,
-            });
-        })
-    }
+    // @Post('create')
+    // async create(@Res() res, @Body() body: CreateOderDTO){
+    //     return this.oderService.create(body).then(result =>{
+    //         res.status(200).json({
+    //             message : 'success',
+    //             result,
+    //         });
+    //     }).catch(err =>{
+    //         res.status(500).json({
+    //             message : 'failed',
+    //             err,
+    //         });
+    //     })
+    // }
 
     @Delete('delete/:oder_id')
     async delete(@Res() res, @Param('oder_id')oder_id:string){
