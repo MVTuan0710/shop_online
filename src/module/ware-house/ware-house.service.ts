@@ -32,7 +32,8 @@ export class WareHouseService {
             });
             return result;
         }catch(err){
-            throw new HttpException('failed',500)
+            console.log(err)
+            throw new HttpException('Bad req',500)
         }
 
     }
@@ -46,7 +47,8 @@ export class WareHouseService {
 
             return result;
         }catch(err){
-
+            console.log(err)
+            throw new HttpException('Bad req',500)
         }
     }
 
@@ -57,7 +59,8 @@ export class WareHouseService {
     //             relations: { itemEntity: true, userEntity: true },
     //         });
     //     }catch (err){
-    //         throw new HttpException('failed',500)
+    //           console.log(err)
+            // throw new HttpException('Bad req',500)
     //     }
     // }
 
@@ -70,13 +73,14 @@ export class WareHouseService {
             return result;
 
         }catch(err){
-            throw new HttpException('failed',500)
+            console.log(err)
+            throw new HttpException('Bad req',500)
         }
         
     }
     
     // create warehouse
-    async create(data: CreateWareHouseDTO, token: any): Promise<WareHouseEntity> {
+    async create(data: CreateWareHouseDTO): Promise<WareHouseEntity> {
         try {
             // check id exists
             console.log(data)
@@ -106,8 +110,8 @@ export class WareHouseService {
 
             return _result;
         }catch(err){
-            console.log("errors",err);
-             throw console.log('Can`t create ware house');
+            console.log(err)
+            throw new HttpException('Bad req',500)
         }
     }
     
@@ -140,36 +144,25 @@ export class WareHouseService {
 
            return result;
        }catch (err){
-           console.log('error',err);
-           throw console.log('Can`t update ware-house');
+        console.log(err)
+        throw new HttpException('Bad req',500)
        }
     }
 
     // cap nhat nay se khong cap nhat lai user da tao record ware house
     // => kh co truong user_id
-    async updateByOderDetail( data: UpdateWareHouseDTO): Promise<any> {
+    async updateByOder(ware_house_id: string, quantity: number): Promise<any> {
         try{
-            const _item = await this.itemService.getByIdNormal(data.item_id);
-            const warehouse = await this.wareHouseRepository.findOne({where : {ware_house_id : data.ware_house_id}});
+            const warehouse = await this.wareHouseRepository.findOne({where : {ware_house_id : ware_house_id}});
             
-            if (!warehouse)
-            throw console.log('Can`t found Account by account_id');
-
-            if(data.quantity < 0){
-                var new_quantity = -data.quantity;
-            }else{
-                if(data.quantity == 0){
-                    var new_quantity = 0;
-                }
-            }
-
             const wareHouseEntity = new WareHouseEntity();
-            wareHouseEntity.expiry = data.expiry;
-            wareHouseEntity.quantity = new_quantity;
-            wareHouseEntity.itemEntity = _item;
+            wareHouseEntity.expiry = warehouse.expiry;
+            wareHouseEntity.quantity = quantity;
+            wareHouseEntity.userEntity = warehouse.userEntity;
+            wareHouseEntity.itemEntity = warehouse.itemEntity;
 
-           await this.wareHouseRepository.update(data.ware_house_id, wareHouseEntity);
-           const result = await this.wareHouseRepository.findOne({where: {ware_house_id: data.ware_house_id}})
+           await this.wareHouseRepository.update(ware_house_id,wareHouseEntity);
+           const result = await this.wareHouseRepository.findOne({where: {ware_house_id: ware_house_id}})
 
            const new_wareHouseLogEntity = new WareHouseLogEntity();
            new_wareHouseLogEntity.expiry = wareHouseEntity.expiry;
@@ -196,8 +189,8 @@ export class WareHouseService {
             const result = await this.wareHouseRepository.delete(ware_house_id);
             return data;
         }catch (err){
-            console.log('errors',err);
-            throw console.log('Can`t delete Warehouse');
+            console.log(err)
+            throw new HttpException('Bad req',500)
         }
     }
 }

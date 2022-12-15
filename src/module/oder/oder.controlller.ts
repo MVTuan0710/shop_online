@@ -1,10 +1,11 @@
-import {Body, Controller, Delete, Get, Param, Post, Res, Put, UseGuards} from "@nestjs/common";
+import {Body, Controller, Delete, Get, Param, Post, Res, Put, UseGuards, Req} from "@nestjs/common";
 import {OderService} from "./oder.service";
 import {GuardsJwt} from "../auth/guard/guards.jwt";
 import {RolesGuard} from "../role/guards/role.guards";
 import {EnumRole} from "../constant/role/role.constant";
 import {CreateOderDTO} from "./oder.dto"
 import { resolve } from "path";
+import { Request } from "express";
 
 
 @Controller('oder')
@@ -31,20 +32,21 @@ export class OderController{
 
 
     // @Roles(EnumRole.super_admin)
-    // @Post('create')
-    // async create(@Res() res, @Body() body: CreateOderDTO){
-    //     return this.oderService.create(body).then(result =>{
-    //         res.status(200).json({
-    //             message : 'success',
-    //             result,
-    //         });
-    //     }).catch(err =>{
-    //         res.status(500).json({
-    //             message : 'failed',
-    //             err,
-    //         });
-    //     })
-    // }
+    @Post('create')
+    async create(@Res() res, @Body() data: CreateOderDTO, @Req() req){
+        data.user_id = req['user'].id;
+        return this.oderService.create(data).then(result =>{
+            res.status(200).json({
+                message : 'success',
+                result,
+            });
+        }).catch(err =>{
+            res.status(500).json({
+                message : 'failed',
+                err,
+            });
+        })
+    }
 
     @Delete('delete/:oder_id')
     async delete(@Res() res, @Param('oder_id')oder_id:string){

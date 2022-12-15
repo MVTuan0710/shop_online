@@ -18,18 +18,9 @@ export class CreateWareHouseDTO{
     item_id : string;
 }
 export class UpdateWareHouseDTO{
-    
-    @IsEmpty()
-    item_id : string;
-
-    user_id : string;
-
-    @IsEmpty()
     ware_house_id : string;
-
-    @IsEmpty()
     quantity : number;
-
-    @IsEmpty()
-    expiry : Date;
+    user_id: string;
+    expiry: Date;
+    item_id: string;
 }

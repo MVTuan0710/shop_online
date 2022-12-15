@@ -19,7 +19,7 @@ export class SaleService {
         try{
             const result = await this.saleRepository.findOne({
                 where: {sale_id: sale_id},
-                relations: { saleLogEntity : true }
+                relations: { saleLogEntity : true, saleItemEntity: true }
             });
             return result;
         }catch(err){
@@ -32,7 +32,7 @@ export class SaleService {
         try{
             const result = await this.saleRepository.findOne({
                 where: {voucher_code: voucher_code},
-                relations: { saleLogEntity : true }
+                relations: { saleLogEntity : true, saleItemEntity: true }
             });
             return result;
         }catch(err){

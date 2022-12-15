@@ -47,8 +47,9 @@ export class WareHouseController{
 
     // @Roles(EnumRole.warehouse_manager, EnumRole.super_admin)
     @Post('create')
-    async createWareHouse(@Res() res, @Body()data: CreateWareHouseDTO, @Headers()token: string) : Promise<any>{
-        return this.wareHouseService.create(data,token).then(result =>{
+    async createWareHouse(@Res() res, @Req() req,@Body()data: CreateWareHouseDTO, @Headers()token: string) : Promise<any>{
+        data.user_id = req['user'].id;
+        return this.wareHouseService.create(data).then(result =>{
             res.status(200).json({
                 message : 'success',
                 result,

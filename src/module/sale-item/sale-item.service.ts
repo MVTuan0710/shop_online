@@ -31,6 +31,18 @@ export class SaleItemService {
         }
     }
 
+    async updateByOder(sale_item_id: string, amount: number): Promise<any>{
+        try{
+            const sale_item = await this.saleItemRepository.findOne({where:{sale_item_id: sale_item_id}});
+            const tmp = sale_item.amount - amount;
+            sale_item.amount = tmp;
+            
+            await this.saleItemRepository.update(sale_item_id,sale_item);
+        }catch(err){
+            console.log("errors",err);
+            throw new HttpException('Bad req',400);
+        }
+    }
 
     // Find All sale-item
     async find(): Promise<SaleItemEntity[]> {

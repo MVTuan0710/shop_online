@@ -13,15 +13,15 @@ import {
 import { OderDetailEntity } from "../oder-detail/oder-detail.entity";
 import { ShippingEntity } from "../shipping/shipping.entity";
 import { UserEntity } from "../users/user.entity";
-
+import { CreateOderItemDTO } from "./oder.dto";
 
 @Entity({name: 'oder'})
 export class OderEntity extends BaseEntity{
     @PrimaryGeneratedColumn('uuid')
     oder_id : string;
 
-    // @Column({name : 'oder_item', type : 'jsonb', nullable : true})
-    // oder_item: OderDetailEntity[];
+    @Column({name : 'oder_item', type : 'jsonb', nullable : true})
+    oder_item: CreateOderItemDTO[];
 
     @Column({name : 'voucher_code', type : 'varchar', nullable : true})
     voucher_code : string;
