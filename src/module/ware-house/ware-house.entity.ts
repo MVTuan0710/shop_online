@@ -30,7 +30,7 @@ export class WareHouseEntity extends BaseEntity{
     userEntity : UserEntity;
 
     @OneToMany((type)=>WareHouseLogEntity, (wareHouseLogEntity)=>wareHouseLogEntity.wareHouseEntity)
-    wareHouseLogEntity: WareHouseLogEntity
+    wareHouseLogEntity: WareHouseLogEntity;
 
     @ManyToOne((type)=> ItemEntity, (itemEntity)=>itemEntity.wareHouseEntity)
     @JoinColumn({name : 'item_id'})

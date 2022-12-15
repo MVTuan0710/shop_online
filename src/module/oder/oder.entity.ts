@@ -39,7 +39,7 @@ export class OderEntity extends BaseEntity{
     oderDetailEntity: OderDetailEntity[];
 
     @OneToOne ((type)=> ShippingEntity, (shippingEntity)=>shippingEntity.oderEntity)
-    shippingEntity: ShippingEntity
+    shippingEntity: ShippingEntity;
 
     @ManyToOne((type)=> UserEntity, (userEntity)=>userEntity.oderEntity)
     @JoinColumn({name : 'user_id'})

@@ -9,7 +9,7 @@ import { Request } from "express";
 
 
 @Controller('oder')
-// @UseGuards(GuardsJwt, RolesGuard)
+@UseGuards(GuardsJwt, RolesGuard)
 export class OderController{
     constructor(private oderService : OderService) {}
 

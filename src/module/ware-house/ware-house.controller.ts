@@ -4,10 +4,11 @@ import {CreateWareHouseDTO, UpdateWareHouseDTO} from "./ware-house.dto";
 import {GuardsJwt} from "../auth/guard/guards.jwt";
 import { RolesGuard } from "../role/guards/role.guards";
 import { Roles } from '../decorator/role.decorator';
-import { EnumRole } from '../constant/role/role.constant'
+import { EnumRole } from '../constant/role/role.constant';
+
 
 @Controller('ware-house')
-// @UseGuards(GuardsJwt, RolesGuard)
+@UseGuards(GuardsJwt, RolesGuard)
 export class WareHouseController{
     constructor(private wareHouseService  : WareHouseService) {}
 

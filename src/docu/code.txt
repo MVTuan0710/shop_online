@@ -155,3 +155,115 @@
     //        throw console.log('Can`t update item');
     //    }
     // }
+
+
+
+for(let j = 0; j < data.oder_item.length; j++){
+
+            const item = await this.itemService.getByIdNormal(data.oder_item[j].item_id);
+            if (!item){
+                throw new HttpException('Not Found item', 404);
+            }
+            data.oder_item[j].item_info = JSON.stringify(item);
+            // tinh tong so luong co san trong ware house
+            let sum_quantity_of_item_in_ware_house= 0;
+            // tinh hieu giua so luong item can mua va so luong item co trong ware house
+            let tmp = 0;
+            let ware_house =await this.wareHouserService.getByItemId(data.oder_item[j].item_id);
+            for(let z = 0; z < ware_house.length; z++){
+                // month = ngay hien tai + 30 ngay 
+                // expiry ngay het hang su dung cua item trong ware house
+                const month = moment().add(30, 'days').format('DD/MM/YYYY');
+                const expiry = moment(ware_house[z].expiry).format('DD/MM/YYYY');
+                
+                if(month <= expiry){
+                    sum_quantity_of_item_in_ware_house += ware_house[z].quantity;
+                    
+                    if(sum_quantity_of_item_in_ware_house >= data.oder_item[j].quantity)
+                        break;
+                }
+            }
+
+            // cap nhat lai quantity cua item trong ware house
+            for(let x = 0; x < ware_house.length; x++){
+            
+                const month = moment().add(30, 'days').format('DD/MM/YYYY');
+                const expiry = moment(ware_house[x].expiry).format('DD/MM/YYYY');
+
+                // tinh toan, update lai ware houe 
+                if(month <= expiry){
+                    // tinh toan tru lay du de cap nhat quantity cua item trong ware house
+                    tmp = data.oder_item[j].quantity - ware_house[x].quantity
+                    if(tmp > 0){
+                        ware_house[x].quantity = 0
+                        await this.wareHouserService.updateByOder(ware_house[x].ware_house_id,ware_house[x].quantity);
+
+                    }else{
+                        ware_house[x].quantity = -tmp;
+                        await this.wareHouserService.updateByOder(ware_house[x].ware_house_id,ware_house[x].quantity);
+                        break;
+                    }
+                }
+            }
+            // Tinh tien 
+                // tinh origin_price
+                data.oder_item[j].origin_price = data.oder_item[j].quantity * item.price;
+                // tinh origin_total_money
+                data.original_total_money += data.oder_item[j].origin_price;
+                if(user.roleEntity.role_id === 3 || user.roleEntity.role_id === 2 || user.roleEntity.role_id === 1 ){
+                    var oder_price = data.oder_item[j].origin_price - (((data.oder_item[j].origin_price)/100)*20);
+                    data.total_money +=oder_price;
+                }else{
+                    if(data.voucher_code){
+                        const voucher = await this.saleService.getByCode(data.voucher_code);
+                        for(let j = 0; j < voucher.saleItemEntity.length; j++){
+                            if(data.oder_item[j].item_id == voucher.saleItemEntity[j].itemEntity.item_id){
+                                var oder_price = data.oder_item[j].origin_price - voucher.value;
+                                data.total_money +=oder_price;
+
+                                await this.saleItemService.updateByOder(voucher.saleItemEntity[j].sale_item_id,data.oder_item[j].quantity)
+                            }else{
+                                var oder_price = data.oder_item[j].origin_price;
+                                data.total_money +=oder_price;
+                            }
+                        }
+                    }else{
+                        let oder_price = data.oder_item[j].origin_price;
+                        data.total_money += oder_price;
+
+                    }
+                }
+            const new_oder_detail = new OderDetailEntity();
+            new_oder_detail.item_info = data.oder_item[j].item_info;
+            new_oder_detail.item_id = data.oder_item[j].item_id;
+            new_oder_detail.quantity = data.oder_item[j].quantity,
+            new_oder_detail.oderEntity = oder;
+            new_oder_detail.oder_price = oder_price;
+            new_oder_detail.origin_price =  data.oder_item[j].origin_price;
+            
+            await this.oderDetailService.create(new_oder_detail);
+            
+        }
+
+
+
+
+
+
+        const warehouse = await this.wareHouseRepository.findOne({where : {ware_house_id : ware_house_id}});
+            
+            const wareHouseEntity = new WareHouseEntity();
+            wareHouseEntity.expiry = warehouse.expiry;
+            wareHouseEntity.quantity = quantity;
+            wareHouseEntity.userEntity = warehouse.userEntity;
+            wareHouseEntity.itemEntity = warehouse.itemEntity;
+
+           await this.wareHouseRepository.update(ware_house_id,wareHouseEntity);
+           const result = await this.wareHouseRepository.findOne({where: {ware_house_id: ware_house_id}})
+
+           const new_wareHouseLogEntity = new WareHouseLogEntity();
+           new_wareHouseLogEntity.expiry = wareHouseEntity.expiry;
+           new_wareHouseLogEntity.quantity= wareHouseEntity.quantity;
+           new_wareHouseLogEntity.wareHouseEntity = result
+
+           await this.wareHouseLogService.create(new_wareHouseLogEntity)

@@ -1,8 +1,10 @@
 import {IsNotEmpty} from "class-validator";
 import { ItemEntity } from "../item/item.entity";
+import { UserEntity } from "../users/user.entity";
 
 export class CreateOderDTO{
     user_id : string;
+    userEntity: UserEntity;
     voucher_code: string;
     oder_item: CreateOderItemDTO[];
     original_total_money: number;
