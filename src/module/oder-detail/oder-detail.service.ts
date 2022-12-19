@@ -82,11 +82,13 @@ export class OderDetailService {
                 const item = await this.itemService.getByIdNormal(oder.oder_item[i].item_id);
 
                 const origin_price = item.price * oder.oder_item[i].quantity;
+                let oder_price = 0;
                 if(oder.voucher_code){
                     const sale_item = await this.saleItemService.getByOderDetail(oder.voucher_code,oder.oder_item[i].item_id);
+                       
                     if(sale_item){
                         if(sale_item.amount - oder.oder_item[i].quantity >= 0){
-                            let oder_price = origin_price - sale_item.saleEntity.value;
+                            oder_price = origin_price - sale_item.saleEntity.value;
                         }
                         if(sale_item.amount - oder.oder_item[i].quantity < 0){
                             // use voucher
@@ -110,7 +112,7 @@ export class OderDetailService {
                             await queryRunner.manager.save(OderDetailLogEntity,new_oder_detail);
 
 
-                            
+
                             // can't use voucher
                             const _new_oder_detail = new OderDetailEntity();
                             _new_oder_detail.item_id = oder.oder_item[i].item_id;
@@ -133,7 +135,7 @@ export class OderDetailService {
                         }
                     }
                 }else{
-                    var oder_price = origin_price;
+                    oder_price = origin_price;
                 }
 
                 const new_oder_detail = new OderDetailEntity();
