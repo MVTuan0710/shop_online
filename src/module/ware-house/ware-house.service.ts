@@ -1,7 +1,7 @@
 import {HttpException, Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {WareHouseEntity} from "./ware-house.entity";
-import {DataSource, MoreThan, MoreThanOrEqual, Repository} from "typeorm";
+import {DataSource, EntityManager, MoreThan, MoreThanOrEqual, QueryRunner, Repository} from "typeorm";
 import {CreateWareHouseDTO, UpdateWareHouseDTO} from "./ware-house.dto";
 import { UserService } from "../users/user.service";
 import { ItemService } from "../item/item.service";
@@ -9,6 +9,7 @@ import {WareHouseLogEntity} from "../ware-house-log/ware-house-log.entity";
 import {WareHouseLogService} from "../ware-house-log/ware-house-log.servic";
 import { ItemEntity } from "../item/item.entity";
 import { CreateOderItemDTO } from "../oder/oder.dto";
+import { Query } from "typeorm/driver/Query";
 var moment = require('moment');
 
 @Injectable()
@@ -81,7 +82,7 @@ export class WareHouseService {
     }
     
     // create warehouse
-    async create(data: CreateWareHouseDTO): Promise<WareHouseEntity> {
+    async create( data: CreateWareHouseDTO): Promise<WareHouseEntity> {
         try {
             // check id exists
             console.log(data)
@@ -119,10 +120,7 @@ export class WareHouseService {
     // cap nhat nay se khong cap nhat lai user da tao record ware house
     // => kh co truong user_id
     // quantity can mua
-    async updateByOder(data: CreateOderItemDTO[]): Promise<any>{
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction();
+    async updateByOder(data: CreateOderItemDTO[], queryRunner: QueryRunner): Promise<any>{
         try{  
             
             for(let i = 0; i< data.length; i++){
@@ -141,19 +139,16 @@ export class WareHouseService {
                     }
                     
                 }))
+                let quantity = data[i].quantity;
                 
-                console.log(`===========`);
                 // let array_ware_house = [];
                 for(let j = 0; j < ware_house.length; j++){
                     
-                    
-                    
-                    
-                    if(data[i].quantity - ware_house[j].quantity > 0){
-                        data[i].quantity = data[i].quantity - ware_house[j].quantity;
+                    if(quantity- ware_house[j].quantity > 0){
+
+                        quantity = quantity - ware_house[j].quantity;
                         ware_house[j].quantity = 0;
 
-                        console.log(data[i].quantity);
                         const new_ware_house = new WareHouseEntity();
                         new_ware_house.expiry = ware_house[j].expiry;
                         new_ware_house.quantity = ware_house[j].quantity;
@@ -163,11 +158,10 @@ export class WareHouseService {
                         await queryRunner.manager.update(WareHouseEntity, ware_house[j].ware_house_id, new_ware_house);
                     }
 
-                    if(data[i].quantity - ware_house[j].quantity == 0){
-                        data[i].quantity = 0;
+                    if(quantity- ware_house[j].quantity == 0){
+                        quantity = 0;
                         ware_house[j].quantity = 0;
 
-                        console.log(data[i].quantity);
                         const new_ware_house = new WareHouseEntity();
                         new_ware_house.expiry = ware_house[j].expiry;
                         new_ware_house.quantity = ware_house[j].quantity;
@@ -177,11 +171,10 @@ export class WareHouseService {
                         await queryRunner.manager.update(WareHouseEntity, ware_house[j].ware_house_id, new_ware_house);
                     }
 
-                    if(data[i].quantity - ware_house[j].quantity < 0){
-                        ware_house[j].quantity = ware_house[j].quantity - data[i].quantity ;
-                        data[i].quantity = 0;
+                    if(quantity - ware_house[j].quantity < 0){
+                        ware_house[j].quantity = ware_house[j].quantity - quantity ;
+                        quantity= 0;
 
-                        console.log(data[i].quantity);
                         const new_ware_house = new WareHouseEntity();
                         new_ware_house.expiry = ware_house[j].expiry;
                         new_ware_house.quantity = ware_house[j].quantity;
@@ -191,20 +184,15 @@ export class WareHouseService {
                         await queryRunner.manager.update(WareHouseEntity, ware_house[j].ware_house_id, new_ware_house);
                     }  
                 }
-                if(data[i].quantity > 0){
+                if(quantity > 0){
                     throw new HttpException('Out of Stock',500);
                 }
             }
-            await queryRunner.commitTransaction();
-
+           
         }catch(err){
-            await queryRunner.rollbackTransaction();
+           
             console.log(err)
             throw new HttpException('Bad req',500);
-            
-            
-        } finally {
-            await queryRunner.release();
         }
 
     }

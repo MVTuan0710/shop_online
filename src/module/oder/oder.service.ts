@@ -64,6 +64,9 @@ export class OderService {
     
     // create oder
    async create (data: CreateOderDTO):Promise<any> {
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction();
     try{
         const user = await this.userService.getById(data.user_id);
         
@@ -73,21 +76,35 @@ export class OderService {
         new_oder.total_money = 0;
         new_oder.voucher_code = data.voucher_code;
         new_oder.oder_item = data.oder_item;
+        const _oder = await queryRunner.manager.save(OderEntity,new_oder); 
         
-        await this.wareHouserService.updateByOder(data.oder_item);
+        await this.wareHouserService.updateByOder(data.oder_item, queryRunner);
         
-        
-            
-            // const oder = await this.oderRepository.save(new_oder); 
-        
-    
+        await this.oderDetailService.createByOder(_oder,queryRunner);
+
+        if(new_oder.voucher_code){
+            await this.saleItemService.updateSaleItemByOder(data.voucher_code, data.oder_item, queryRunner);
+        }
+
+        const oder_detail = await this.oderDetailService.getByOderId(_oder.oder_id);
+        for(let i = 0; i < oder_detail.length; i++){
+            new_oder.original_total_money += oder_detail[i].origin_price;
+            new_oder.total_money += oder_detail[i].oder_price; 
+        }
+        const result = await queryRunner.manager.update(OderEntity,_oder.oder_id,new_oder); 
         
         //check, update ware house by oder
         
-
+        await queryRunner.commitTransaction();
+        return result;
     }catch(err){
+        await queryRunner.rollbackTransaction();
         console.log(err)
-        throw new HttpException('failed',500)
+        throw new HttpException('Bad req',500);
+        
+        
+    } finally {
+        await queryRunner.release();
     }
         
    }

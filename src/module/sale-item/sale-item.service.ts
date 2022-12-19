@@ -1,11 +1,12 @@
 import {HttpException, Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import { SaleItemEntity } from "./sale-item.entity";
-import {Repository} from "typeorm";
+import {MoreThan, QueryRunner, Repository} from "typeorm";
 import { CreateSaleItemDTO} from "./sale-item.dto";
 import { ItemService } from "../item/item.service";
 import { SaleLogEntity } from "../sale-log/sale-log.entity";
 import { SaleService } from "../sale/sale.service";
+import { CreateOderItemDTO } from "../oder/oder.dto";
 
 @Injectable()
 export class SaleItemService {
@@ -58,6 +59,24 @@ export class SaleItemService {
         }
         
     }
+    async getByOderDetail(voucher_code: string, item_id: string):Promise<SaleItemEntity>{
+        try{
+            const sale_item =  await this.saleItemRepository.findOne({
+                where: {
+                    itemEntity: {item_id: item_id},
+                    saleEntity: {voucher_code: voucher_code},
+                    amount : MoreThan(0),
+                },
+                
+            });
+            return sale_item;
+
+        }catch(err){
+            console.log("errors",err);
+            throw new HttpException('Bad req',400);
+        }
+        
+    }
     
     // create sale
     async create(data: CreateSaleItemDTO): Promise<any> {
@@ -88,7 +107,38 @@ export class SaleItemService {
             throw new HttpException('Bad req',400);
         }
     }
-    
+    async updateSaleItemByOder(voucher_code: string, oder_item:CreateOderItemDTO[],  queryRunner: QueryRunner):Promise<any>{
+        try{
+            for(let i = 0; i< oder_item.length; i++){
+                const sale_item =  await this.saleItemRepository.findOne({
+                    where: {
+                        itemEntity: {item_id: oder_item[i].item_id},
+                        saleEntity: {voucher_code: voucher_code}
+                    }
+                });
+                if(sale_item){
+                    let new_sale_item = new SaleItemEntity();
+                    new_sale_item = sale_item;
+                    if(new_sale_item.amount >= oder_item[i].quantity){
+                        new_sale_item.amount = new_sale_item.amount - oder_item[i].quantity;
+                    }
+                    if(new_sale_item.amount != 0 && new_sale_item.amount < oder_item[i].quantity){
+                        oder_item[i].quantity = oder_item[i].quantity - new_sale_item.amount
+                        new_sale_item.amount = 0; 
+                    }
+                    if(new_sale_item.amount < oder_item[i].quantity){
+                        throw new HttpException('Bad req',400);
+                    }
+
+                    await queryRunner.manager.update(SaleItemEntity,sale_item.sale_item_id,new_sale_item)
+                }
+            }
+        }catch(err){
+            console.log("errors",err);
+            throw new HttpException('Bad req',400);
+        }
+       
+    }
     // update sale-item
     async update(sale_item_id : string, data: CreateSaleItemDTO): Promise<any> {
        try {

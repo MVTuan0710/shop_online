@@ -40,7 +40,19 @@ export class SaleService {
             throw new HttpException('Bad req',400);
         }
     }
-
+    // su dung o oder-detail
+    async getByCodeAndItemId(voucher_code: string, item_id: string): Promise<SaleEntity> {
+        try{
+            const result = await this.saleRepository.findOne({
+                where: {voucher_code: voucher_code, saleItemEntity: {itemEntity : {item_id : item_id}}},
+                relations: { saleLogEntity : true, saleItemEntity: true }
+            });
+            return result;
+        }catch(err){
+            console.log("errors",err);
+            throw new HttpException('Bad req',400);
+        }
+    }
     // Find All sale
     async find(): Promise<SaleEntity[]> {
         try{
