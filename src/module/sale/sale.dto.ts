@@ -22,3 +22,7 @@ export class CreateSaleDTO{
 export class UpdateActiveSaleDTO{
     applied: boolean;
 }
+export class GetSaleItemDTO{
+    voucher_code: string;
+    item_id: string;
+}

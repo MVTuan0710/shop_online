@@ -75,28 +75,36 @@ export class OderService {
         new_oder.original_total_money = 0;
         new_oder.total_money = 0;
         new_oder.voucher_code = data.voucher_code;
-        new_oder.oder_item = data.oder_item;
+        new_oder.oderDetailEntity = data.oderDetailEntity;
         const _oder = await queryRunner.manager.save(OderEntity,new_oder); 
         
-        await this.wareHouserService.updateByOder(data.oder_item, queryRunner);
+        await this.wareHouserService.updateByOder(data.oderDetailEntity, queryRunner);
         
-        await this.oderDetailService.createByOder(_oder,queryRunner);
+        if(user.roleEntity.role_id == 1|| user.roleEntity.role_id == 2|| user.roleEntity.role_id == 3){
+            await this.oderDetailService.createForStaff(_oder,queryRunner);
+        
+        }else{
 
-        if(new_oder.voucher_code){
-            await this.saleItemService.updateSaleItemByOder(data.voucher_code, data.oder_item, queryRunner);
+            await this.oderDetailService.createForCustomer(_oder,queryRunner);
+
+            if(new_oder.voucher_code){
+                await this.saleItemService.updateSaleItemByOder(data.voucher_code, data.oderDetailEntity, queryRunner);
+            }
         }
 
-        const oder_detail = await this.oderDetailService.getByOderId(_oder.oder_id);
+        const oder_detail = await this.oderDetailService.getByOderId(_oder.oder_id,queryRunner);
+    
         for(let i = 0; i < oder_detail.length; i++){
-            new_oder.original_total_money += oder_detail[i].origin_price;
-            new_oder.total_money += oder_detail[i].oder_price; 
+            _oder.original_total_money += oder_detail[i].origin_price;
+            _oder.total_money += oder_detail[i].oder_price; 
         }
-        const result = await queryRunner.manager.update(OderEntity,_oder.oder_id,new_oder); 
-        
-        //check, update ware house by oder
+
+        _oder.oderDetailEntity = oder_detail;
+        _oder.discount = _oder.original_total_money - _oder.total_money;
+        const result = await queryRunner.manager.save(OderEntity,_oder); 
         
         await queryRunner.commitTransaction();
-        return result;
+        return result
     }catch(err){
         await queryRunner.rollbackTransaction();
         console.log(err)

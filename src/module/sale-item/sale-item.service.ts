@@ -1,12 +1,14 @@
 import {HttpException, Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import { SaleItemEntity } from "./sale-item.entity";
-import {MoreThan, QueryRunner, Repository} from "typeorm";
+import {LessThanOrEqual, MoreThan, Raw, MoreThanOrEqual, QueryRunner, Repository, ArrayOverlap } from "typeorm";
 import { CreateSaleItemDTO} from "./sale-item.dto";
 import { ItemService } from "../item/item.service";
 import { SaleLogEntity } from "../sale-log/sale-log.entity";
 import { SaleService } from "../sale/sale.service";
-import { CreateOderItemDTO } from "../oder/oder.dto";
+import { OderDetailEntity } from "../oder-detail/oder-detail.entity";
+import { GetSaleItemDTO } from "../sale/sale.dto";
+var moment = require('moment');
 
 @Injectable()
 export class SaleItemService {
@@ -59,15 +61,36 @@ export class SaleItemService {
         }
         
     }
-    async getByOderDetail(voucher_code: string, item_id: string):Promise<SaleItemEntity>{
+    async getByOderDetail(data: GetSaleItemDTO):Promise<SaleItemEntity>{
         try{
+
             const sale_item =  await this.saleItemRepository.findOne({
-                where: {
-                    itemEntity: {item_id: item_id},
-                    saleEntity: {voucher_code: voucher_code},
-                    amount : MoreThan(0),
-                },
-                
+                where:[
+                    {
+                        itemEntity: {item_id: data.item_id},
+                        saleEntity: {
+                            voucher_code: data.voucher_code, 
+                            start_date: Raw((alias) => `${alias} < NOW()`),
+                            end_date: Raw((alias) => `${alias} > NOW()`),
+                        },
+                        amount : MoreThan(0),
+                    
+                    },
+                    {
+                        itemEntity: {item_id: data.item_id},
+                        saleEntity: {
+                            voucher_code: data.voucher_code, 
+                            start_date: Raw((alias) => `${alias} < NOW()`),
+                            end_date: null,
+                        },
+                        amount : MoreThan(0),
+                    
+                    }
+                ], 
+                relations: {
+                    itemEntity: true,
+                    saleEntity: true
+                }
             });
             return sale_item;
 
@@ -107,7 +130,7 @@ export class SaleItemService {
             throw new HttpException('Bad req',400);
         }
     }
-    async updateSaleItemByOder(voucher_code: string, oder_item:CreateOderItemDTO[],  queryRunner: QueryRunner):Promise<any>{
+    async updateSaleItemByOder(voucher_code: string, oder_item:OderDetailEntity[],  queryRunner: QueryRunner):Promise<any>{
         try{
             for(let i = 0; i< oder_item.length; i++){
                 const sale_item =  await this.saleItemRepository.findOne({
@@ -122,15 +145,13 @@ export class SaleItemService {
                     if(new_sale_item.amount >= oder_item[i].quantity){
                         new_sale_item.amount = new_sale_item.amount - oder_item[i].quantity;
                     }
-                    if(new_sale_item.amount != 0 && new_sale_item.amount < oder_item[i].quantity){
-                        oder_item[i].quantity = oder_item[i].quantity - new_sale_item.amount
+                    if(new_sale_item.amount < oder_item[i].quantity){
+    
                         new_sale_item.amount = 0; 
                     }
-                    if(new_sale_item.amount < oder_item[i].quantity){
-                        throw new HttpException('Bad req',400);
-                    }
+                   
 
-                    await queryRunner.manager.update(SaleItemEntity,sale_item.sale_item_id,new_sale_item)
+                    await queryRunner.manager.update(SaleItemEntity,sale_item.sale_item_id,new_sale_item);
                 }
             }
         }catch(err){

@@ -1,15 +1,14 @@
 import {HttpException, Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {WareHouseEntity} from "./ware-house.entity";
-import {DataSource, EntityManager, MoreThan, MoreThanOrEqual, QueryRunner, Repository} from "typeorm";
+import {DataSource, MoreThan, MoreThanOrEqual, QueryRunner, Raw, Repository} from "typeorm";
 import {CreateWareHouseDTO, UpdateWareHouseDTO} from "./ware-house.dto";
 import { UserService } from "../users/user.service";
 import { ItemService } from "../item/item.service";
 import {WareHouseLogEntity} from "../ware-house-log/ware-house-log.entity";
 import {WareHouseLogService} from "../ware-house-log/ware-house-log.servic";
 import { ItemEntity } from "../item/item.entity";
-import { CreateOderItemDTO } from "../oder/oder.dto";
-import { Query } from "typeorm/driver/Query";
+import { OderDetailEntity } from "../oder-detail/oder-detail.entity";
 var moment = require('moment');
 
 @Injectable()
@@ -120,7 +119,7 @@ export class WareHouseService {
     // cap nhat nay se khong cap nhat lai user da tao record ware house
     // => kh co truong user_id
     // quantity can mua
-    async updateByOder(data: CreateOderItemDTO[], queryRunner: QueryRunner): Promise<any>{
+    async updateByOder(data: OderDetailEntity[], queryRunner: QueryRunner): Promise<any>{
         try{  
             
             for(let i = 0; i< data.length; i++){
@@ -130,7 +129,8 @@ export class WareHouseService {
                     where: {
                         itemEntity: {item_id: data[i].item_id},
                         quantity: MoreThan(0),
-                        expiry: MoreThanOrEqual(month)
+                        // expiry: MoreThanOrEqual(month),
+                        expiry: Raw((alias) => `${alias} > :date`, { date: month })
                     },
                     
                     relations: { itemEntity: true},
