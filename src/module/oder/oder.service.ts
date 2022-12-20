@@ -5,13 +5,8 @@ import {Repository} from "typeorm";
 import {CreateOderDTO} from "./oder.dto";
 import { UserService } from "../users/user.service";
 import { OderDetailService } from "../oder-detail/oder-detail.service";
-import { ItemService } from "../item/item.service";
 import { WareHouseService } from "../ware-house/ware-house.service";
-import { runInThisContext } from "vm";
-import { SaleService } from "../sale/sale.service";
 import { SaleItemService } from "../sale-item/sale-item.service";
-import { OderDetailEntity } from "../oder-detail/oder-detail.entity";
-import { Delete } from "@nestjs/common/decorators";
 import { DataSource } from "typeorm";
 
 
@@ -21,10 +16,8 @@ export class OderService {
         private readonly oderRepository: Repository<OderEntity>,
         private readonly userService: UserService,
         private readonly oderDetailService: OderDetailService,
-        private readonly itemService: ItemService, 
         private readonly dataSource: DataSource,
         private readonly wareHouserService: WareHouseService,
-        private readonly saleService: SaleService,
         private readonly saleItemService: SaleItemService, 
     ) {}
 
@@ -59,61 +52,60 @@ export class OderService {
         
     }
 
-
-
     
     // create oder
    async create (data: CreateOderDTO):Promise<any> {
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
         await queryRunner.startTransaction();
-    try{
-        const user = await this.userService.getById(data.user_id);
         
-        const new_oder = new OderEntity();
-        new_oder.userEntity = user;
-        new_oder.original_total_money = 0;
-        new_oder.total_money = 0;
-        new_oder.voucher_code = data.voucher_code;
-        new_oder.oderDetailEntity = data.oderDetailEntity;
-        const _oder = await queryRunner.manager.save(OderEntity,new_oder); 
-        
-        await this.wareHouserService.updateByOder(data.oderDetailEntity, queryRunner);
-        
-        if(user.roleEntity.role_id == 1|| user.roleEntity.role_id == 2|| user.roleEntity.role_id == 3){
-            await this.oderDetailService.createForStaff(_oder,queryRunner);
-        
-        }else{
+        try{
+            const user = await this.userService.getById(data.user_id);
+            
+            const new_oder = new OderEntity();
+            new_oder.userEntity = user;
+            new_oder.original_total_money = 0;
+            new_oder.total_money = 0;
+            new_oder.voucher_code = data.voucher_code;
+            new_oder.oderDetailEntity = data.oderDetailEntity;
+            const _oder = await queryRunner.manager.save(OderEntity,new_oder); 
+            
+            await this.wareHouserService.updateByOder(data.oderDetailEntity, queryRunner);
+            
+            if(user.roleEntity.role_id == 1|| user.roleEntity.role_id == 2|| user.roleEntity.role_id == 3){
+                await this.oderDetailService.createForStaff(_oder,queryRunner);
+            
+            }else{
 
-            await this.oderDetailService.createForCustomer(_oder,queryRunner);
+                await this.oderDetailService.createForCustomer(_oder,queryRunner);
 
-            if(new_oder.voucher_code){
-                await this.saleItemService.updateSaleItemByOder(data.voucher_code, data.oderDetailEntity, queryRunner);
+                if(new_oder.voucher_code){
+                    await this.saleItemService.updateSaleItemByOder(data.voucher_code, data.oderDetailEntity, queryRunner);
+                }
             }
-        }
 
-        const oder_detail = await this.oderDetailService.getByOderId(_oder.oder_id,queryRunner);
-    
-        for(let i = 0; i < oder_detail.length; i++){
-            _oder.original_total_money += oder_detail[i].origin_price;
-            _oder.total_money += oder_detail[i].oder_price; 
-        }
+            const oder_detail = await this.oderDetailService.getByOderId(_oder.oder_id,queryRunner);
+        
+            for(let i = 0; i < oder_detail.length; i++){
+                _oder.original_total_money += oder_detail[i].origin_price;
+                _oder.total_money += oder_detail[i].oder_price; 
+            }
 
-        _oder.oderDetailEntity = oder_detail;
-        _oder.discount = _oder.original_total_money - _oder.total_money;
-        const result = await queryRunner.manager.save(OderEntity,_oder); 
+            _oder.oderDetailEntity = oder_detail;
+            _oder.discount = _oder.original_total_money - _oder.total_money;
+            const result = await queryRunner.manager.save(OderEntity,_oder); 
+            
+            await queryRunner.commitTransaction();
+            return result;
         
-        await queryRunner.commitTransaction();
-        return result
-    }catch(err){
-        await queryRunner.rollbackTransaction();
-        console.log(err)
-        throw new HttpException('Bad req',500);
+        }catch(err){
+            await queryRunner.rollbackTransaction();
+            console.log(err)
+            throw new HttpException('Bad req',500);
         
-        
-    } finally {
-        await queryRunner.release();
-    }
+        } finally {
+            await queryRunner.release();
+        }
         
    }
     

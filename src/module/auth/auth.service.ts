@@ -1,6 +1,6 @@
 import {HttpException, HttpStatus, Injectable} from "@nestjs/common";
 import {UserService} from '../users/user.service';
-import {CreateAccountDTO, BodyActiveAccount} from "../users/user.dto";
+import {CreateAccountDTO} from "../users/user.dto";
 import {UserEntity} from "../users/user.entity";
 import {JwtService} from "@nestjs/jwt";
 import { BodyLogin } from "./auth.dto";

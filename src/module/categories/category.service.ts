@@ -3,9 +3,6 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {CategoryEntity} from "../categories/category.entity";
 import {Repository} from "typeorm";
 import {CreateCategoryDTO} from "../categories/category.dto";
-import { WareHouseService } from "../ware-house/ware-house.service";
-import { throttleTime } from "rxjs";
-
 
 
 @Injectable()

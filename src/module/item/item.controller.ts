@@ -8,15 +8,15 @@ import { EnumRole } from '../constant/role/role.constant'
 import { Request, Response } from "express";
 
 @Controller('item')
-// @UseGuards(GuardsJwt,RolesGuard)
+@UseGuards(GuardsJwt,RolesGuard)
 export class ItemController{
     constructor(private itemService  : ItemService) {}
 
     // get all item
-    // @Roles(EnumRole.user)
     @Get('get-all')
-    async getAll(@Res() res: Response,@Req()req: Request,@Body()data: GetItemDTO) : Promise<any>{
-        return this.itemService.find().then(result =>{
+    async getAll(@Res() res: Response,@Req()req: Request) : Promise<any>{
+        const id = req['user'].id;
+        return this.itemService.find(id).then(result =>{
             res.status(200).json({
                 message : 'success',
                 result,
@@ -30,7 +30,7 @@ export class ItemController{
     }
 
     // get item by Id
-    // @Roles(EnumRole.super_admin)
+    @Roles(EnumRole.super_admin)
     @Get('/id/:item_id')
     async getByID(@Res() res,@Body()data: GetItemDTO, @Req()req: Request) : Promise<any>{
         data.user_id = req['user'].id;
@@ -48,10 +48,10 @@ export class ItemController{
     }
 
     //create item
-    // @Roles(EnumRole.super_admin, EnumRole.business_manager)
+    @Roles(EnumRole.super_admin, EnumRole.business_manager)
     @Post('create')
     async create(@Res() res, @Body()data: CreateItemDTO, @Req() req) : Promise<any>{
-        // data.user_id = req['user'].id;
+        data.user_id = req['user'].id;
         return this.itemService.create(data).then(result =>{
             res.status(200).json({
                 message : 'success',
@@ -67,7 +67,7 @@ export class ItemController{
 
 
     // update item
-    // @Roles(EnumRole.super_admin, EnumRole.business_manager)
+    @Roles(EnumRole.super_admin, EnumRole.business_manager)
     @Put('update/:item_id')
     async put(@Body() data : CreateItemDTO, @Res() res, @Req() req, @Param('item_id')
     item_id : string ): Promise<any> {
@@ -87,7 +87,7 @@ export class ItemController{
     }
 
     // delete item
-    // @Roles(EnumRole.super_admin)
+    @Roles(EnumRole.super_admin)
     @Delete('delete/:item_id')
     async delete(@Res() res , @Param('item_id') item_id : string) : Promise<any>{
         return this.itemService.delete(item_id).then(result =>{

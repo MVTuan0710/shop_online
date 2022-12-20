@@ -8,7 +8,6 @@ import { JwtService } from "@nestjs/jwt";
 import { UserService } from "../users/user.service";
 import { ItemLogService } from "../item-log/item_log.service";
 import { ItemLogEntity } from "../item-log/item_log.entity";
-// import moment from "moment";
 var moment = require('moment');
 
 @Injectable()
@@ -19,8 +18,6 @@ export class ItemService {
                 private readonly categoryService: CategoryService,
                 private readonly userService: UserService,
                 private readonly itemLogService: ItemLogService,
-                private readonly jwtService : JwtService
-
     ) {}
 
     async getByIdNormal(item_id:string): Promise<ItemEntity>{
@@ -133,7 +130,7 @@ export class ItemService {
     }
 
     //Find All item
-    async find(): Promise<ItemEntity[]> {
+    async find(id: string): Promise<ItemEntity[]> {
         try{
             const result: ItemEntity[] = []
             const item = await this.itemRepository.find({

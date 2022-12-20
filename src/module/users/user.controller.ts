@@ -32,10 +32,10 @@ export class UserController{
     }
 
     // Cau 6
-    // @Roles(EnumRole.super_admin,EnumRole.warehouse_manager)
+    @Roles(EnumRole.super_admin, EnumRole.warehouse_manager, EnumRole.business_manager)
     @Get('/get-one')
     async getByName(@Res() res, @Req() req,@Body() data : BodyGetOneAccount) : Promise<any>{
-        data.id = req.user.id
+        data.id = req['user'].id;
         return this.userService.getOne(data).then(result =>{
             res.status(200).json({
                 message : 'success',

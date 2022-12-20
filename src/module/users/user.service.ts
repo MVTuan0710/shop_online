@@ -1,4 +1,4 @@
-import {HttpException, HttpStatus, Injectable} from "@nestjs/common";
+import {Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {UserEntity} from "./user.entity";
 import {DeleteResult, Repository, UpdateResult} from "typeorm";
@@ -7,9 +7,9 @@ import {RoleService} from "../role/role.service";
 import {v4 as uuidv4} from 'uuid';
 import {hashSync} from 'bcryptjs';
 import {JwtService} from "@nestjs/jwt";
-import { UserLogEntity } from "../user-log/user-log.entity";
-import { UserLogService } from "../user-log/user-log.service";
-import { RoleEntity } from "../role/role.entity";
+import {UserLogEntity} from "../user-log/user-log.entity";
+import {UserLogService} from "../user-log/user-log.service";
+
 
 
 
@@ -30,9 +30,12 @@ export class UserService {
     // Cau 6
     async getOne(data: BodyGetOneAccount): Promise<UserEntity> {
     try{
-        const user = await this.userRepository.findOne({where: {email: data.email}})
+        const user = await this.userRepository.findOne({
+            where: {user_id: data.id},
+            relations: {roleEntity: true}
+        })
     
-        if(user.roleEntity.role_id === 1|| user.roleEntity.role_id === 1){
+        if(user.roleEntity.role_id === 1|| user.roleEntity.role_id === 2){
 
             const account = await this.userRepository.findOne({
                 where: {name: data.name, phone: data.phone}
@@ -42,7 +45,7 @@ export class UserService {
 
         }else{
 
-            if(user.roleEntity.role_id === 1){
+            if(user.roleEntity.role_id === 3){
                 const account = await this.userRepository.findOne({
                     where: {name: data.name, phone: data.phone}
                 });
