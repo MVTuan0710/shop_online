@@ -21,6 +21,9 @@ export class UserLogEntity extends BaseEntity{
     @Column({name : 'name', type : 'varchar', nullable : true})
     name : string;
 
+    @Column({name : 'address', type : 'varchar', nullable : true})
+    address : string;
+
     @Column({name : 'phone', type : 'varchar', nullable : true})
     phone : string;
 

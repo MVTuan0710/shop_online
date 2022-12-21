@@ -11,7 +11,6 @@ import {
     Column
 } from "typeorm";
 import { OderDetailEntity } from "../oder-detail/oder-detail.entity";
-import { ShippingEntity } from "../shipping/shipping.entity";
 import { UserEntity } from "../users/user.entity";
 
 
@@ -32,11 +31,11 @@ export class OderEntity extends BaseEntity{
     @Column({name : 'total_money', type : 'integer', nullable : true})
     total_money : number;
 
+    @Column({name : 'shipping_info',  type : 'varchar' , nullable : true})
+    shipping_info : string;
+
     @OneToMany((type)=> OderDetailEntity, (oderDetailEntity)=>oderDetailEntity.oderEntity)
     oderDetailEntity: OderDetailEntity[];
-
-    @OneToOne ((type)=> ShippingEntity, (shippingEntity)=>shippingEntity.oderEntity)
-    shippingEntity: ShippingEntity;
 
     @ManyToOne((type)=> UserEntity, (userEntity)=>userEntity.oderEntity)
     @JoinColumn({name : 'user_id'})

@@ -1,4 +1,4 @@
-import {Injectable} from "@nestjs/common";
+import {HttpException, Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {UserEntity} from "./user.entity";
 import {DeleteResult, Repository, UpdateResult} from "typeorm";
@@ -23,8 +23,7 @@ export class UserService {
                 
         private readonly jwtService : JwtService,
                 
-        private readonly userLogService: UserLogService,
-
+        private readonly userLogService: UserLogService
     ) {}
    
     // Cau 6
@@ -58,9 +57,9 @@ export class UserService {
                 return account;
             }
         }
-
     }catch(err){
-        throw console.log("failed");
+        console.log(err)
+        throw new HttpException('Bad req',500)
     }
 }
 
@@ -74,57 +73,79 @@ export class UserService {
             return accounts;
 
         }catch(err){
-            throw err;
+            console.log(err)
+            throw new HttpException('Bad req',500)
         }
         
     }
 
     async getById(user_id : string): Promise<UserEntity> {
-        const accounts = await this.userRepository.findOne({
-            where: {user_id: user_id }, 
-            relations: { roleEntity : true }
-        })
-        delete accounts.password;
-        return accounts;
+        try{
+            const accounts = await this.userRepository.findOne({
+                where: {user_id: user_id }, 
+                relations: { roleEntity : true }
+            })
+            delete accounts.password;
+            return accounts;
+        
+        }catch(err){
+            console.log(err)
+            throw new HttpException('Bad req',500)
+        }
     }
 
     // find by email
     async getByEmail(email: string): Promise<UserEntity> {
-        const accounts = await this.userRepository.findOne({
-            where: {email: email },
-            relations: { roleEntity : true }
-        });
+        try{
+            const accounts = await this.userRepository.findOne({
+                where: {email: email },
+                relations: { roleEntity : true }
+            });
 
-        delete accounts.password;
-        return accounts;
+            delete accounts.password;
+            return accounts;
+
+        }catch(err){
+            console.log(err)
+            throw new HttpException('Bad req',500)
+        }
     }
    
     // find verifyToken
     async getByVerifyToken(token : string) : Promise<UserEntity>{
-        return this.userRepository.findOne({where : {verify_token : token}});
+        try{
+            return this.userRepository.findOne({where : {verify_token : token}});
+
+        }catch(err){
+            console.log(err)
+            throw new HttpException('Bad req',500)
+        }
     }
 
     // find username and role
     async findByUsernameAndSelectRole(email : string) : Promise<UserEntity>{
-        return this.userRepository.findOne({
-            where : {email : email},
-            relations: { roleEntity : true }
-        })
+        try{
+            return this.userRepository.findOne({
+                where : {email : email},
+                relations: { roleEntity : true }
+            });
+
+        }catch(err){
+            console.log(err)
+            throw new HttpException('Bad req',500)
+        }
     }
 
     // create account
-    async createAccount(data: CreateAccountDTO, token : any): Promise<UserEntity> {
+    async createAccount(data: CreateAccountDTO): Promise<UserEntity> {
         try {
             // check email exists
-            const email: UserEntity  = await this.userRepository.findOne({where : {email :data.email}});
-            if (email){
-                throw console.log('The account is not found');
+            const user_is_exist = await this.userRepository.findOne({where: {email: data.email}});
+            if (user_is_exist){
+                throw new HttpException('user is exist',500);
             }
-
-                const _token = token.authorization.split(" ");
-                const payload = this.jwtService.verify(_token[1]); 
-    
-                if(payload.role.role_id === 1){
+            const user  = await this.userRepository.findOne({where : {user_id :data.user_id}});
+                if(user.roleEntity.role_id === 1){
                     if(data.role_id === 3 || data.role_id === 2){
     
                     const role = await this.roleService.findById(data.role_id);
@@ -153,7 +174,7 @@ export class UserService {
                     }
                 }else{
 
-                    if(payload.role.role_id === 4 && data.role_id === 4){
+                    if(user.roleEntity.role_id === 4 && data.role_id === 4){
                 
                         const role = await this.roleService.findById(data.role_id);
         
@@ -183,28 +204,23 @@ export class UserService {
             
             
         }catch(err){
-            console.log("errors",err);
-             throw console.log('Can`t create Account');
+            console.log(err)
+            throw new HttpException('Bad req',500)
         }
     }
     
     async register(data: CreateAccountDTO): Promise<UserEntity> {
         try {
-                // if(data.role_id === 4){
-                // check email exists
-                const email: UserEntity  = await this.userRepository.findOne({where : {email :data.email}});
-                if (email){
-                    throw console.log('The account is exist');
+                const user  = await this.userRepository.findOne({where : {email :data.email}});
+                if (user){
+                    throw new HttpException('User is exist',500);
                 }
-    
-                const role = await this.roleService.findById(data.role_id);
             
                 const userEntity = new UserEntity();
                 userEntity.email = data.email;
                 userEntity.name = data.name;
                 userEntity.password = hashSync(data.password, 6);
                 userEntity.phone = data.phone;
-                userEntity.roleEntity = role;
                 userEntity.verify_token = uuidv4();
     
                 const result = await this.userRepository.save(userEntity);
@@ -219,8 +235,8 @@ export class UserService {
 
                 return result;  
         }catch(err){
-            console.log("errors",err);
-             throw console.log('Can`t create Account');
+            console.log(err)
+            throw new HttpException('Bad req',500)
         }
     }
     async updateActiveAccount(user_id : string, data : BodyActiveAccount): Promise<any> {
@@ -249,8 +265,8 @@ export class UserService {
             const result = await this.userRepository.update(user_id, data);
             return result;
         }catch (err){
-            console.log('error',err);
-            throw console.log('Can`t update token Account');
+            console.log(err)
+            throw new HttpException('Bad req',500)
         }
     }
 
@@ -285,10 +301,10 @@ export class UserService {
 
                 await this.userLogService.create(userLogEntity);
            return result;
+
        }catch (err){
-           
-        console.log('error',err);
-           throw console.log('Can`t update Account');
+            console.log(err)
+            throw new HttpException('Bad req',500)
        }
     }
 
@@ -323,8 +339,8 @@ export class UserService {
             }
           
         }catch (err){
-            console.log('errors',err);
-            throw console.log('Can`t delete Account');
+            console.log(err)
+            throw new HttpException('Bad req',500)
         }
     }
 }

@@ -15,7 +15,7 @@ export class UserController{
     constructor(private userService  : UserService) {}
 
     // get all account
-    // @Roles(EnumRole.super_admin)
+    @Roles(EnumRole.super_admin)
     @Get('get-all')
     async getAll(@Res() res) : Promise<any>{
         return this.userService.find().then(result =>{
@@ -49,10 +49,11 @@ export class UserController{
         })
     }
     
-    // @Roles(EnumRole.super_admin, EnumRole.user)
+    @Roles(EnumRole.super_admin, EnumRole.user)
     @Post('/create')
-    async create(@Res() res, @Body()data: CreateAccountDTO, @Headers()token: string) : Promise<any>{
-        return this.userService.createAccount(data, token).then(result =>{
+    async create(@Res() res, @Body()data: CreateAccountDTO, @Req() req) : Promise<any>{
+        data.user_id = req['user'].id
+        return this.userService.createAccount(data).then(result =>{
             res.status(200).json({
                 message : 'success',
                 result,
@@ -66,7 +67,7 @@ export class UserController{
     }
 
     // update account
-    // @Roles(EnumRole.super_admin)
+    @Roles(EnumRole.super_admin)
     @Put('update/:account_id')
     async putAccount(@Body() data : CreateAccountDTO, @Res() res, @Param('account_id')
         account_id : string ): Promise<any> {

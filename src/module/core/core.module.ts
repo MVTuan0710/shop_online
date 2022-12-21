@@ -10,11 +10,9 @@ import { ItemEntity } from "../item/item.entity";
 import { CategoryEntity } from "../categories/category.entity";
 import { OderDetailEntity } from "../oder-detail/oder-detail.entity";
 import { OderEntity } from "../oder/oder.entity";
-import { ShippingEntity } from "../shipping/shipping.entity";
 import { ItemLogEntity } from "../item-log/item_log.entity";
 import {OderDetailLogEntity} from "../oder-detial-log/oder-detail-log.entity";
 import {WareHouseLogEntity} from "../ware-house-log/ware-house-log.entity";
-import {ShippingLogEntity} from "../shipping-log/shipping-log.entity";
 import { UserLogEntity } from "../user-log/user-log.entity";
 import { SaleEntity } from "../sale/sale.entity";
 import { SaleLogEntity } from "../sale-log/sale-log.entity";
@@ -42,9 +40,9 @@ import { SaleItemEntity } from "../sale-item/sale-item.entity";
                 database: 'test_db_shop_online',
                 entities: [UserEntity, RoleEntity, WareHouseEntity,
                             ItemEntity, CategoryEntity, OderDetailEntity,
-                            OderDetailLogEntity, OderEntity, ShippingEntity,
-                            ItemLogEntity, WareHouseLogEntity, ShippingLogEntity,
-                            UserLogEntity,SaleEntity, SaleLogEntity, SaleItemEntity]
+                            OderDetailLogEntity, OderEntity, ItemLogEntity,
+                            WareHouseLogEntity, UserLogEntity,SaleEntity, 
+                            SaleLogEntity, SaleItemEntity]
             }),
         })
     ],

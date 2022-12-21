@@ -5,5 +5,6 @@ export class CreateUserLogDTO{
     userEntity: UserEntity;
     email: string;
     name : string;
+    address:  string;
     phone : string;
 }

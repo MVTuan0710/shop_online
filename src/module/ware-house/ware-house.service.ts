@@ -19,7 +19,6 @@ export class WareHouseService {
     constructor(@InjectRepository(WareHouseEntity) 
         private readonly wareHouseRepository: Repository<WareHouseEntity>,
         private readonly userService: UserService,
-        private readonly dataSource: DataSource,
         private readonly itemService: ItemService,
         private readonly wareHouseLogService: WareHouseLogService
     ) {}
@@ -52,18 +51,6 @@ export class WareHouseService {
             throw new HttpException('Bad req',500)
         }
     }
-
-    // async  getByItemId(item_id: string): Promise<WareHouseEntity>{
-    //     try{
-    //         const result = await this.wareHouseRepository.findOne({
-    //             where: {itemEntity: ware_house_id },
-    //             relations: { itemEntity: true, userEntity: true },
-    //         });
-    //     }catch (err){
-    //           console.log(err)
-            // throw new HttpException('Bad req',500)
-    //     }
-    // }
 
     // Find All warehouse
     async find(): Promise<WareHouseEntity[]> {
@@ -129,7 +116,6 @@ export class WareHouseService {
                     where: {
                         itemEntity: {item_id: data[i].item_id},
                         quantity: MoreThan(0),
-                        // expiry: MoreThanOrEqual(month),
                         expiry: Raw((alias) => `${alias} > :date`, { date: month })
                     },
                     
@@ -137,7 +123,6 @@ export class WareHouseService {
                     order:{
                         expiry: "DESC"
                     }
-                    
                 }))
                 let quantity = data[i].quantity;
                 
@@ -224,9 +209,10 @@ export class WareHouseService {
            await this.wareHouseLogService.create(new_wareHouseLogEntity)
 
            return result;
+           
        }catch (err){
-        console.log(err)
-        throw new HttpException('Bad req',500)
+            console.log(err)
+            throw new HttpException('Bad req',500)
        }
     }
 

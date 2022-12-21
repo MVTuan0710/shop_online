@@ -8,14 +8,13 @@ export class CreateOderDTO{
     voucher_code: string;
     oderDetailEntity: OderDetailEntity[];
     original_total_money: number;
+    shipping_info: ShippingInfo;
     total_money: number;
     discount : number;
 }
 
-// export interface CreateOderItemDTO{
-//     item_id: string;
-//     quantity: number;
-//     item_info: string;
-//     oder_price: number;
-//     origin_price: number;
-// }
+export interface ShippingInfo{
+    name: string,
+    phone: string,
+    address: string
+}

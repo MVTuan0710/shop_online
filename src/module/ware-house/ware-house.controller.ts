@@ -13,7 +13,7 @@ export class WareHouseController{
     constructor(private wareHouseService  : WareHouseService) {}
 
     // get all ware house
-    // @Roles(EnumRole.warehouse_manager, EnumRole.super_admin)
+    @Roles(EnumRole.warehouse_manager, EnumRole.super_admin)
     @Get('get-all')
     async getAll(@Res() res) : Promise<any>{
         return this.wareHouseService.find().then(result =>{
@@ -30,7 +30,7 @@ export class WareHouseController{
     }
 
     // get account by Id
-    // @Roles(EnumRole.warehouse_manager, EnumRole.super_admin)
+    @Roles(EnumRole.warehouse_manager, EnumRole.super_admin)
     @Get('/id/:ware_house_id')
     async getWareHouseByID(@Res() res, @Param('ware_house_id') ware_house_id : string) : Promise<any>{
         return this.wareHouseService.getById(ware_house_id).then(result =>{
@@ -46,7 +46,7 @@ export class WareHouseController{
         })
     }
 
-    // @Roles(EnumRole.warehouse_manager, EnumRole.super_admin)
+    @Roles(EnumRole.warehouse_manager, EnumRole.super_admin)
     @Post('create')
     async createWareHouse(@Res() res, @Req() req,@Body()data: CreateWareHouseDTO, @Headers()token: string) : Promise<any>{
         data.user_id = req['user'].id;
@@ -65,7 +65,7 @@ export class WareHouseController{
 
 
     // update ware house
-    // @Roles(EnumRole.warehouse_manager, EnumRole.super_admin)
+    @Roles(EnumRole.warehouse_manager, EnumRole.super_admin)
     @Put('update')
     async updateAccount(@Body() data : UpdateWareHouseDTO, @Res() res, @Headers()token: string): Promise<any> {
         return this.wareHouseService.update(data).then(result =>{
@@ -83,7 +83,7 @@ export class WareHouseController{
     }
 
     // delete ware house
-    // @Roles(EnumRole.warehouse_manager, EnumRole.super_admin)
+    @Roles(EnumRole.warehouse_manager, EnumRole.super_admin)
     @Delete('delete/:ware_house_id')
     async delete(@Res() res , @Param('ware_house_id') ware_house_id : string) : Promise<any>{
         return this.wareHouseService.delete(ware_house_id).then(result =>{

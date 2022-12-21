@@ -93,7 +93,7 @@ export class OderDetailService {
             const oder_detail = await queryRunner.manager.save(OderDetailEntity,new_oder_detail);
 
             const new_oder_detail_log = new OderDetailLogEntity();
-            new_oder_detail_log.item_info = item.toString();
+            new_oder_detail_log.item_info = JSON.stringify(item);
             new_oder_detail_log.quantity =  new_oder_detail.quantity;
             new_oder_detail_log.oder_price =  new_oder_detail.oder_price;
             new_oder_detail_log.origin_price = new_oder_detail.origin_price;
@@ -126,6 +126,7 @@ export class OderDetailService {
                             oder_price = origin_price - (oder.oderDetailEntity[i].quantity * sale_item.saleEntity.value);
                         }
                         if(sale_item.amount - oder.oderDetailEntity[i].quantity < 0){
+                            
                             // use voucher
                             const new_oder_detail = new OderDetailEntity();
                             new_oder_detail.item_id = oder.oderDetailEntity[i].item_id;
@@ -145,7 +146,6 @@ export class OderDetailService {
                             new_oder_detail_log.oderDetailEntity = oder_detail;
             
                             await queryRunner.manager.save(OderDetailLogEntity,new_oder_detail_log);
-
 
 
                             // can't use voucher

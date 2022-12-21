@@ -2,7 +2,7 @@ import {HttpException, Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {OderEntity} from "./oder.entity";
 import {Repository} from "typeorm";
-import {CreateOderDTO} from "./oder.dto";
+import {CreateOderDTO, ShippingInfo} from "./oder.dto";
 import { UserService } from "../users/user.service";
 import { OderDetailService } from "../oder-detail/oder-detail.service";
 import { WareHouseService } from "../ware-house/ware-house.service";
@@ -67,7 +67,20 @@ export class OderService {
             new_oder.original_total_money = 0;
             new_oder.total_money = 0;
             new_oder.voucher_code = data.voucher_code;
+            
+            // cau 8
+            if(!data.user_id && !data.shipping_info){
+                throw new HttpException('Shipping_info is empty',500);
+            }
+            if(data.user_id){
+                new_oder.shipping_info = user.address;
+            }
+            if(!data.user_id && data.shipping_info){
+                new_oder.shipping_info = JSON.stringify(data.shipping_info);
+            }
+            
             new_oder.oderDetailEntity = data.oderDetailEntity;
+
             const _oder = await queryRunner.manager.save(OderEntity,new_oder); 
             
             await this.wareHouserService.updateByOder(data.oderDetailEntity, queryRunner);
@@ -108,28 +121,6 @@ export class OderService {
         }
         
    }
-    
-    // update oder-detail
-    async update(oder_id : string, data: CreateOderDTO): Promise<any> {
-       try {
-           // user
-           const user  = await this.userService.getById(data.user_id)
-
-           if (!user){
-                throw new HttpException('Not Found', 404);
-           }
-
-           const oderEntity = new OderEntity();
-            oderEntity.userEntity = user;
-
-            // update account
-            const result = await this.oderRepository.update(oder_id,oderEntity);
-            return result;
-       }catch (err){
-            console.log(err)
-            throw new HttpException('failed',500)
-       }
-    }
 
     // delete oder-detail
     async delete(oder_id : string): Promise<any> {

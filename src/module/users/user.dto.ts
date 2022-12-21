@@ -11,11 +11,11 @@ export class CreateAccountDTO extends BodyLogin{
     @IsNotEmpty()
     role_id : number;
 
+    address: string;
     id: string;
-
     is_active: boolean;
-
     verify_token : string;
+    user_id: string;
 }
 
 export class BodyActiveAccount{

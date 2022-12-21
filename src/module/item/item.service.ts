@@ -1,14 +1,15 @@
 import {HttpException, Injectable,HttpStatus} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {ItemEntity} from "./item.entity";
-import {Repository} from "typeorm";
+import {MoreThan, Raw, Repository} from "typeorm";
 import {CreateItemDTO,GetItemDTO} from "../item/item.dto";
 import { CategoryService } from "../categories/category.service";
 import { JwtService } from "@nestjs/jwt";
 import { UserService } from "../users/user.service";
 import { ItemLogService } from "../item-log/item_log.service";
 import { ItemLogEntity } from "../item-log/item_log.entity";
-var moment = require('moment');
+// var moment = require('moment');
+import * as moment from 'moment'
 
 @Injectable()
 export class ItemService {
@@ -33,132 +34,49 @@ export class ItemService {
     // find item by id
     async getById(data: GetItemDTO): Promise<ItemEntity> {
         try{
+            const month = moment().add(30, 'days');
             const item = await this.itemRepository.findOne({
-                where: {item_id: data.item_id },
+                where: {
+                    item_id: data.item_id,
+                    wareHouseEntity: {
+                        expiry: Raw((alias) => `${alias} > :date`, { date: month })
+                    }
+                },
                 relations: { wareHouseEntity : true }
             });
-            if(data.user_id){
-                const user = await this.userService.getById(data.user_id) 
-
-                for(let i= 0;i < item.wareHouseEntity.length ; i++){
-                    if(user.roleEntity.role_id === 1 || user.roleEntity.role_id === 2|| user.roleEntity.role_id === 3){
-                        return item;
-                    }else{
-                        const month = moment().add(30, 'days').format('DD/MM/YYYY');
-                        const expiry = moment(item.wareHouseEntity[i].expiry).format('DD/MM/YYYY');
-                         
-                       
-                        if(item.wareHouseEntity[i].quantity <= 5){
-                            if(month <= expiry){
-                                throw new HttpException('Out of stock', 500);
-                            }else{
-                                return item;
-                            }
-                        }else{
-                            delete item.wareHouseEntity[i].quantity;
-                            if(month <= expiry){
-                                throw new HttpException('Out of stock', 500);
-                            }else{
-                                return item;
-                            }
-                        }
-                    }
-                }
-               
-
-            }else{
-                for(let j= 0;j < item.wareHouseEntity.length ; j++){
-                    const month = moment().add(30, 'days').format('DD/MM/YYYY');
-                    const expiry = moment(item.wareHouseEntity[j].expiry).format('DD/MM/YYYY');
-                    
-                    if(item.wareHouseEntity[j].quantity <= 5){
-                        if(month <= expiry){
-                            throw new HttpException('Out of stock', 500);
-                        }else{
-                            return item;
-                        }
-                    }else{
-                        delete item.wareHouseEntity[j].quantity;
-                        if(month <= expiry){
-                            throw new HttpException('Out of stock', 500);
-                        }else{
-                            return item;
-                        }
-                    }
-                }     
-            }
-            
+           
+            return item;
         }catch(err){
             console.log('errors',err);
             throw new HttpException('Bad req',400);
         }        
 }
 
-    async getByName(name: string): Promise<ItemEntity> {
-        try{
-            const item = await this.itemRepository.findOne({
-                where: {name: name },
-                relations: { wareHouseEntity : true }
-            });
-            for(let i=0;i < item.wareHouseEntity.length; i++){
-                const expiry = moment(String(item.wareHouseEntity[i].expiry)).format('DD/MM/YYYY')
-                const month = moment().add(30, 'days').calendar();
-    
-                if(item.wareHouseEntity[i].quantity <= 5){
-                    if(month <= expiry){
-                        throw new HttpException('Out of stock', 500);
-                    }else{
-                        return item;
-                    }
-                }else{
-                    delete item.wareHouseEntity[i].quantity;
-                    if(month <= expiry){
-                        throw new HttpException('Out of stock', 500);
-                    }else{
-                        return item;
-                    }
-                }
-            }
-            
-        }catch(err){
-            console.log('errors',err);
-            throw new HttpException('Bad req',400);
-        }
-       
-
-
-    }
 
     //Find All item
     async find(id: string): Promise<ItemEntity[]> {
         try{
-            const result: ItemEntity[] = []
-            const item = await this.itemRepository.find({
-                 relations: { categoryEntity : true }
-            }); 
-            for(let i = 0; i < item.length; i++){
-               for(let j=0;j< item[i].wareHouseEntity.length; i++){
-                const expiry = moment(String(item[i].wareHouseEntity[j].expiry)).format('DD/MM/YYYY')
-                const month = moment().add(30, 'days').calendar();
-                
-                if(item[i].wareHouseEntity[j].quantity <= 5){
-                    if(month <= expiry){
-                        throw new HttpException('Out of stock', 500);
-                    }else{
-                        result.push(item[i]);
-                    }
-                }else{
-                    delete item[i].wareHouseEntity[j].quantity;
-                    if(month <= expiry){
-                        throw new HttpException('Out of stock', 500);
-                    }else{
-                        result.push(item[i]);
-                    }
+            const month = moment().add(30, 'days').toISOString();
+            
+            // Date();
+            const _item = await this.itemRepository.query(`
+            select * from (select it.item_id, cast(sum (wh.quantity) as int)  as total
+            from public.item as it join public.ware_house as wh on it.item_id = wh.item_id 
+            where wh.quantity > 0 and wh.expiry > '${month}'
+            group by it.item_id)
+            as res inner join public.item as it1 on it1.item_id = res.item_id
+            `)
+
+            for(let i = 0;i < _item.length; i++){
+                if(_item[i].total > 5){
+                    delete _item[i].total;
                 }
-                
-            } 
+
             }
-            return result;
+            if(!_item){
+                throw new HttpException('Out of Stock',400);
+            }
+            return _item;
         }catch(err){
             console.log('errors',err);
             throw new HttpException('Bad req',400);
