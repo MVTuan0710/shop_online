@@ -4,6 +4,7 @@ import {Repository} from "typeorm";
 import { CreateSaleLogDTO } from "./sale-log.dto";
 import { SaleLogEntity } from "./sale-log.entity";
 
+
 @Injectable()
 export class SaleLogService{
     public saleLogEntity = new SaleLogEntity();
@@ -13,19 +14,21 @@ export class SaleLogService{
 
     async getAll(): Promise<SaleLogEntity[]> {
         try{
-            return await this.saleLogRepository.find()
+            return await this.saleLogRepository.find();
+
         }catch(err){
             console.log(err);
-            throw new HttpException('failed', 500)
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
 
     async create(data: CreateSaleLogDTO): Promise<any> {
         try{
-            await this.saleLogRepository.save(data)
+            await this.saleLogRepository.save(data);
+
         }catch(err){
             console.log(err);
-            throw new HttpException('failed', 500)
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
 }

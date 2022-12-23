@@ -1,4 +1,4 @@
-import {HttpException, Injectable} from "@nestjs/common";
+import {HttpException, HttpStatus, Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {UserEntity} from "./user.entity";
 import {DeleteResult, Repository, UpdateResult} from "typeorm";
@@ -57,9 +57,10 @@ export class UserService {
                 return account;
             }
         }
+        
     }catch(err){
-        console.log(err)
-        throw new HttpException('Bad req',500)
+        console.log(err);
+        throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
     }
 }
 
@@ -73,8 +74,8 @@ export class UserService {
             return accounts;
 
         }catch(err){
-            console.log(err)
-            throw new HttpException('Bad req',500)
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
         
     }
@@ -89,8 +90,8 @@ export class UserService {
             return accounts;
         
         }catch(err){
-            console.log(err)
-            throw new HttpException('Bad req',500)
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -106,8 +107,8 @@ export class UserService {
             return accounts;
 
         }catch(err){
-            console.log(err)
-            throw new HttpException('Bad req',500)
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
    
@@ -117,8 +118,8 @@ export class UserService {
             return this.userRepository.findOne({where : {verify_token : token}});
 
         }catch(err){
-            console.log(err)
-            throw new HttpException('Bad req',500)
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -131,8 +132,8 @@ export class UserService {
             });
 
         }catch(err){
-            console.log(err)
-            throw new HttpException('Bad req',500)
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -202,10 +203,9 @@ export class UserService {
                     }
                 }
             
-            
         }catch(err){
-            console.log(err)
-            throw new HttpException('Bad req',500)
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
     
@@ -232,11 +232,11 @@ export class UserService {
                 userLogEntity.userEntity = result; 
 
                 await this.userLogService.create(userLogEntity);
+                return result;
 
-                return result;  
         }catch(err){
-            console.log(err)
-            throw new HttpException('Bad req',500)
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
     async updateActiveAccount(user_id : string, data : BodyActiveAccount): Promise<any> {
@@ -249,9 +249,10 @@ export class UserService {
             // update account
             const result= await this.userRepository.update(user_id, data);
             return result;
+
         }catch (err){
-            console.log('error',err);
-            throw console.log('Can`t active Account');
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
     async updateTokenAccount(user_id : string, data: CreateAccountDTO): Promise<UpdateResult> {
@@ -264,9 +265,10 @@ export class UserService {
             // update account
             const result = await this.userRepository.update(user_id, data);
             return result;
+
         }catch (err){
-            console.log(err)
-            throw new HttpException('Bad req',500)
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -299,12 +301,12 @@ export class UserService {
                 userLogEntity.phone = data.phone;
                 userLogEntity.userEntity = user; 
 
-                await this.userLogService.create(userLogEntity);
-           return result;
+            await this.userLogService.create(userLogEntity);
+            return result;
 
        }catch (err){
-            console.log(err)
-            throw new HttpException('Bad req',500)
+        console.log(err);
+        throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
        }
     }
 
@@ -339,8 +341,8 @@ export class UserService {
             }
           
         }catch (err){
-            console.log(err)
-            throw new HttpException('Bad req',500)
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
 }

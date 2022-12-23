@@ -1,7 +1,7 @@
-import {HttpException, Injectable} from "@nestjs/common";
+import {HttpException, HttpStatus, Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {WareHouseEntity} from "./ware-house.entity";
-import {DataSource, MoreThan, MoreThanOrEqual, QueryRunner, Raw, Repository} from "typeorm";
+import { MoreThan, QueryRunner, Raw, Repository} from "typeorm";
 import {CreateWareHouseDTO, UpdateWareHouseDTO} from "./ware-house.dto";
 import { UserService } from "../users/user.service";
 import { ItemService } from "../item/item.service";
@@ -9,7 +9,7 @@ import {WareHouseLogEntity} from "../ware-house-log/ware-house-log.entity";
 import {WareHouseLogService} from "../ware-house-log/ware-house-log.servic";
 import { ItemEntity } from "../item/item.entity";
 import { OderDetailEntity } from "../oder-detail/oder-detail.entity";
-var moment = require('moment');
+import * as moment from 'moment';
 
 @Injectable()
 export class WareHouseService {
@@ -18,8 +18,11 @@ export class WareHouseService {
     
     constructor(@InjectRepository(WareHouseEntity) 
         private readonly wareHouseRepository: Repository<WareHouseEntity>,
+
         private readonly userService: UserService,
+
         private readonly itemService: ItemService,
+
         private readonly wareHouseLogService: WareHouseLogService
     ) {}
 
@@ -31,9 +34,10 @@ export class WareHouseService {
                 relations: { itemEntity: true, userEntity: true },
             });
             return result;
+            
         }catch(err){
-            console.log(err)
-            throw new HttpException('Bad req',500)
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
 
     }
@@ -47,8 +51,8 @@ export class WareHouseService {
 
             return result;
         }catch(err){
-            console.log(err)
-            throw new HttpException('Bad req',500)
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -61,8 +65,8 @@ export class WareHouseService {
             return result;
 
         }catch(err){
-            console.log(err)
-            throw new HttpException('Bad req',500)
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
         
     }
@@ -95,11 +99,11 @@ export class WareHouseService {
             new_wareHouseLogEntity.wareHouseEntity = _result
 
             await this.wareHouseLogService.create(new_wareHouseLogEntity)
-
             return _result;
+
         }catch(err){
-            console.log(err)
-            throw new HttpException('Bad req',500)
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -126,7 +130,6 @@ export class WareHouseService {
                 }))
                 let quantity = data[i].quantity;
                 
-                // let array_ware_house = [];
                 for(let j = 0; j < ware_house.length; j++){
                     
                     if(quantity- ware_house[j].quantity > 0){
@@ -175,9 +178,8 @@ export class WareHouseService {
             }
            
         }catch(err){
-           
-            console.log(err)
-            throw new HttpException('Bad req',500);
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
 
     }
@@ -185,8 +187,8 @@ export class WareHouseService {
     async update( data: UpdateWareHouseDTO): Promise<any> {
        try {
            // check account exists
-           const warehouse = await this.wareHouseRepository.findOne({where : {ware_house_id : data.ware_house_id}});
-           if (!warehouse)
+            const warehouse = await this.wareHouseRepository.findOne({where : {ware_house_id : data.ware_house_id}});
+            if (!warehouse)
                throw console.log('Can`t found Account by account_id');
 
             const _user = await this.userService.getById(data.user_id);
@@ -198,25 +200,24 @@ export class WareHouseService {
             wareHouseEntity.userEntity = _user;
             wareHouseEntity.itemEntity = _item;
 
-           await this.wareHouseRepository.update(data.ware_house_id, wareHouseEntity);
-           const result = await this.wareHouseRepository.findOne({where: {ware_house_id: data.ware_house_id}})
+            await this.wareHouseRepository.update(data.ware_house_id, wareHouseEntity);
 
-           const new_wareHouseLogEntity = new WareHouseLogEntity();
-           new_wareHouseLogEntity.expiry = wareHouseEntity.expiry;
-           new_wareHouseLogEntity.quantity= wareHouseEntity.quantity;
-           new_wareHouseLogEntity.wareHouseEntity = result
+            const result = await this.wareHouseRepository.findOne({where: {ware_house_id: data.ware_house_id}})
 
-           await this.wareHouseLogService.create(new_wareHouseLogEntity)
+            const new_wareHouseLogEntity = new WareHouseLogEntity();
+            new_wareHouseLogEntity.expiry = wareHouseEntity.expiry;
+            new_wareHouseLogEntity.quantity= wareHouseEntity.quantity;
+            new_wareHouseLogEntity.wareHouseEntity = result
 
-           return result;
+            await this.wareHouseLogService.create(new_wareHouseLogEntity)
+
+            return result;
            
-       }catch (err){
-            console.log(err)
-            throw new HttpException('Bad req',500)
-       }
+        }catch (err){
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
+        }
     }
-
-    
 
     // delete ware house
     async delete(ware_house_id : string): Promise<any> {
@@ -227,11 +228,12 @@ export class WareHouseService {
                 throw console.log('Can`t found Warehouse by id');
 
             // delete
-            const result = await this.wareHouseRepository.delete(ware_house_id);
+            await this.wareHouseRepository.delete(ware_house_id);
             return data;
+
         }catch (err){
-            console.log(err)
-            throw new HttpException('Bad req',500)
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
 }

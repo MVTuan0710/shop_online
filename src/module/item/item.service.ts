@@ -1,14 +1,11 @@
 import {HttpException, Injectable,HttpStatus} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {ItemEntity} from "./item.entity";
-import {MoreThan, Raw, Repository} from "typeorm";
+import { Raw, Repository} from "typeorm";
 import {CreateItemDTO,GetItemDTO} from "../item/item.dto";
 import { CategoryService } from "../categories/category.service";
-import { JwtService } from "@nestjs/jwt";
-import { UserService } from "../users/user.service";
 import { ItemLogService } from "../item-log/item_log.service";
 import { ItemLogEntity } from "../item-log/item_log.entity";
-// var moment = require('moment');
 import * as moment from 'moment'
 
 @Injectable()
@@ -16,9 +13,10 @@ export class ItemService {
     public itemEntity = new ItemEntity();
     constructor(@InjectRepository(ItemEntity) 
         private readonly itemRepository: Repository<ItemEntity>,
-                private readonly categoryService: CategoryService,
-                private readonly userService: UserService,
-                private readonly itemLogService: ItemLogService,
+
+        private readonly categoryService: CategoryService,
+
+        private readonly itemLogService: ItemLogService,
     ) {}
 
     async getByIdNormal(item_id:string): Promise<ItemEntity>{
@@ -26,8 +24,8 @@ export class ItemService {
             const result = await this.itemRepository.findOne({where: {item_id: item_id}});
             return result;
         }catch(err){
-            console.log('errors',err);
-            throw new HttpException('Bad req',400);
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -47,8 +45,8 @@ export class ItemService {
            
             return item;
         }catch(err){
-            console.log('errors',err);
-            throw new HttpException('Bad req',400);
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }        
 }
 
@@ -78,8 +76,8 @@ export class ItemService {
             }
             return _item;
         }catch(err){
-            console.log('errors',err);
-            throw new HttpException('Bad req',400);
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
         
     }
@@ -119,8 +117,8 @@ export class ItemService {
             return result;
 
         }catch(err){
-            console.log('errors',err);
-            throw new HttpException('Bad req',400);
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
       }
     
@@ -161,8 +159,8 @@ export class ItemService {
 
            return result;
        }catch (err){
-            console.log('errors',err);
-            throw new HttpException('Bad req',400);
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
        }
     }
 
@@ -178,8 +176,8 @@ export class ItemService {
             await this.itemRepository.delete(item_id);
             return item;
         }catch (err){
-            console.log('errors',err);
-            throw new HttpException('Bad req',400);
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
 }

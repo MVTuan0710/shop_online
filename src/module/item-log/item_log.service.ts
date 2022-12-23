@@ -1,12 +1,11 @@
 import {HttpException, Injectable,HttpStatus} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
-import {Repository, UpdateDateColumn} from "typeorm";
+import {Repository} from "typeorm";
 import { CreateItemLogDTO } from "./item_log.dto";
 import { ItemLogEntity } from "./item_log.entity";
 
 @Injectable()
 export class ItemLogService{
-    public itemLogEntity = new ItemLogEntity();
     constructor(@InjectRepository(ItemLogEntity) 
         private readonly itemLogRepository: Repository<ItemLogEntity>
     ){}
@@ -16,7 +15,7 @@ export class ItemLogService{
             return await this.itemLogRepository.find();
         }catch(err){
             console.log(err);
-            throw new HttpException('failed', 500);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
       }
 
@@ -25,7 +24,7 @@ export class ItemLogService{
            await this.itemLogRepository.save(data);
         }catch(err){
             console.log(err);
-            throw new HttpException('failed', 500);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
 }

@@ -4,18 +4,18 @@ import {Roles} from "../decorator/role.decorator";
 import {GuardsJwt} from "../auth/guard/guards.jwt";
 import {RolesGuard} from "./guards/role.guards";
 import {EnumRole} from "../constant/role/role.constant";
-import {ApiBearerAuth, ApiOkResponse, ApiTags} from "@nestjs/swagger";
+import {ApiBearerAuth, ApiOkResponse} from "@nestjs/swagger";
 import {CreateRoleDTO} from "./role.dto";
 
 @Controller('role')
-// @UseGuards(GuardsJwt, RolesGuard)
+@UseGuards(GuardsJwt, RolesGuard)
 @ApiBearerAuth('JWT-auth')
 export class RoleController{
     constructor(private roleService : RoleService) {}
 
     // find all role
-    // @ApiOkResponse({description : 'Get all role'})
-    // @Roles(EnumRole.super_admin)
+    @ApiOkResponse({description : 'Get all role'})
+    @Roles(EnumRole.super_admin)
     @Get('/')
     async getAllRole(@Res() res){
         return this.roleService.getAllRole().then(result =>{
@@ -30,7 +30,8 @@ export class RoleController{
             });
         })
     }
-    // @Roles(EnumRole.super_admin)
+
+    @Roles(EnumRole.super_admin)
     @Post('/create')
     async createRole(@Res() res, @Body() body: CreateRoleDTO){
         return this.roleService.createRole(body).then(result =>{

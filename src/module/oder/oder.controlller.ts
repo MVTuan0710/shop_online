@@ -4,8 +4,8 @@ import {GuardsJwt} from "../auth/guard/guards.jwt";
 import {RolesGuard} from "../role/guards/role.guards";
 import {EnumRole} from "../constant/role/role.constant";
 import {CreateOderDTO} from "./oder.dto"
-import { resolve } from "path";
-import { Request } from "express";
+import { Roles } from "../decorator/role.decorator";
+
 
 
 @Controller('oder')
@@ -14,7 +14,7 @@ export class OderController{
     constructor(private oderService : OderService) {}
 
     // find all oder-detail
-    // @Roles(EnumRole.super_admin)
+    @Roles(EnumRole.super_admin)
     @Get('get-all')
     async getAll(@Res() res){
         return this.oderService.find().then(result =>{
@@ -31,7 +31,7 @@ export class OderController{
     }
 
 
-    // @Roles(EnumRole.super_admin)
+    @Roles(EnumRole.super_admin)
     @Post('create')
     async create(@Res() res, @Body() data: CreateOderDTO, @Req() req){
         data.user_id = req['user'].id;

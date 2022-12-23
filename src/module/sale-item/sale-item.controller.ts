@@ -4,17 +4,17 @@ import {GuardsJwt} from "../auth/guard/guards.jwt";
 import {RolesGuard} from "../role/guards/role.guards";
 import {EnumRole} from "../constant/role/role.constant";
 import { CreateSaleItemDTO } from "./sale-item.dto";
-import dataSource from "ormconfig";
+import { Roles } from "../decorator/role.decorator";
 
 
 
 @Controller('sale-item')
-// @UseGuards(GuardsJwt, RolesGuard)
+@UseGuards(GuardsJwt, RolesGuard)
 export class SaleItemController{
     constructor(private saleItemService : SaleItemService) {}
 
     // find all oder-detail
-    // @Roles(EnumRole.super_admin)
+    @Roles(EnumRole.super_admin)
     @Get('get-all')
     async getAll(@Res() res){
         return this.saleItemService.find().then(result =>{
@@ -31,7 +31,7 @@ export class SaleItemController{
     }
 
     // create sale
-    // @Roles(EnumRole.super_admin)
+    @Roles(EnumRole.super_admin)
     @Post('create')
     async create(@Res() res, @Body() data: CreateSaleItemDTO, @Req()req){
         return this.saleItemService.create(data).then(result =>{

@@ -1,4 +1,4 @@
-import {HttpException, Injectable} from "@nestjs/common";
+import {HttpException, HttpStatus, Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import { SaleEntity } from "./sale.entity";
 import {Repository} from "typeorm";
@@ -10,7 +10,8 @@ import { SaleLogEntity } from "../sale-log/sale-log.entity";
 export class SaleService {
     constructor(@InjectRepository(SaleEntity) 
         private readonly saleRepository: Repository<SaleEntity>,
-        private readonly saleLogService: SaleLogService, 
+
+        private readonly saleLogService: SaleLogService
    
     ) {}
 
@@ -22,9 +23,10 @@ export class SaleService {
                 relations: { saleLogEntity : true, saleItemEntity: true }
             });
             return result;
+
         }catch(err){
-            console.log("errors",err);
-            throw new HttpException('Bad req',400);
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -35,9 +37,10 @@ export class SaleService {
                 relations: { saleLogEntity : true, saleItemEntity: true }
             });
             return result;
+
         }catch(err){
-            console.log("errors",err);
-            throw new HttpException('Bad req',400);
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
     // su dung o oder-detail
@@ -48,9 +51,10 @@ export class SaleService {
                 relations: { saleLogEntity : true, saleItemEntity: true }
             });
             return result;
+
         }catch(err){
-            console.log("errors",err);
-            throw new HttpException('Bad req',400);
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
     // Find All sale
@@ -60,9 +64,10 @@ export class SaleService {
                 // relations: { saleLogEntity : true }
             });
             return result;
+
         }catch(err){
-            console.log("errors",err);
-            throw new HttpException('Bad req',400);
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
         
     }
@@ -95,8 +100,8 @@ export class SaleService {
             return result;
 
         }catch(err){
-            console.log("errors",err);
-            throw new HttpException('Bad req',400);
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
     
@@ -111,9 +116,10 @@ export class SaleService {
             // update sale
             const result = await this.saleRepository.update(sale_id,data);
             return result;
+
        }catch (err){
-           console.log('error',err);
-           throw new HttpException('Bad req',400);
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
        }
     }
 
@@ -128,9 +134,10 @@ export class SaleService {
             // delete sale
             const result = await this.saleRepository.delete(sale_id);
             return result;
+
         }catch (err){
-            console.log('errors',err);
-            throw new HttpException('Bad req',400);
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
 }

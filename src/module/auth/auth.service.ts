@@ -9,6 +9,7 @@ import { BodyLogin } from "./auth.dto";
 @Injectable()
 export class AuthService{
     constructor(private readonly userService : UserService,
+        
                 private readonly jwtService : JwtService,
     ) {}
 
@@ -17,9 +18,10 @@ export class AuthService{
         try {
             const result: UserEntity =  await this.userService.register(data);
             return result;
+
         }catch (err){
-            console.log('errors',err);
-            throw console.log('Create fail');
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -39,7 +41,8 @@ export class AuthService{
             })
            return result;
        }catch (err){
-            throw console.log(`Can't active`);
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
        }
     }
 
@@ -53,7 +56,7 @@ export class AuthService{
            }
            return null
        }catch (err){
-           console.log('errors',err);
+           console.log(err);
            throw new HttpException('Invalid account or password',HttpStatus.INTERNAL_SERVER_ERROR);
        }
     }
@@ -75,7 +78,8 @@ export class AuthService{
         }
 
         }catch (err) {
-            throw console.log(`Failed`);
+            console.log(err);
+            throw new HttpException('Invalid account or password',HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

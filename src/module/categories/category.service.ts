@@ -1,4 +1,4 @@
-import {Injectable} from "@nestjs/common";
+import {HttpException, HttpStatus, Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {CategoryEntity} from "../categories/category.entity";
 import {Repository} from "typeorm";
@@ -7,7 +7,6 @@ import {CreateCategoryDTO} from "../categories/category.dto";
 
 @Injectable()
 export class CategoryService {
-    public categoryEntity = new CategoryEntity();
     constructor(@InjectRepository(CategoryEntity) 
         private readonly categoryRepository: Repository<CategoryEntity>
     ) {}
@@ -18,7 +17,8 @@ export class CategoryService {
             const data = await this.categoryRepository.find();
             return data;
         }catch(err){
-            throw err;
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
         
     }
@@ -31,8 +31,8 @@ export class CategoryService {
             })
             return category;    
         }catch(err){
-            throw err;
-            
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
    }
 
@@ -51,8 +51,8 @@ export class CategoryService {
             const result = await this.categoryRepository.save(data);
             return result;
         }catch(err){
-            console.log("errors",err);
-             throw console.log('Can`t create Category');
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
     
@@ -67,8 +67,8 @@ export class CategoryService {
            const result = await this.categoryRepository.update(category_id, data);
            return result;
        }catch (err){
-           console.log('error',err);
-           throw console.log('Can`t update Category');
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
        }
     }
 
@@ -84,8 +84,8 @@ export class CategoryService {
             const result = await this.categoryRepository.delete(category_id);
             return result;
         }catch (err){
-            console.log('errors',err);
-            throw console.log('Can`t delete Category');
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
 }

@@ -2,7 +2,7 @@ import {HttpException, Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {OderEntity} from "./oder.entity";
 import {Repository} from "typeorm";
-import {CreateOderDTO, ShippingInfo} from "./oder.dto";
+import {CreateOderDTO} from "./oder.dto";
 import { UserService } from "../users/user.service";
 import { OderDetailService } from "../oder-detail/oder-detail.service";
 import { WareHouseService } from "../ware-house/ware-house.service";
@@ -14,10 +14,15 @@ import { DataSource } from "typeorm";
 export class OderService {
     constructor(@InjectRepository(OderEntity) 
         private readonly oderRepository: Repository<OderEntity>,
+
         private readonly userService: UserService,
+
         private readonly oderDetailService: OderDetailService,
+
         private readonly dataSource: DataSource,
+
         private readonly wareHouserService: WareHouseService,
+
         private readonly saleItemService: SaleItemService, 
     ) {}
 

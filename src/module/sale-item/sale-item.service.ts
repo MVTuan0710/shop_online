@@ -1,21 +1,22 @@
-import {HttpException, Injectable} from "@nestjs/common";
+import {HttpException, HttpStatus, Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import { SaleItemEntity } from "./sale-item.entity";
-import {LessThanOrEqual, MoreThan, Raw, MoreThanOrEqual, QueryRunner, Repository, ArrayOverlap } from "typeorm";
+import { MoreThan, Raw, QueryRunner, Repository} from "typeorm";
 import { CreateSaleItemDTO} from "./sale-item.dto";
 import { ItemService } from "../item/item.service";
-import { SaleLogEntity } from "../sale-log/sale-log.entity";
 import { SaleService } from "../sale/sale.service";
 import { OderDetailEntity } from "../oder-detail/oder-detail.entity";
 import { GetSaleItemDTO } from "../sale/sale.dto";
-var moment = require('moment');
+
 
 @Injectable()
 export class SaleItemService {
 
     constructor(@InjectRepository(SaleItemEntity) 
         private readonly saleItemRepository: Repository<SaleItemEntity>,
+
         private readonly itemService: ItemService,
+
         private readonly saleService: SaleService
     ) {}
 
@@ -29,8 +30,8 @@ export class SaleItemService {
             return result;
         
         }catch(err){
-            console.log("errors",err);
-            throw new HttpException('Bad req',400);
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -42,8 +43,8 @@ export class SaleItemService {
             
             await this.saleItemRepository.update(sale_item_id,sale_item);
         }catch(err){
-            console.log("errors",err);
-            throw new HttpException('Bad req',400);
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -56,8 +57,8 @@ export class SaleItemService {
             return result;
         
         }catch(err){
-            console.log("errors",err);
-            throw new HttpException('Bad req',400);
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
         
     }
@@ -95,8 +96,8 @@ export class SaleItemService {
             return sale_item;
 
         }catch(err){
-            console.log("errors",err);
-            throw new HttpException('Bad req',400);
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
         
     }
@@ -126,8 +127,8 @@ export class SaleItemService {
             return result;
 
         }catch(err){
-            console.log("errors",err);
-            throw new HttpException('Bad req',400);
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
     async updateSaleItemByOder(voucher_code: string, oder_item:OderDetailEntity[],  queryRunner: QueryRunner):Promise<any>{
@@ -154,9 +155,10 @@ export class SaleItemService {
                     await queryRunner.manager.update(SaleItemEntity,sale_item.sale_item_id,new_sale_item);
                 }
             }
+
         }catch(err){
-            console.log("errors",err);
-            throw new HttpException('Bad req',400);
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
        
     }
@@ -189,9 +191,10 @@ export class SaleItemService {
             await this.saleItemRepository.update(sale_item_id,saleItemEntity);
             const result =  await this.saleItemRepository.findOne({where: {sale_item_id: sale_item_id}})
             return result;
+
        }catch (err){
-           console.log('error',err);
-           throw new HttpException('Bad req',400);
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
        }
     }
 
@@ -208,9 +211,10 @@ export class SaleItemService {
             // delete sale-item
             const result = await this.saleItemRepository.delete(sale_item_id);
             return result;
+
         }catch (err){
-            console.log('errors',err);
-            throw new HttpException('Bad req',400);
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
 }

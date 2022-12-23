@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, Header, Headers, Param, Post, Put, Req, Res, UseGuards} from "@nestjs/common";
+import {Body, Controller, Delete, Get, Headers, Param, Post, Put, Req, Res, UseGuards} from "@nestjs/common";
 import {UserService} from "./user.service";
 import {CreateAccountDTO,BodyGetOneAccount} from "../users/user.dto";
 import {GuardsJwt} from "../auth/guard/guards.jwt";
@@ -86,7 +86,7 @@ export class UserController{
     }
 
     // delete account
-    // @Roles(EnumRole.super_admin, EnumRole.user)
+    @Roles(EnumRole.super_admin, EnumRole.user)
     @Delete('delete/:account_id')
     async deleteAccount(@Res() res , @Param('account_id') account_id : string, @Headers()token: string) : Promise<any>{
         return this.userService.deleteAccount(account_id,token).then(result =>{

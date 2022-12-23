@@ -1,7 +1,7 @@
-import {HttpException, Injectable} from "@nestjs/common";
+import {HttpException, HttpStatus, Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {OderDetailEntity} from "./oder-detail.entity";
-import {DataSource, QueryRunner, Repository} from "typeorm";
+import { QueryRunner, Repository} from "typeorm";
 import {CreateOderDetailDTO, UpdateOderDetailDTO} from "./oder-detail.dto";
 import { ItemService } from "../item/item.service";
 import { OderEntity } from "../oder/oder.entity";
@@ -15,10 +15,11 @@ export class OderDetailService {
     public oderDetailEntity = new OderDetailEntity();
     constructor(
         @InjectRepository(OderDetailEntity) 
-        private readonly oderDetailRepository: Repository<OderDetailEntity>, 
-        private readonly dataSource: DataSource,   
+        private readonly oderDetailRepository: Repository<OderDetailEntity>,
+        
         private readonly itemService: ItemService,
-        private readonly saleItemService: SaleItemService, 
+
+        private readonly saleItemService: SaleItemService
     ) {}
 
     //find oder-detail by id
@@ -32,7 +33,7 @@ export class OderDetailService {
 
         }catch(err){
             console.log(err);
-            throw new HttpException('failed', 500);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
     async getByOderId(oder_id: string,  queryRunner: QueryRunner): Promise<OderDetailEntity[]> {
@@ -48,7 +49,7 @@ export class OderDetailService {
 
         }catch(err){
             console.log(err);
-            throw new HttpException('failed', 500);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -62,7 +63,7 @@ export class OderDetailService {
 
         }catch(err){
             console.log(err);
-            throw new HttpException('failed', 500);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         } 
     }
 
@@ -74,7 +75,7 @@ export class OderDetailService {
 
         }catch(err){
             console.log(err);
-            throw new HttpException('failed', 500);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -197,7 +198,7 @@ export class OderDetailService {
       
         }catch(err){
             console.log(err);
-            throw new HttpException('failed', 500);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
     
@@ -212,7 +213,7 @@ export class OderDetailService {
 
         }catch(err){
             console.log(err);
-            throw new HttpException('failed', 500);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
    }
 
@@ -230,7 +231,7 @@ export class OderDetailService {
 
         }catch (err){
             console.log(err);
-            throw new HttpException('failed', 500);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
 }

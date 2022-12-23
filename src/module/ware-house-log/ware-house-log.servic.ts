@@ -6,7 +6,6 @@ import {WareHouseLogEntity} from "./ware-house-log.entity";
 
 @Injectable()
 export class WareHouseLogService{
-    public wareHouseLogEntity = new WareHouseLogEntity();
     constructor(@InjectRepository(WareHouseLogEntity)
                 private readonly wareHouseLogRepository: Repository<WareHouseLogEntity>
     ){}
@@ -14,9 +13,10 @@ export class WareHouseLogService{
     async getAll(): Promise<WareHouseLogEntity[]> {
         try{
             return await this.wareHouseLogRepository.find();
+
         }catch(err){
             console.log(err);
-            throw new HttpException('failed', 500);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
         
     }
@@ -25,9 +25,10 @@ export class WareHouseLogService{
         
         try{
             await this.wareHouseLogRepository.save(data);
+            
         }catch(err){
             console.log(err);
-            throw new HttpException('failed', 500);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
 }
