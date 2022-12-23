@@ -101,8 +101,6 @@ export class OderDetailService {
             new_oder_detail_log.oderDetailEntity = oder_detail;
 
             await queryRunner.manager.save(OderDetailLogEntity,new_oder_detail_log);
-
-            
         }
        
     }

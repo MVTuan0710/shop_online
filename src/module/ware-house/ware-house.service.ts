@@ -7,15 +7,11 @@ import { UserService } from "../users/user.service";
 import { ItemService } from "../item/item.service";
 import {WareHouseLogEntity} from "../ware-house-log/ware-house-log.entity";
 import {WareHouseLogService} from "../ware-house-log/ware-house-log.servic";
-import { ItemEntity } from "../item/item.entity";
 import { OderDetailEntity } from "../oder-detail/oder-detail.entity";
 import * as moment from 'moment';
 
 @Injectable()
 export class WareHouseService {
-    public wareHouseEntity = new WareHouseEntity();
-    public itemEntity = new ItemEntity();
-    
     constructor(@InjectRepository(WareHouseEntity) 
         private readonly wareHouseRepository: Repository<WareHouseEntity>,
 
@@ -75,13 +71,12 @@ export class WareHouseService {
     async create( data: CreateWareHouseDTO): Promise<WareHouseEntity> {
         try {
             // check id exists
-            console.log(data)
-            const user  = await this.userService.getById(data.user_id);
+            const user  = await this.userService.getById(data.create_at);
             if (!user){
-                throw console.log('The account is not found');
+                throw console.log('Not found',HttpStatus.NOT_FOUND);
             }
 
-            const _user = await this.userService.getById(data.user_id);
+            const _user = await this.userService.getById(data.create_at);
             const _item = await this.itemService.getByIdNormal(data.item_id);
 
             const wareHouseEntity = new WareHouseEntity();
@@ -90,15 +85,15 @@ export class WareHouseService {
             wareHouseEntity.userEntity = _user;
             wareHouseEntity.itemEntity = _item;
 
-            // // save warehouse
+            // save warehouse
             const _result = await this.wareHouseRepository.save(wareHouseEntity);
 
             const new_wareHouseLogEntity = new WareHouseLogEntity();
             new_wareHouseLogEntity.expiry = wareHouseEntity.expiry;
             new_wareHouseLogEntity.quantity= wareHouseEntity.quantity;
-            new_wareHouseLogEntity.wareHouseEntity = _result
+            new_wareHouseLogEntity.wareHouseEntity = _result;
 
-            await this.wareHouseLogService.create(new_wareHouseLogEntity)
+            await this.wareHouseLogService.create(new_wareHouseLogEntity);
             return _result;
 
         }catch(err){
@@ -188,10 +183,12 @@ export class WareHouseService {
        try {
            // check account exists
             const warehouse = await this.wareHouseRepository.findOne({where : {ware_house_id : data.ware_house_id}});
-            if (!warehouse)
-               throw console.log('Can`t found Account by account_id');
+            if (!warehouse){
+                throw console.log('Not found',HttpStatus.NOT_FOUND);
+            }
+               
 
-            const _user = await this.userService.getById(data.user_id);
+            const _user = await this.userService.getById(data.create_at);
             const _item = await this.itemService.getByIdNormal(data.item_id);
             
             const wareHouseEntity = new WareHouseEntity();
@@ -224,9 +221,10 @@ export class WareHouseService {
         try {
             // check warehouse exists
             const data = await this.wareHouseRepository.findOne({where : {ware_house_id : ware_house_id}});
-            if (!data)
-                throw console.log('Can`t found Warehouse by id');
-
+            if (!data){
+                throw console.log('Not found',HttpStatus.NOT_FOUND);
+            }
+                
             // delete
             await this.wareHouseRepository.delete(ware_house_id);
             return data;

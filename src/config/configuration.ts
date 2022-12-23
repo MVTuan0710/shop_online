@@ -2,8 +2,6 @@ export default () => {
     return {
         node_env: 'local',
         port: 3020,
-        // timezone: process.env.TIMEZONE || 'America/New_York',
-        // log_file_path: process.env.LOG_FILE_PATH || 'logs/combined.log',
         database: {
             type:'postgres',
             host:'localhost',

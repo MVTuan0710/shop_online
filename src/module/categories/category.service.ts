@@ -16,6 +16,7 @@ export class CategoryService {
         try{
             const data = await this.categoryRepository.find();
             return data;
+            
         }catch(err){
             console.log(err);
             throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
@@ -29,7 +30,8 @@ export class CategoryService {
             const category = await this.categoryRepository.findOne({
                 where: {category_id: category_id}
             })
-            return category;    
+            return category;   
+
         }catch(err){
             console.log(err);
             throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
@@ -50,6 +52,7 @@ export class CategoryService {
             // save categoruy 
             const result = await this.categoryRepository.save(data);
             return result;
+
         }catch(err){
             console.log(err);
             throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
@@ -66,6 +69,7 @@ export class CategoryService {
             // update category
            const result = await this.categoryRepository.update(category_id, data);
            return result;
+
        }catch (err){
             console.log(err);
             throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
@@ -83,6 +87,7 @@ export class CategoryService {
             // delete category
             const result = await this.categoryRepository.delete(category_id);
             return result;
+
         }catch (err){
             console.log(err);
             throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);

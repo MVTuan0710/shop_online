@@ -1,4 +1,4 @@
-import {HttpException, Injectable} from "@nestjs/common";
+import {HttpException, HttpStatus, Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {OderEntity} from "./oder.entity";
 import {Repository} from "typeorm";
@@ -33,8 +33,8 @@ export class OderService {
                 where: {oder_id: oder_id },
                 relations: { userEntity : true }
             });
-            
             return data;
+            
         }catch(err){
             console.log(err)
             throw new HttpException('failed',500)
@@ -46,7 +46,7 @@ export class OderService {
     async find(): Promise<OderEntity[]> {
         try{
             const data = await this.oderRepository.find({
-                //  relations: { oderDetailEntity : true }
+                 relations: { oderDetailEntity : true }
             });
             return data;
 
@@ -75,7 +75,7 @@ export class OderService {
             
             // cau 8
             if(!data.user_id && !data.shipping_info){
-                throw new HttpException('Shipping_info is empty',500);
+                throw console.log('Not found',HttpStatus.NOT_FOUND);
             }
             if(data.user_id){
                 new_oder.shipping_info = user.address;
@@ -132,12 +132,14 @@ export class OderService {
         try {
             // check item exists
             const data = await this.oderRepository.findOne({where : {oder_id : oder_id}});
-            if (!data)
-                throw console.log('Can`t found Warehouse by id');
-
+            if (!data){
+                throw console.log('Not found',HttpStatus.NOT_FOUND);
+            }
+            
             // delete
             const result = await this.oderRepository.delete(oder_id);
             return result;
+
         }catch (err){
             console.log(err)
             throw new HttpException('failed',500)

@@ -6,7 +6,7 @@ import { UserEntity } from "../users/user.entity";
 
 export class CreateWareHouseDTO{
     @IsNotEmpty()
-    user_id : string;
+    create_at : string;
 
     @IsNotEmpty()
     quantity : number;
@@ -20,7 +20,7 @@ export class CreateWareHouseDTO{
 export class UpdateWareHouseDTO{
     ware_house_id : string;
     quantity : number;
-    user_id: string;
+    create_at: string;
     expiry: Date;
     item_id: string;
 }

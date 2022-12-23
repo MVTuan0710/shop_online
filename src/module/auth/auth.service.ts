@@ -9,13 +9,18 @@ import { BodyLogin } from "./auth.dto";
 @Injectable()
 export class AuthService{
     constructor(private readonly userService : UserService,
-        
+
                 private readonly jwtService : JwtService,
     ) {}
 
     // create account
     async register(data : CreateAccountDTO) : Promise<UserEntity>{
         try {
+            const user = await this.userService.getByEmail(data.email);
+            if(user){
+                throw new HttpException('Ready exist', 400);
+            }
+
             const result: UserEntity =  await this.userService.register(data);
             return result;
 
@@ -30,16 +35,18 @@ export class AuthService{
     async verifyAccount(token : string) : Promise<UserEntity>{
        try {
            const data: UserEntity = await this.userService.getByVerifyToken(token);
-           if(!data){
+            if(!data){
                 throw console.log('The account is not exists');
-           }
-           if(data.is_active == true){
+            }
+            if(data.is_active == true){
                 throw console.log('The account is activated');
-           }
+            }
+
             const result =  await this.userService.updateActiveAccount(data.user_id,{
                 is_active: true,
             })
            return result;
+
        }catch (err){
             console.log(err);
             throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
@@ -48,17 +55,18 @@ export class AuthService{
 
     // validate Account
     async validateAccount(email : string, password : string) : Promise<any>{
-       try {
-           const account: UserEntity = await this.userService.getByEmail(email);
-           if(account && account.isPasswordValid(password)){
-               const { password, ...result} = account
-               return result
-           }
-           return null
-       }catch (err){
+        try {
+            const account: UserEntity = await this.userService.getByEmail(email);
+            if(account && account.isPasswordValid(password)){
+               const { password, ...result} = account;
+               return result;
+            }
+            return null;
+
+        }catch (err){
            console.log(err);
            throw new HttpException('Invalid account or password',HttpStatus.INTERNAL_SERVER_ERROR);
-       }
+        }
     }
 
     // login

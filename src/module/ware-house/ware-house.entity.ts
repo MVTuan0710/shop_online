@@ -26,7 +26,7 @@ export class WareHouseEntity extends BaseEntity{
     expiry : Date;
 
     @ManyToOne((type) => UserEntity, (userEntity)=> userEntity.wareHouseEntity)
-    @JoinColumn({name : 'user_id'})
+    @JoinColumn({name : 'create_at'})
     userEntity : UserEntity;
 
     @OneToMany((type)=>WareHouseLogEntity, (wareHouseLogEntity)=>wareHouseLogEntity.wareHouseEntity)
