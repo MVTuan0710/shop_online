@@ -18,7 +18,7 @@ export class AuthService{
         try {
             const user = await this.userService.getByEmail(data.email);
             if(user){
-                throw new HttpException('Ready exist', 400);
+                throw new HttpException('Ready exist', HttpStatus.BAD_REQUEST);
             }
 
             const result: UserEntity =  await this.userService.register(data);

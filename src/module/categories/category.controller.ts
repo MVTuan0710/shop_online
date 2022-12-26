@@ -30,7 +30,7 @@ export class CategoryController{
 
     // get by Id
     @Roles(EnumRole.super_admin)
-    @Get('/id/:category_id')
+    @Get('/get-id/:category_id')
     async getById(@Res() res, @Param('category_id') category_id : string) : Promise<any>{
         return this.categoryService.getById(category_id).then(result =>{
             res.status(200).json({
@@ -66,17 +66,16 @@ export class CategoryController{
     // update
     @Roles(EnumRole.super_admin)
     @Put('/update/:category_id')
-    async putAccount(@Body() body : CreateCategoryDTO, @Res() res, @Param('')
-        account_id : string ): Promise<any> {
-        return this.categoryService.update(account_id, body).then(result =>{
+    async putAccount(@Body() body : CreateCategoryDTO, @Res() res, @Param('category_id')category_id: string ): Promise<any> {
+        return this.categoryService.update(category_id, body).then(result =>{
             res.status(200).json({
-                message : 'Account is updated',
+                message : 'success',
                 result,
             });
         }).catch(err =>{
             console.log();
             res.status(500).json({
-                message : 'update failed',
+                message : 'failed',
                 err,
             });
         })

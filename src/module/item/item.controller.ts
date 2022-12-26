@@ -15,8 +15,8 @@ export class ItemController{
     // get all 
     @Get('get-all')
     async getAll(@Res() res: Response,@Req()req: Request) : Promise<any>{
-        const id = req['user'].id;
-        return this.itemService.find(id).then(result =>{
+        const role = req['user'].role_id;
+        return this.itemService.find(role).then(result =>{
             res.status(200).json({
                 message : 'success',
                 result,
@@ -30,10 +30,10 @@ export class ItemController{
     }
 
     // get by Id
-    @Roles(EnumRole.super_admin)
-    @Get('/id/:item_id')
+    // @Roles(EnumRole.super_admin)
+    @Get('/get-id')
     async getByID(@Res() res,@Body()data: GetItemDTO, @Req()req: Request) : Promise<any>{
-        data.user_id = req['user'].id;
+        data.role_id = req['user'].role_id;
         return this.itemService.getById(data).then(result =>{
             res.status(200).json({
                 message : 'success',
@@ -74,13 +74,13 @@ export class ItemController{
         data.user_id = req['user'].id;
         return this.itemService.update(item_id, data).then(result =>{
             res.status(200).json({
-                message : 'Account is updated',
+                message : 'success',
                 result,
             });
         }).catch(err =>{
             console.log();
             res.status(500).json({
-                message : 'update failed',
+                message : 'failed',
                 err,
             });
         })

@@ -23,8 +23,7 @@ export class CreateItemDTO {
     user_id : string;
 }
 export class GetItemDTO{
-    
+    role_id: number;
     item_id : string;
     name: string;
-    user_id: string;
 }

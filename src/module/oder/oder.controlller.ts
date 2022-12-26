@@ -7,14 +7,13 @@ import {CreateOderDTO} from "./oder.dto"
 import { Roles } from "../decorator/role.decorator";
 
 
-
 @Controller('oder')
 @UseGuards(GuardsJwt, RolesGuard)
 export class OderController{
     constructor(private oderService : OderService) {}
 
     // find all 
-    @Roles(EnumRole.super_admin)
+    // @Roles(EnumRole.super_admin)
     @Get('get-all')
     async getAll(@Res() res){
         return this.oderService.find().then(result =>{
@@ -31,7 +30,6 @@ export class OderController{
     }
 
     // create
-    @Roles(EnumRole.super_admin)
     @Post('create')
     async create(@Res() res, @Body() data: CreateOderDTO, @Req() req){
         data.user_id = req['user'].id;
@@ -65,9 +63,9 @@ export class OderController{
     }
 
     // get by id
-    @Get('get/:oder_detail_id')
-    async getByOderId(@Res() res, @Param('oder_detail_id') oder_detail_id : string){
-        return this.oderService.getByOderId(oder_detail_id).then(result =>{
+    @Get('get/:oder_id')
+    async getByOderId(@Res() res, @Param('oder_id') oder_id : string){
+        return this.oderService.getByOderId(oder_id).then(result =>{
             res.status(200).json({
                 message : 'successful',
                 result,

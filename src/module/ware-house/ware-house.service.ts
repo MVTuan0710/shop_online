@@ -140,7 +140,7 @@ export class WareHouseService {
 
                         await queryRunner.manager.update(WareHouseEntity, ware_house[j].ware_house_id, new_ware_house);
                     }
-
+                    
                     if(quantity- ware_house[j].quantity == 0){
                         quantity = 0;
                         ware_house[j].quantity = 0;

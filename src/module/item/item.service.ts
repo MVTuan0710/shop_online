@@ -37,18 +37,39 @@ export class ItemService {
     // cap nhat ware house
     async getById(data: GetItemDTO): Promise<ItemEntity> {
         try{
-            const month = moment().add(30, 'days');
+            const month = moment().add(30, 'days').toISOString();
+            if(data.role_id == 4){
+                const _item = await this.itemRepository.query(`
+                select * from (select it.item_id, cast(sum (wh.quantity) as int)  as total
+                from public.item as it join public.ware_house as wh on it.item_id = wh.item_id 
+                where wh.quantity > 0 and it.item_id = '${data.item_id}' and wh.expiry > '${month}'
+                group by it.item_id)
+                as res inner join public.item as it1 on it1.item_id = res.item_id
+                `)
+                for(let i = 0;i < _item.length; i++){
+                    if(_item[i].total > 5){
+                        delete _item[i].total;
+                    }
+                }
+                if(!_item){
+                    throw new HttpException('Out of Stock',HttpStatus.NOT_FOUND);
+                }
+                return _item;
+            }
             const item = await this.itemRepository.findOne({
                 where: {
                     item_id: data.item_id,
-                    wareHouseEntity: {
-                        expiry: Raw((alias) => `${alias} > :date`, { date: month })
-                    }
+                    // wareHouseEntity: {
+                    //     expiry: Raw((alias) => `${alias} > :date`, { date: month })
+                    // }
                 },
                 relations: { wareHouseEntity : true }
             });
-           
+            if(item == null){
+                throw new HttpException('Out of stock',HttpStatus.NOT_FOUND);
+            }
             return item;
+
         }catch(err){
             console.log(err);
             throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
@@ -57,12 +78,12 @@ export class ItemService {
 
 
     //Find all
-    async find(id: string): Promise<ItemEntity[]> {
+    async find(role: number): Promise<ItemEntity[]> {
         try{
             const month = moment().add(30, 'days').toISOString();
-            const user = await this.userService.getById(id);
+        
 
-            if(user.roleEntity.role_id == 4){
+            if(role == 4){
                 const _item = await this.itemRepository.query(`
                 select * from (select it.item_id, cast(sum (wh.quantity) as int)  as total
                 from public.item as it join public.ware_house as wh on it.item_id = wh.item_id 
@@ -75,15 +96,14 @@ export class ItemService {
                     if(_item[i].total > 5){
                         delete _item[i].total;
                     }
-    
                 }
                 if(!_item){
-                    throw new HttpException('Out of Stock',400);
+                    throw new HttpException('Out of Stock',HttpStatus.NOT_FOUND);
                 }
                 return _item;
             }
 
-            const _item = await this.itemRepository.find()
+            const _item = await this.itemRepository.find({relations: { wareHouseEntity : true }});
             return _item;
             
         }catch(err){
@@ -96,8 +116,15 @@ export class ItemService {
     // create 
     async create(data: CreateItemDTO): Promise<any> {
         try{
+            data.user_id
             // Check item name exists
-            const isItemExists = await this.itemRepository.findOne({where:{name:data.name}});
+            const isItemExists = await this.itemRepository.findOne({
+                where:{
+                    name:data.name,
+                    height: data.height,
+                    weight: data.weight,
+                }
+            });
             if (isItemExists) {
                 throw new HttpException('The item already in use', HttpStatus.CONFLICT);
             }
@@ -135,7 +162,13 @@ export class ItemService {
     // update 
     async update(item_id : string, data: CreateItemDTO): Promise<any> {
        try {
-           // check category exists
+            // check item exists
+            const isItemExists = await this.itemRepository.findOne({where: {item_id: item_id}});
+            if(!isItemExists){
+                throw new HttpException('Not found',HttpStatus.NOT_FOUND);
+            }
+
+            // check category exists
             const _category = await this.categoryService.getById(data.category_id);
             if (!_category){
                 throw new HttpException('Can`t found Category by category_id',HttpStatus.BAD_REQUEST);
@@ -153,7 +186,14 @@ export class ItemService {
                     
             // update item
             const createItemEntity = await this.itemRepository.create(itemEntity);
-            const result = await this.itemRepository.update(item_id, itemEntity)
+            await this.itemRepository.update(item_id, itemEntity);
+            const result = await this.itemRepository.findOne({
+                where: {
+                    name: createItemEntity.name,
+                    height: createItemEntity.height,
+                    weight: createItemEntity.weight
+                }
+            });
 
             // Create item_log
                 const new_itemLogEntity = new ItemLogEntity();

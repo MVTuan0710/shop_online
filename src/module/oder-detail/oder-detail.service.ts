@@ -121,9 +121,6 @@ export class OderDetailService {
                     const sale_item = await this.saleItemService.getByOderDetail(get_sale_item);
                        
                     if(sale_item){
-                        if(sale_item.amount - oder.oderDetailEntity[i].quantity >= 0){
-                            oder_price = origin_price - (oder.oderDetailEntity[i].quantity * sale_item.saleEntity.value);
-                        }
                         if(sale_item.amount - oder.oderDetailEntity[i].quantity < 0){
                             
                             // use voucher
@@ -167,9 +164,15 @@ export class OderDetailService {
                             await queryRunner.manager.save(OderDetailLogEntity,_new_oder_detail_log);
                             continue;
                         }
+                        if(sale_item.amount - oder.oderDetailEntity[i].quantity >= 0){
+                            oder_price = origin_price - (oder.oderDetailEntity[i].quantity * sale_item.saleEntity.value);
+                        }
+                    }
+                    if(!sale_item){
+                        oder_price = origin_price;
                     }
                 }
-                    oder_price = origin_price;
+                    
                 
 
                 const new_oder_detail = new OderDetailEntity();

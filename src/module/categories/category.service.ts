@@ -30,6 +30,9 @@ export class CategoryService {
             const result = await this.categoryRepository.findOne({
                 where: {category_id: category_id}
             })
+            if(result == null){
+                throw new HttpException('Not found category',HttpStatus.NOT_FOUND);
+            }
             return result;   
 
         }catch(err){
@@ -43,7 +46,7 @@ export class CategoryService {
         try {
             // check category exists
             const category  = await this.categoryRepository.findOne({
-                where: {name: data.name },
+                where: {name: data.name }
             });
             if (category){
                 throw new HttpException('The category is exist',HttpStatus.BAD_REQUEST);
@@ -63,13 +66,17 @@ export class CategoryService {
     async update(category_id : string, data: CreateCategoryDTO): Promise<any> {
        try {
            // check exists
-           const categories = await this.categoryRepository.findOne({where : {category_id : category_id}});
-           if (!categories){
+           const categories = await this.categoryRepository.findOne({where: {category_id: category_id}});
+            if (!categories){
                 throw new HttpException('Can`t found Category by category_id',HttpStatus.BAD_REQUEST);
-           }
+            }
+            if (categories.name == data.name){
+                throw new HttpException('The category is exist',HttpStatus.BAD_REQUEST);
+            }
             // update
-           const result = await this.categoryRepository.update(category_id, data);
-           return result;
+           await this.categoryRepository.update(category_id, data);
+           const new_categories = await this.categoryRepository.findOne({where: {category_id: category_id}});
+           return new_categories;
 
        }catch (err){
             console.log(err);
@@ -81,13 +88,13 @@ export class CategoryService {
     async delete(category_id : string): Promise<any> {
         try {
             // check category exists
-            const data = await this.categoryRepository.findOne({where : {category_id:category_id}});
-            if (!data){
+            const categories = await this.categoryRepository.findOne({where : {category_id:category_id}});
+            if (!categories){
                 throw new HttpException('Can`t found Category by category_id',HttpStatus.BAD_REQUEST);
             }
             // delete 
-            const result = await this.categoryRepository.delete(category_id);
-            return result;
+            await this.categoryRepository.delete(category_id);
+            return categories;
 
         }catch (err){
             console.log(err);
