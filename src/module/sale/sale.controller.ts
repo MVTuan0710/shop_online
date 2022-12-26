@@ -7,13 +7,12 @@ import { CreateSaleDTO } from "./sale.dto";
 import { Roles } from "../decorator/role.decorator";
 
 
-
 @Controller('sale')
 @UseGuards(GuardsJwt, RolesGuard)
 export class SaleController{
     constructor(private saleService : SaleService) {}
 
-    // find all oder-detail
+    // find all 
     @Roles(EnumRole.super_admin)
     @Get('get-all')
     async getAll(@Res() res){
@@ -30,7 +29,7 @@ export class SaleController{
         })
     }
 
-    // create sale
+    // create
     @Roles(EnumRole.super_admin)
     @Post('create')
     async create(@Res() res, @Body() data: CreateSaleDTO, @Req()req){
@@ -48,7 +47,7 @@ export class SaleController{
         })
     }
 
-    // delete sale
+    // delete
     @Delete('delete/:sale_id')
     async delete(@Res() res, @Param('sale_id')sale_id:string){
         return this.saleService.delete(sale_id).then(result =>{
@@ -64,7 +63,7 @@ export class SaleController{
         })
     }
 
-    // update sale
+    // update
     @Put('update/:sale_id')
     async update(@Res() res, @Param('sale_id')sale_id:string, @Body()data:CreateSaleDTO){
         return this.saleService.update(sale_id,data).then(result =>{
@@ -80,7 +79,7 @@ export class SaleController{
         })
     }
 
-    // find sale by id
+    // find by id
     @Get('get/:sale_id')
     async getByOderId(@Res() res, @Param('sale_id') sale_id : string){
         return this.saleService.getById(sale_id).then(result =>{
@@ -96,7 +95,7 @@ export class SaleController{
         })
     }
 
-    //find sale by code
+    //find by code
     @Get('get-by-code/:voucher_code')
     async getByCode(@Res() res, @Param('voucher_code') voucher_code : string){
         return this.saleService.getByCode(voucher_code).then(result =>{

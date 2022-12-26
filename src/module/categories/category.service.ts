@@ -11,7 +11,7 @@ export class CategoryService {
         private readonly categoryRepository: Repository<CategoryEntity>
     ) {}
 
-    // Find All category
+    // Find all
     async find(): Promise<CategoryEntity[]> {
         try{
             const data = await this.categoryRepository.find();
@@ -24,13 +24,13 @@ export class CategoryService {
         
     }
     
-    // get category by id
+    // get by id
     async getById(category_id: string): Promise<CategoryEntity>{
         try{
-            const category = await this.categoryRepository.findOne({
+            const result = await this.categoryRepository.findOne({
                 where: {category_id: category_id}
             })
-            return category;   
+            return result;   
 
         }catch(err){
             console.log(err);
@@ -38,18 +38,18 @@ export class CategoryService {
         }
    }
 
-    // create category
+    // create
     async create(data: CreateCategoryDTO): Promise<CategoryEntity> {
         try {
             // check category exists
             const category  = await this.categoryRepository.findOne({
                 where: {name: data.name },
-            });;
+            });
             if (category){
-                throw console.log('The category is exist');
+                throw new HttpException('The category is exist',HttpStatus.BAD_REQUEST);
             }
 
-            // save categoruy 
+            // save 
             const result = await this.categoryRepository.save(data);
             return result;
 
@@ -59,14 +59,15 @@ export class CategoryService {
         }
     }
     
-    // update category
+    // update 
     async update(category_id : string, data: CreateCategoryDTO): Promise<any> {
        try {
-           // check category exists
-           const _data = await this.categoryRepository.findOne({where : {category_id : category_id}});
-           if (!_data)
-               throw console.log('Can`t found Category by category_id');
-            // update category
+           // check exists
+           const categories = await this.categoryRepository.findOne({where : {category_id : category_id}});
+           if (!categories){
+                throw new HttpException('Can`t found Category by category_id',HttpStatus.BAD_REQUEST);
+           }
+            // update
            const result = await this.categoryRepository.update(category_id, data);
            return result;
 
@@ -76,15 +77,15 @@ export class CategoryService {
        }
     }
 
-    // delete category
+    // delete 
     async delete(category_id : string): Promise<any> {
         try {
             // check category exists
             const data = await this.categoryRepository.findOne({where : {category_id:category_id}});
-            if (!data)
-                throw console.log('Can`t found Category by category_id');
-
-            // delete category
+            if (!data){
+                throw new HttpException('Can`t found Category by category_id',HttpStatus.BAD_REQUEST);
+            }
+            // delete 
             const result = await this.categoryRepository.delete(category_id);
             return result;
 

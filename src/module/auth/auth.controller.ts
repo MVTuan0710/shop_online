@@ -4,7 +4,6 @@ import { BodyLogin } from "./auth.dto";
 import {AuthService} from "./auth.service";
 
 
-
 @Controller('auth')
 export class AuthController{
     constructor(
@@ -15,12 +14,12 @@ export class AuthController{
     async logIn(@Body() _data : BodyLogin, @Res() res) : Promise<any>{
         return this.authService.LoginAccount(_data).then(result =>{
             res.status(200).json({
-                message : 'Login successful',
+                message : 'successful',
                 result,
             });
         }).catch(err =>{
             res.status(500).json({
-                message : 'Login failed',
+                message : 'failed',
                 err,
             });
         })
@@ -31,11 +30,11 @@ export class AuthController{
         return this.authService.register(body).then(result =>{
             res.status(200).json({
                 result,
-                message : 'Sign up successfully, please check your mail to active this account',
+                message : 'successful',
             });
         }).catch(err =>{
             res.status(500).json({
-                message : 'Sign up failed',
+                message : 'failed',
                 err,
             });
         })
@@ -45,12 +44,12 @@ export class AuthController{
     async verify(@Res() res, @Param('token') token : string) : Promise<any>{
         return this.authService.verifyAccount(token).then(result =>{
             res.status(200).json({
-                message : 'Success',
+                message : 'successful',
                 result,
             });
         }).catch(err =>{
             res.status(500).json({
-                message : 'Fail',
+                message : 'failed',
                 err,
             });
         })

@@ -146,7 +146,6 @@ export class OderDetailService {
             
                             await queryRunner.manager.save(OderDetailLogEntity,new_oder_detail_log);
 
-
                             // can't use voucher
                             const _new_oder_detail = new OderDetailEntity();
                             _new_oder_detail.item_id = oder.oderDetailEntity[i].item_id;
@@ -203,8 +202,9 @@ export class OderDetailService {
     async update(data: UpdateOderDetailDTO) {
         try{
             const oder_detail = await this.oderDetailRepository.findOne({where : {oder_detail_id : data.oder_detail_id}});
-            if (!oder_detail)
-                throw new HttpException('Not Found', 404);
+            if (!oder_detail){
+                throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
+            }
 
             const result = await this.oderDetailRepository.update(data.oder_detail_id,data)
             return result;
@@ -215,15 +215,16 @@ export class OderDetailService {
         }
    }
 
-    // delete oder-detail
+    // delete 
     async delete(oder_detail_id : string): Promise<any> {
         try {
             // check oder detail exists
             const oder_detail = await this.oderDetailRepository.findOne({where : {oder_detail_id : oder_detail_id}});
-            if (!oder_detail)
-                throw new HttpException('Not Found', 404);
-
-            // delete oder detail
+            if (!oder_detail){
+                throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
+            }
+            
+            // delete 
             await this.oderDetailRepository.delete(oder_detail_id);
             return oder_detail;
 

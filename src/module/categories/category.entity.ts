@@ -6,8 +6,7 @@ import {
     Entity,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
-    OneToMany,
-    JoinColumn
+    OneToMany
 } from "typeorm";
 import { ItemEntity } from "../item/item.entity";
 

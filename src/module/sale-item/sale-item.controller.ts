@@ -13,7 +13,7 @@ import { Roles } from "../decorator/role.decorator";
 export class SaleItemController{
     constructor(private saleItemService : SaleItemService) {}
 
-    // find all oder-detail
+    // find all 
     @Roles(EnumRole.super_admin)
     @Get('get-all')
     async getAll(@Res() res){
@@ -30,7 +30,7 @@ export class SaleItemController{
         })
     }
 
-    // create sale
+    // create 
     @Roles(EnumRole.super_admin)
     @Post('create')
     async create(@Res() res, @Body() data: CreateSaleItemDTO, @Req()req){
@@ -47,7 +47,7 @@ export class SaleItemController{
         })
     }
 
-    // delete sale
+    // delete
     @Delete('delete/:sale_id')
     async delete(@Res() res, @Param('sale_id')sale_id:string){
         return this.saleItemService.delete(sale_id).then(result =>{
@@ -63,7 +63,7 @@ export class SaleItemController{
         })
     }
 
-    // update sale
+    // update
     @Put('update/:sale_id')
     async update(@Res() res, @Param('sale_id')sale_id:string, @Body()data:CreateSaleItemDTO){
         return this.saleItemService.update(sale_id,data).then(result =>{
@@ -79,7 +79,7 @@ export class SaleItemController{
         })
     }
 
-    // find sale by id
+    // find by id
     @Get('get/:sale_id')
     async getByOderId(@Res() res, @Param('sale_id') sale_id : string){
         return this.saleItemService.getById(sale_id).then(result =>{

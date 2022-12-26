@@ -12,7 +12,7 @@ import { Request, Response } from "express";
 export class ItemController{
     constructor(private itemService  : ItemService) {}
 
-    // get all item
+    // get all 
     @Get('get-all')
     async getAll(@Res() res: Response,@Req()req: Request) : Promise<any>{
         const id = req['user'].id;
@@ -29,7 +29,7 @@ export class ItemController{
         })
     }
 
-    // get item by Id
+    // get by Id
     @Roles(EnumRole.super_admin)
     @Get('/id/:item_id')
     async getByID(@Res() res,@Body()data: GetItemDTO, @Req()req: Request) : Promise<any>{

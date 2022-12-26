@@ -13,6 +13,7 @@ import {
 import { ItemEntity } from '../item/item.entity';
 import { SaleEntity } from '../sale/sale.entity';
 
+
 @Entity({name: 'sale_item'})
 export class SaleItemEntity extends BaseEntity{
     @PrimaryGeneratedColumn('uuid')

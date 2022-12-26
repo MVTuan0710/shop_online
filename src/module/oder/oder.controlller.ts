@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, Param, Post, Res, Put, UseGuards, Req} from "@nestjs/common";
+import {Body, Controller, Delete, Get, Param, Post, Res, UseGuards, Req} from "@nestjs/common";
 import {OderService} from "./oder.service";
 import {GuardsJwt} from "../auth/guard/guards.jwt";
 import {RolesGuard} from "../role/guards/role.guards";
@@ -13,13 +13,13 @@ import { Roles } from "../decorator/role.decorator";
 export class OderController{
     constructor(private oderService : OderService) {}
 
-    // find all oder-detail
+    // find all 
     @Roles(EnumRole.super_admin)
     @Get('get-all')
     async getAll(@Res() res){
         return this.oderService.find().then(result =>{
             res.status(200).json({
-                message : 'success',
+                message : 'successful',
                 result,
             });
         }).catch(err =>{
@@ -30,14 +30,14 @@ export class OderController{
         })
     }
 
-
+    // create
     @Roles(EnumRole.super_admin)
     @Post('create')
     async create(@Res() res, @Body() data: CreateOderDTO, @Req() req){
         data.user_id = req['user'].id;
         return this.oderService.create(data).then(result =>{
             res.status(200).json({
-                message : 'success',
+                message : 'successful',
                 result,
             });
         }).catch(err =>{
@@ -48,11 +48,12 @@ export class OderController{
         })
     }
 
+    // delete
     @Delete('delete/:oder_id')
     async delete(@Res() res, @Param('oder_id')oder_id:string){
         return this.oderService.delete(oder_id).then(result =>{
             res.status(200).json({
-                message : 'success',
+                message : 'successful',
                 result,
             });
         }).catch(err =>{
@@ -63,12 +64,12 @@ export class OderController{
         })
     }
 
-    // find role by id
+    // get by id
     @Get('get/:oder_detail_id')
     async getByOderId(@Res() res, @Param('oder_detail_id') oder_detail_id : string){
         return this.oderService.getByOderId(oder_detail_id).then(result =>{
             res.status(200).json({
-                message : 'success',
+                message : 'successful',
                 result,
             });
         }).catch(err =>{

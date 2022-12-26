@@ -13,6 +13,7 @@ export class ItemLogService{
     async getAll(): Promise<ItemLogEntity[]> {
         try{
             return await this.itemLogRepository.find();
+            
         }catch(err){
             console.log(err);
             throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
@@ -22,6 +23,7 @@ export class ItemLogService{
     async create(data: CreateItemLogDTO): Promise<any> {
         try{
            await this.itemLogRepository.save(data);
+
         }catch(err){
             console.log(err);
             throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);

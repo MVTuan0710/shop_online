@@ -43,6 +43,7 @@ export class SaleService {
             throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
+
     // su dung o oder-detail
     async getByCodeAndItemId(voucher_code: string, item_id: string): Promise<SaleEntity> {
         try{
@@ -107,20 +108,20 @@ export class SaleService {
     
     // update sale
     async update(sale_id : string, data: CreateSaleDTO): Promise<any> {
-       try {
-           // find sale
-           const sale  = await this.saleRepository.findOne({where: {sale_id:sale_id}});
-           if (!sale){
+        try {
+            // find sale
+            const sale  = await this.saleRepository.findOne({where: {sale_id:sale_id}});
+            if (!sale){
                 throw new HttpException('Not Found',500);
-           }
+            }
             // update sale
             const result = await this.saleRepository.update(sale_id,data);
             return result;
 
-       }catch (err){
+        }catch (err){
             console.log(err);
             throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
-       }
+        }
     }
 
     // delete sale

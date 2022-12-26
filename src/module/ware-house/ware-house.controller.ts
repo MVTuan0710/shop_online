@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, Headers, Param, Post, Put, Query, Req, Res, UseGuards} from "@nestjs/common";
+import {Body, Controller, Delete, Get, Headers, Param, Post, Put, Req, Res, UseGuards} from "@nestjs/common";
 import {WareHouseService} from "./ware-house.service";
 import {CreateWareHouseDTO, UpdateWareHouseDTO} from "./ware-house.dto";
 import {GuardsJwt} from "../auth/guard/guards.jwt";
@@ -12,7 +12,7 @@ import { EnumRole } from '../constant/role/role.constant';
 export class WareHouseController{
     constructor(private wareHouseService  : WareHouseService) {}
 
-    // get all ware house
+    // get all 
     @Roles(EnumRole.warehouse_manager, EnumRole.super_admin)
     @Get('get-all')
     async getAll(@Res() res) : Promise<any>{
@@ -29,7 +29,7 @@ export class WareHouseController{
         })
     }
 
-    // get account by Id
+    // get by Id
     @Roles(EnumRole.warehouse_manager, EnumRole.super_admin)
     @Get('/id/:ware_house_id')
     async getWareHouseByID(@Res() res, @Param('ware_house_id') ware_house_id : string) : Promise<any>{
@@ -46,6 +46,7 @@ export class WareHouseController{
         })
     }
 
+    // create
     @Roles(EnumRole.warehouse_manager, EnumRole.super_admin)
     @Post('create')
     async createWareHouse(@Res() res, @Req() req,@Body()data: CreateWareHouseDTO, @Headers()token: string) : Promise<any>{
@@ -63,7 +64,7 @@ export class WareHouseController{
         })
     }
 
-    // update ware house
+    // update 
     @Roles(EnumRole.warehouse_manager, EnumRole.super_admin)
     @Put('update')
     async updateAccount(@Body() data : UpdateWareHouseDTO, @Res() res, @Headers()token: string): Promise<any> {
@@ -81,7 +82,7 @@ export class WareHouseController{
         })
     }
 
-    // delete ware house
+    // delete 
     @Roles(EnumRole.warehouse_manager, EnumRole.super_admin)
     @Delete('delete/:ware_house_id')
     async delete(@Res() res , @Param('ware_house_id') ware_house_id : string) : Promise<any>{

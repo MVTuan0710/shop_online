@@ -13,7 +13,7 @@ export class AuthService{
                 private readonly jwtService : JwtService,
     ) {}
 
-    // create account
+    // register
     async register(data : CreateAccountDTO) : Promise<UserEntity>{
         try {
             const user = await this.userService.getByEmail(data.email);
@@ -36,10 +36,10 @@ export class AuthService{
        try {
            const data: UserEntity = await this.userService.getByVerifyToken(token);
             if(!data){
-                throw console.log('The account is not exists');
+                throw new HttpException('The account is not exists',HttpStatus.BAD_REQUEST);
             }
             if(data.is_active == true){
-                throw console.log('The account is activated');
+                throw new HttpException('The account is activated',HttpStatus.BAD_REQUEST);
             }
 
             const result =  await this.userService.updateActiveAccount(data.user_id,{

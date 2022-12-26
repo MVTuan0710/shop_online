@@ -23,7 +23,6 @@ import { SaleItemEntity } from "../sale-item/sale-item.entity";
     imports :[
         ScheduleModule.forRoot(),
         ConfigModule.forRoot({
-            // envFilePath : `./env/${NODE_ENV ? '.' + NODE_ENV.trim() : ''}.env`,
             envFilePath : `./env/.env`,
             isGlobal : true,
             load : [configuration]

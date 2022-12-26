@@ -1,4 +1,3 @@
-import { CreateOderDetailDTO } from "../oder-detail/oder-detail.dto";
 import { OderDetailEntity } from "../oder-detail/oder-detail.entity";
 import { UserEntity } from "../users/user.entity";
 

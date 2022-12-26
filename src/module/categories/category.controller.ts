@@ -11,13 +11,13 @@ import { EnumRole } from '../constant/role/role.constant'
 export class CategoryController{
     constructor(private categoryService  : CategoryService) {}
 
-    // get all category
+    // get all 
     @Roles(EnumRole.super_admin)
     @Get('get-all')
     async getAll(@Res() res) : Promise<any>{
         return this.categoryService.find().then(result =>{
             res.status(200).json({
-                message : 'success',
+                message : 'successful',
                 result,
             });
         }).catch(err =>{
@@ -28,13 +28,13 @@ export class CategoryController{
         })
     }
 
-    // get category by Id
+    // get by Id
     @Roles(EnumRole.super_admin)
     @Get('/id/:category_id')
     async getById(@Res() res, @Param('category_id') category_id : string) : Promise<any>{
         return this.categoryService.getById(category_id).then(result =>{
             res.status(200).json({
-                message : 'success',
+                message : 'successful',
                 result,
             });
         }).catch(err =>{
@@ -45,13 +45,13 @@ export class CategoryController{
         })
     }
 
-    //create category
+    //create 
     @Roles(EnumRole.super_admin)
     @Post('create')
     async create(@Res() res, @Body()data: CreateCategoryDTO) : Promise<any>{
         return this.categoryService.create(data).then(result =>{
             res.status(200).json({
-                message : 'success',
+                message : 'successful',
                 result,
             });
         }).catch(err =>{
@@ -63,7 +63,7 @@ export class CategoryController{
     }
 
 
-    // update category
+    // update
     @Roles(EnumRole.super_admin)
     @Put('/update/:category_id')
     async putAccount(@Body() body : CreateCategoryDTO, @Res() res, @Param('')
@@ -82,7 +82,7 @@ export class CategoryController{
         })
     }
 
-    // delete category
+    // delete
     @Roles(EnumRole.super_admin)
     @Delete('delete/:category_id')
     async delete(@Res() res , @Param('category_id') category_id : string) : Promise<any>{

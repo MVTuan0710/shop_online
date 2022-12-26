@@ -1,6 +1,4 @@
 import {IsNotEmpty} from "class-validator";
-import { ItemEntity } from "../item/item.entity";
-import { SaleEntity } from "../sale/sale.entity";
 
 
 export class CreateSaleItemDTO{

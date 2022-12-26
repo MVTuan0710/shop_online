@@ -26,7 +26,7 @@ export class OderService {
         private readonly saleItemService: SaleItemService, 
     ) {}
 
-    // find oder-detail by id
+    // find by id
     async getByOderId(oder_id: string): Promise<OderEntity> {
         try{
             const data = await this.oderRepository.findOne({
@@ -37,12 +37,11 @@ export class OderService {
             
         }catch(err){
             console.log(err)
-            throw new HttpException('failed',500)
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
-        
     }
 
-    // Find All oder-detail
+    // Find all
     async find(): Promise<OderEntity[]> {
         try{
             const data = await this.oderRepository.find({
@@ -52,13 +51,13 @@ export class OderService {
 
         }catch(err){
             console.log(err)
-            throw new HttpException('failed',500)
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
         
     }
 
     
-    // create oder
+    // create 
    async create (data: CreateOderDTO):Promise<any> {
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
@@ -94,7 +93,6 @@ export class OderService {
                 await this.oderDetailService.createForStaff(_oder,queryRunner);
             
             }else{
-
                 await this.oderDetailService.createForCustomer(_oder,queryRunner);
 
                 if(new_oder.voucher_code){
@@ -119,7 +117,7 @@ export class OderService {
         }catch(err){
             await queryRunner.rollbackTransaction();
             console.log(err)
-            throw new HttpException('Bad req',500);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         
         } finally {
             await queryRunner.release();
@@ -127,7 +125,7 @@ export class OderService {
         
    }
 
-    // delete oder-detail
+    // delete
     async delete(oder_id : string): Promise<any> {
         try {
             // check item exists
@@ -142,7 +140,7 @@ export class OderService {
 
         }catch (err){
             console.log(err)
-            throw new HttpException('failed',500)
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
 }

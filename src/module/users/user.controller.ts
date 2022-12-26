@@ -14,7 +14,7 @@ import { EnumRole } from '../constant/role/role.constant';
 export class UserController{
     constructor(private userService  : UserService) {}
 
-    // get all account
+    // get all 
     @Roles(EnumRole.super_admin)
     @Get('get-all')
     async getAll(@Res() res) : Promise<any>{

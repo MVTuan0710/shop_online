@@ -1,7 +1,4 @@
-import {IsEmpty, IsNotEmpty} from "class-validator";
-import { ItemEntity } from "../item/item.entity";
-import { UserEntity } from "../users/user.entity";
-
+import {IsNotEmpty} from "class-validator";
 
 
 export class CreateWareHouseDTO{

@@ -42,6 +42,7 @@ export class SaleItemService {
             sale_item.amount = tmp;
             
             await this.saleItemRepository.update(sale_item_id,sale_item);
+
         }catch(err){
             console.log(err);
             throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
@@ -64,7 +65,6 @@ export class SaleItemService {
     }
     async getByOderDetail(data: GetSaleItemDTO):Promise<SaleItemEntity>{
         try{
-
             const sale_item =  await this.saleItemRepository.findOne({
                 where:[
                     {
@@ -151,7 +151,6 @@ export class SaleItemService {
                         new_sale_item.amount = 0; 
                     }
                    
-
                     await queryRunner.manager.update(SaleItemEntity,sale_item.sale_item_id,new_sale_item);
                 }
             }

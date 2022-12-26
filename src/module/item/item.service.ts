@@ -7,6 +7,7 @@ import { CategoryService } from "../categories/category.service";
 import { ItemLogService } from "../item-log/item_log.service";
 import { ItemLogEntity } from "../item-log/item_log.entity";
 import * as moment from 'moment'
+import { UserService } from "../users/user.service";
 
 @Injectable()
 export class ItemService {
@@ -17,12 +18,15 @@ export class ItemService {
         private readonly categoryService: CategoryService,
 
         private readonly itemLogService: ItemLogService,
+
+        private readonly userService: UserService
     ) {}
 
     async getByIdNormal(item_id:string): Promise<ItemEntity>{
         try{
             const result = await this.itemRepository.findOne({where: {item_id: item_id}});
             return result;
+
         }catch(err){
             console.log(err);
             throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
@@ -30,6 +34,7 @@ export class ItemService {
     }
 
     // find item by id
+    // cap nhat ware house
     async getById(data: GetItemDTO): Promise<ItemEntity> {
         try{
             const month = moment().add(30, 'days');
@@ -51,30 +56,36 @@ export class ItemService {
 }
 
 
-    //Find All item
+    //Find all
     async find(id: string): Promise<ItemEntity[]> {
         try{
             const month = moment().add(30, 'days').toISOString();
-            
-            // Date();
-            const _item = await this.itemRepository.query(`
-            select * from (select it.item_id, cast(sum (wh.quantity) as int)  as total
-            from public.item as it join public.ware_house as wh on it.item_id = wh.item_id 
-            where wh.quantity > 0 and wh.expiry > '${month}'
-            group by it.item_id)
-            as res inner join public.item as it1 on it1.item_id = res.item_id
-            `)
+            const user = await this.userService.getById(id);
 
-            for(let i = 0;i < _item.length; i++){
-                if(_item[i].total > 5){
-                    delete _item[i].total;
+            if(user.roleEntity.role_id == 4){
+                const _item = await this.itemRepository.query(`
+                select * from (select it.item_id, cast(sum (wh.quantity) as int)  as total
+                from public.item as it join public.ware_house as wh on it.item_id = wh.item_id 
+                where wh.quantity > 0 and wh.expiry > '${month}'
+                group by it.item_id)
+                as res inner join public.item as it1 on it1.item_id = res.item_id
+                `)
+    
+                for(let i = 0;i < _item.length; i++){
+                    if(_item[i].total > 5){
+                        delete _item[i].total;
+                    }
+    
                 }
+                if(!_item){
+                    throw new HttpException('Out of Stock',400);
+                }
+                return _item;
+            }
 
-            }
-            if(!_item){
-                throw new HttpException('Out of Stock',400);
-            }
+            const _item = await this.itemRepository.find()
             return _item;
+            
         }catch(err){
             console.log(err);
             throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
@@ -82,13 +93,14 @@ export class ItemService {
         
     }
     
-    // create item
+    // create 
     async create(data: CreateItemDTO): Promise<any> {
         try{
             // Check item name exists
-            const isItemExists = await this.itemRepository.findOne({where:{name:data.name}})
-            if (isItemExists) throw new HttpException('The item already in use', HttpStatus.CONFLICT)
-        
+            const isItemExists = await this.itemRepository.findOne({where:{name:data.name}});
+            if (isItemExists) {
+                throw new HttpException('The item already in use', HttpStatus.CONFLICT);
+            }
             const category = await this.categoryService.getById(data.category_id);
     
             // Create item
@@ -100,7 +112,6 @@ export class ItemService {
                 itemEntity.usage = data.usage;
                 itemEntity.categoryEntity =category;
                 
-
             const result = await this.itemRepository.save(itemEntity);
 
             // Create item_log
@@ -112,7 +123,6 @@ export class ItemService {
                 new_itemLogEntity.usage= itemEntity.usage;
                 new_itemLogEntity.itemEntity = result;
 
-
             await this.itemLogService.create(new_itemLogEntity)
             return result;
 
@@ -122,16 +132,16 @@ export class ItemService {
         }
       }
     
-    // update item
+    // update 
     async update(item_id : string, data: CreateItemDTO): Promise<any> {
        try {
            // check category exists
-           const _category = await this.categoryService.getById(data.category_id);
-           if (!_category)
-                throw console.log('Can`t found Category by category_id');
-
-  
-                const category = await this.categoryService.getById(data.category_id);
+            const _category = await this.categoryService.getById(data.category_id);
+            if (!_category){
+                throw new HttpException('Can`t found Category by category_id',HttpStatus.BAD_REQUEST);
+            }
+            
+            const category = await this.categoryService.getById(data.category_id);
     
                 const itemEntity = new ItemEntity();
                 itemEntity.name = data.name;
@@ -156,23 +166,24 @@ export class ItemService {
 
 
             await this.itemLogService.create(new_itemLogEntity)
+            return result;
 
-           return result;
        }catch (err){
             console.log(err);
             throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
        }
     }
 
-    // delete item
+    // delete 
     async delete(item_id : string): Promise<any> {
         try {
             // check item exists
             const item = await this.itemRepository.findOne({where : {item_id : item_id}});
-            if (!item)
-                throw console.log('Can`t found Warehouse by id');
+            if (!item){
+                throw new HttpException('Can`t found Warehouse by id',HttpStatus.BAD_REQUEST);
+            }   
 
-            // delete item
+            // delete 
             await this.itemRepository.delete(item_id);
             return item;
         }catch (err){

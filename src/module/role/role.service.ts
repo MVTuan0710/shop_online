@@ -8,7 +8,7 @@ import { CreateRoleDTO } from "./role.dto";
 export class RoleService{
     constructor(@InjectRepository(RoleEntity) private roleRepository : Repository<RoleEntity>) {}
 
-    // get all Role
+    // get all 
     async getAllRole():Promise<RoleEntity[]> {
         try{
             return this.roleRepository.find();
@@ -21,12 +21,11 @@ export class RoleService{
 
     async findById(id : number): Promise<RoleEntity> {
         try{
-             return this.roleRepository.findOne({where : { role_id : id }});
+            return this.roleRepository.findOne({where : { role_id : id }});
 
         }catch(err){
             console.log(err);
             throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
-
         }
        
     }
