@@ -13,10 +13,12 @@ Otherwise Nest won't instantiate them because all of the essential metadata won'
 
 we define a provider. The @Injectable() decorator marks the CatsService class as a provider.
 
-// * JoinColumn decorator used on one-to-one relations to specify owner side of relationship.
-// * It also can be used on both one-to-one and many-to-one relations to specify custom column name
-// * or custom referenced column.
+* JoinColumn decorator used on one-to-one relations to specify owner side of relationship.
+* It also can be used on both one-to-one and many-to-one relations to specify custom column name
+* or custom referenced column.
 
-// CanActivate() function should return a boolean indicating whether the current request is allowed or not
-// if it returns TRUE, the request will be processed.
-// if it returns FALSE, Nest will deny the request.
+CanActivate() function should return a boolean indicating whether the current request is allowed or not
+if it returns TRUE, the request will be processed.
+if it returns FALSE, Nest will deny the request.
+
+The @Injectable() decorator marks the CatsService class as a provider.

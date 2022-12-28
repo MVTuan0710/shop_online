@@ -6,7 +6,7 @@ import {
     Entity,
     PrimaryGeneratedColumn,
     JoinColumn,
-    ManyToOne,OneToOne,
+    ManyToOne,
     UpdateDateColumn,
     OneToMany
 } from "typeorm";

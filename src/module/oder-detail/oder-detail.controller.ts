@@ -8,13 +8,12 @@ import { Request } from "express";
 import { Roles } from "../decorator/role.decorator";
 
 
-
 @Controller('oder-detail')
 @UseGuards(GuardsJwt, RolesGuard)
 export class OderDetailController{
     constructor(private oderDetailService : OderDetailService) {}
 
-    // find all oder-detail
+    // find all 
     @Roles(EnumRole.super_admin)
     @Get('get-all')
     async getAll(@Res() res){

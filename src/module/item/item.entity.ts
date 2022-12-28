@@ -16,6 +16,7 @@ import {WareHouseEntity} from "../ware-house/ware-house.entity"
 import { ItemLogEntity } from "../item-log/item_log.entity";
 import { SaleItemEntity } from "../sale-item/sale-item.entity";
 
+
 @Entity('item')
 export class ItemEntity extends BaseEntity{
     @PrimaryGeneratedColumn('uuid')

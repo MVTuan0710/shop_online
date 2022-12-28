@@ -1,14 +1,13 @@
 import {Body, Controller, Delete, Get, Param, Post, Res, UseGuards, Req} from "@nestjs/common";
 import {OderService} from "./oder.service";
 import {GuardsJwt} from "../auth/guard/guards.jwt";
-import {RolesGuard} from "../role/guards/role.guards";
 import {EnumRole} from "../constant/role/role.constant";
 import {CreateOderDTO} from "./oder.dto"
 import { Roles } from "../decorator/role.decorator";
 
 
 @Controller('oder')
-@UseGuards(GuardsJwt, RolesGuard)
+@UseGuards(GuardsJwt)
 export class OderController{
     constructor(private oderService : OderService) {}
 

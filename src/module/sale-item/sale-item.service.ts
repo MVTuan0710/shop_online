@@ -131,6 +131,7 @@ export class SaleItemService {
             throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
+    
     async updateSaleItemByOder(voucher_code: string, oder_item:OderDetailEntity[],  queryRunner: QueryRunner):Promise<any>{
         try{
             for(let i = 0; i< oder_item.length; i++){

@@ -17,6 +17,7 @@ import { UserLogEntity } from "../user-log/user-log.entity";
 import { SaleEntity } from "../sale/sale.entity";
 import { SaleLogEntity } from "../sale-log/sale-log.entity";
 import { SaleItemEntity } from "../sale-item/sale-item.entity";
+import { MetadataEntity } from "../metadata/metadata.entity";
 
 
 @Module({
@@ -41,7 +42,7 @@ import { SaleItemEntity } from "../sale-item/sale-item.entity";
                             ItemEntity, CategoryEntity, OderDetailEntity,
                             OderDetailLogEntity, OderEntity, ItemLogEntity,
                             WareHouseLogEntity, UserLogEntity,SaleEntity, 
-                            SaleLogEntity, SaleItemEntity]
+                            SaleLogEntity, SaleItemEntity, MetadataEntity]
             }),
         })
     ],

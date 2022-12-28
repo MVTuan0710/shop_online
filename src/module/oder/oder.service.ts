@@ -73,16 +73,18 @@ export class OderService {
             new_oder.voucher_code = data.voucher_code;
             
             // cau 8
-            if(!data.user_id && !data.shipping_info){
-                throw console.log('Not found',HttpStatus.NOT_FOUND);
-            }
-            if(data.user_id){
-                new_oder.shipping_info = user.address;
-            }
-            if(!data.user_id && data.shipping_info){
+            if(user.roleEntity.role_id == 5){
                 new_oder.shipping_info = JSON.stringify(data.shipping_info);
+            }else{
+                if(!data.shipping_info){
+                    new_oder.shipping_info = user.address;
+                }
+                if(data.shipping_info){
+                    new_oder.shipping_info = JSON.stringify(data.shipping_info);
+                }
             }
             
+    
             new_oder.oderDetailEntity = data.oderDetailEntity;
 
             const _oder = await queryRunner.manager.save(OderEntity,new_oder); 

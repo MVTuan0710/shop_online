@@ -8,7 +8,6 @@ import { CreateRoleDTO } from "./role.dto";
 export class RoleService{
     constructor(@InjectRepository(RoleEntity) private roleRepository : Repository<RoleEntity>) {}
 
-    // get all 
     async getAllRole():Promise<RoleEntity[]> {
         try{
             return this.roleRepository.find();

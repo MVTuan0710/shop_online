@@ -30,7 +30,6 @@ export class ItemController{
     }
 
     // get by Id
-    // @Roles(EnumRole.super_admin)
     @Get('/get-id')
     async getByID(@Res() res,@Body()data: GetItemDTO, @Req()req: Request) : Promise<any>{
         data.role_id = req['user'].role_id;

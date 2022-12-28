@@ -48,7 +48,12 @@ export class SaleService {
     async getByCodeAndItemId(voucher_code: string, item_id: string): Promise<SaleEntity> {
         try{
             const result = await this.saleRepository.findOne({
-                where: {voucher_code: voucher_code, saleItemEntity: {itemEntity : {item_id : item_id}}},
+                where: {
+                    voucher_code: voucher_code, 
+                    saleItemEntity: {
+                        itemEntity : {item_id : item_id}
+                    }
+                },
                 relations: { saleLogEntity : true, saleItemEntity: true }
             });
             return result;
@@ -76,7 +81,7 @@ export class SaleService {
     // create sale
     async create(data: CreateSaleDTO): Promise<any> {
         try {
-           // find voucher_code
+            // find voucher_code
             const voucher_code  = await this.saleRepository.findOne({
                 where: {voucher_code: data.voucher_code}
             });
@@ -88,7 +93,6 @@ export class SaleService {
             // save sale
             const result = await this.saleRepository.save(data);
             
-            // map data saleEntity -> saleLogEntity
             const saleLogEntity = new SaleLogEntity();
             saleLogEntity.name = result.name;
             saleLogEntity.voucher_code = result.voucher_code;
@@ -129,9 +133,9 @@ export class SaleService {
         try {
             // find sale
             const sale  = await this.saleRepository.findOne({where: {sale_id:sale_id}});
-           if (!sale){
+            if (!sale){
                 throw new HttpException('Not Found',500);
-           }
+            }
             // delete sale
             const result = await this.saleRepository.delete(sale_id);
             return result;
