@@ -39,7 +39,7 @@ export class CategoryService {
             console.log(err);
             throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
-   }
+    }
 
     // create
     async create(data: CreateCategoryDTO): Promise<CategoryEntity> {

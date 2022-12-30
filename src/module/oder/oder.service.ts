@@ -23,7 +23,7 @@ export class OderService {
 
         private readonly wareHouserService: WareHouseService,
 
-        private readonly saleItemService: SaleItemService, 
+        private readonly saleItemService: SaleItemService
     ) {}
 
     // find by id
@@ -74,6 +74,9 @@ export class OderService {
             
             // cau 8
             if(user.roleEntity.role_id == 5){
+                if(!data.shipping_info){
+                    throw new HttpException(`Shipping info is empty`, HttpStatus.BAD_REQUEST);
+                }
                 new_oder.shipping_info = JSON.stringify(data.shipping_info);
             }else{
                 if(!data.shipping_info){
@@ -84,12 +87,11 @@ export class OderService {
                 }
             }
             
-    
             new_oder.oderDetailEntity = data.oderDetailEntity;
 
             const _oder = await queryRunner.manager.save(OderEntity,new_oder); 
             
-            await this.wareHouserService.updateByOder(data.oderDetailEntity, queryRunner);
+            await this.wareHouserService.updateByOder(data.oderDetailEntity,_oder.oder_id, queryRunner);
             
             if(user.roleEntity.role_id == 1|| user.roleEntity.role_id == 2|| user.roleEntity.role_id == 3){
                 await this.oderDetailService.createForStaff(_oder,queryRunner);
@@ -127,22 +129,30 @@ export class OderService {
         
    }
 
-    // delete
-    async delete(oder_id : string): Promise<any> {
-        try {
-            // check item exists
-            const data = await this.oderRepository.findOne({where : {oder_id : oder_id}});
-            if (!data){
-                throw console.log('Not found',HttpStatus.NOT_FOUND);
-            }
-            
-            // delete
-            const result = await this.oderRepository.delete(oder_id);
-            return result;
+    // // delete
+    // async delete(data : CreateOderDTO,oder_id: string): Promise<any> {
+    //     const queryRunner = this.dataSource.createQueryRunner()
+    //     await queryRunner.connect()
+    //     await queryRunner.startTransaction();
+        
+    //     try{
+    //         // productRefund
+    //         const oder = await this.oderRepository.findOne({where: {oder_id: oder_id}});
 
-        }catch (err){
-            console.log(err)
-            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
-        }
-    }
+    //         await this.wareHouserService.updateByOder(oder.oderDetailEntity, queryRunner);
+
+
+
+            
+
+    //     }catch(err){
+    //         await queryRunner.rollbackTransaction();
+    //         console.log(err)
+    //         throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
+        
+    //     } finally {
+    //         await queryRunner.release();
+    //     }
+        
+    // }
 }

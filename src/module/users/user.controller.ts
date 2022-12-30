@@ -7,8 +7,6 @@ import { Roles } from '../decorator/role.decorator';
 import { EnumRole } from '../constant/role/role.constant';
 
 
-
-
 @Controller('user')
 @UseGuards(GuardsJwt, RolesGuard)
 export class UserController{

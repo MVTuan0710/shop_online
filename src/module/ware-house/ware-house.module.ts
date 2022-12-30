@@ -6,12 +6,14 @@ import {WareHouseService} from "./ware-house.service";
 import { UserModule } from "../users/user.module";
 import { ItemModule } from "../item/item.module";
 import {WareHouseLogModule} from "../ware-house-log/ware-house-log.module";
+import { OderModule } from "../oder/oder.module";
 
 
 @Module({
     imports :[TypeOrmModule.forFeature([WareHouseEntity]),
         forwardRef(()=>UserModule),
-        forwardRef(()=> ItemModule),
+        forwardRef(()=>ItemModule),
+        forwardRef(()=>OderModule),
         forwardRef(()=>WareHouseLogModule)
     ],
     controllers : [WareHouseController],

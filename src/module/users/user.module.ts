@@ -12,7 +12,6 @@ import { ItemModule } from "../item/item.module";
 import { UserLogModule } from "../user-log/user-log.module";
 
 
-
 @Module({
     imports :[TypeOrmModule.forFeature([UserEntity]),
     forwardRef(()=>JwtModule.registerAsync({
@@ -20,7 +19,6 @@ import { UserLogModule } from "../user-log/user-log.module";
         inject : [ConfigService],
         useFactory: async(configService : ConfigService) =>({
             secret : configService.get<string>('jwt.secret'),
-            // secret : 'dasdasd',
             signOptions : {
                 expiresIn : configService.get<string>('jwt.expires_in'),
             } 

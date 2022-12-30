@@ -12,9 +12,9 @@ import {CreateRoleDTO} from "./role.dto";
 export class RoleController{
     constructor(private roleService : RoleService) {}
 
-    // find all role
+    // get all role
     @Roles(EnumRole.super_admin)
-    @Get('/')
+    @Get('/get-all')
     async getAllRole(@Res() res){
         return this.roleService.getAllRole().then(result =>{
             res.status(200).json({

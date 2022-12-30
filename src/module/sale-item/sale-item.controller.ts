@@ -7,7 +7,6 @@ import { CreateSaleItemDTO } from "./sale-item.dto";
 import { Roles } from "../decorator/role.decorator";
 
 
-
 @Controller('sale-item')
 @UseGuards(GuardsJwt, RolesGuard)
 export class SaleItemController{

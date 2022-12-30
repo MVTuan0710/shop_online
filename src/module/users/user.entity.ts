@@ -17,7 +17,6 @@ import {OderEntity} from "../oder/oder.entity"
 import { UserLogEntity } from "../user-log/user-log.entity";
 
 
-
 @Entity({name: 'user'})
 export class UserEntity extends BaseEntity{
     @PrimaryGeneratedColumn('uuid')
@@ -44,7 +43,7 @@ export class UserEntity extends BaseEntity{
     @Column({name : 'verify_token', type : 'varchar', nullable : true})
     verify_token : string;
 
-    @ManyToOne((type)=>UserLogEntity, (userLogEntity)=>userLogEntity.userEntity)
+    @OneToMany((type)=>UserLogEntity, (userLogEntity)=>userLogEntity.userEntity)
     userLogEntity: UserLogEntity[];
 
     @ManyToOne((type) => RoleEntity, (roleEntity)=> roleEntity.userEntity)

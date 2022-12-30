@@ -25,11 +25,14 @@ export class OderDetailEntity extends BaseEntity{
     @Column({name : 'oder_price',  type : 'integer' , nullable : true})
     oder_price : number;
 
+    @Column({name : 'origin_price',  type : 'integer' , nullable : true})
+    origin_price : number;
+
     @Column({name : 'item_info',  type : 'varchar' , nullable : true})
     item_info : string;
 
-    @Column({name : 'origin_price',  type : 'integer' , nullable : true})
-    origin_price : number;
+    @Column({name : 'ware_house_id',  type : 'varchar' , nullable : true})
+    ware_hosue_id : string;
 
     @Column({name : 'item_id',  type : 'varchar' , nullable : true})
     item_id : string;

@@ -5,10 +5,13 @@ import { MoreThan, QueryRunner, Raw, Repository} from "typeorm";
 import {CreateWareHouseDTO, UpdateWareHouseDTO} from "./ware-house.dto";
 import { UserService } from "../users/user.service";
 import { ItemService } from "../item/item.service";
+import { OderEntity } from "../oder/oder.entity";
+import { OderService } from "../oder/oder.service";
+import { OderDetailEntity } from "../oder-detail/oder-detail.entity";
 import {WareHouseLogEntity} from "../ware-house-log/ware-house-log.entity";
 import {WareHouseLogService} from "../ware-house-log/ware-house-log.servic";
-import { OderDetailEntity } from "../oder-detail/oder-detail.entity";
 import * as moment from 'moment';
+
 
 @Injectable()
 export class WareHouseService {
@@ -18,6 +21,8 @@ export class WareHouseService {
         private readonly userService: UserService,
 
         private readonly itemService: ItemService,
+
+        // private readonly oderService: OderService,
 
         private readonly wareHouseLogService: WareHouseLogService
     ) {}
@@ -105,11 +110,12 @@ export class WareHouseService {
     // cap nhat nay se khong cap nhat lai user da tao record ware house
     // => kh co truong user_id
     // quantity can mua
-    async updateByOder(data: OderDetailEntity[], queryRunner: QueryRunner): Promise<any>{
+    async updateByOder(data: OderDetailEntity[],oder_id: string , queryRunner: QueryRunner): Promise<any>{
         try{  
-            
+            const month = moment().add(30, 'days');
+            // const oder = await this.oderService.getByOderId(oder_id);
             for(let i = 0; i< data.length; i++){
-                const month = moment().add(30, 'days');
+                let quantity = data[i].quantity;
 
                 const ware_house = await this.wareHouseRepository.find(({
                     where: {
@@ -120,15 +126,13 @@ export class WareHouseService {
                     
                     relations: { itemEntity: true},
                     order:{
-                        expiry: "DESC"
+                        expiry: "ASC"
                     }
                 }))
-                let quantity = data[i].quantity;
                 
                 for(let j = 0; j < ware_house.length; j++){
                     
                     if(quantity- ware_house[j].quantity > 0){
-
                         quantity = quantity - ware_house[j].quantity;
                         ware_house[j].quantity = 0;
 
@@ -139,6 +143,8 @@ export class WareHouseService {
                         new_ware_house.userEntity = ware_house[j].userEntity;
 
                         await queryRunner.manager.update(WareHouseEntity, ware_house[j].ware_house_id, new_ware_house);
+                        
+                        continue;
                     }
                     
                     if(quantity- ware_house[j].quantity == 0){
@@ -152,6 +158,11 @@ export class WareHouseService {
                         new_ware_house.userEntity = ware_house[j].userEntity;
 
                         await queryRunner.manager.update(WareHouseEntity, ware_house[j].ware_house_id, new_ware_house);
+                        let new_oder = new OderEntity();
+                        // new_oder = oder
+                        new_oder.oderDetailEntity[i].ware_hosue_id = ware_house[j].ware_house_id
+                        await queryRunner.manager.update(OderEntity,oder_id,new_oder)
+                        continue;
                     }
 
                     if(quantity - ware_house[j].quantity < 0){
@@ -165,10 +176,11 @@ export class WareHouseService {
                         new_ware_house.userEntity = ware_house[j].userEntity;
 
                         await queryRunner.manager.update(WareHouseEntity, ware_house[j].ware_house_id, new_ware_house);
+                        continue;
                     }  
                 }
                 if(quantity > 0){
-                    throw new HttpException('Out of Stock',500);
+                    throw new HttpException(`Out of strock`, HttpStatus.BAD_REQUEST);
                 }
             }
            

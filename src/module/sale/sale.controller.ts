@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, Param, Post, Res, Put, UseGuards, Req} from "@nestjs/common";
+import {Body, Controller, Delete, Get, Param, Post, Res, Put, UseGuards,} from "@nestjs/common";
 import { SaleService } from "./sale.service";
 import {GuardsJwt} from "../auth/guard/guards.jwt";
 import {RolesGuard} from "../role/guards/role.guards";
@@ -32,8 +32,7 @@ export class SaleController{
     // create
     @Roles(EnumRole.super_admin)
     @Post('create')
-    async create(@Res() res, @Body() data: CreateSaleDTO, @Req()req){
-        // data.user_id = req.user.id;
+    async create(@Res() res, @Body() data: CreateSaleDTO){
         return this.saleService.create(data).then(result =>{
             res.status(200).json({
                 message : 'success',

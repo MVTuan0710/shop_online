@@ -23,11 +23,11 @@ import { SaleModule } from './module/sale/sale.module';
 
     UserModule,
     RoleModule,
-    AuthModule, 
+    AuthModule,
+    OderModule,
     WareHouseModule,
     ItemModule, 
     CategoryModule, 
-    OderModule,
     OderDetailModule,
     SaleItemModule,
     SaleModule,

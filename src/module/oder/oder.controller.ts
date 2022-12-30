@@ -12,7 +12,7 @@ export class OderController{
     constructor(private oderService : OderService) {}
 
     // find all 
-    // @Roles(EnumRole.super_admin)
+    @Roles(EnumRole.super_admin)
     @Get('get-all')
     async getAll(@Res() res){
         return this.oderService.find().then(result =>{
@@ -45,21 +45,21 @@ export class OderController{
         })
     }
 
-    // delete
-    @Delete('delete/:oder_id')
-    async delete(@Res() res, @Param('oder_id')oder_id:string){
-        return this.oderService.delete(oder_id).then(result =>{
-            res.status(200).json({
-                message : 'successful',
-                result,
-            });
-        }).catch(err =>{
-            res.status(500).json({
-                message : 'failed',
-                err,
-            });
-        })
-    }
+    // // delete
+    // @Delete('delete/:oder_id')
+    // async delete(@Res() res, @Param('oder_id')oder_id:string, @Body() data: CreateOderDTO){
+    //     return this.oderService.delete(data,oder_id).then(result =>{
+    //         res.status(200).json({
+    //             message : 'successful',
+    //             result,
+    //         });
+    //     }).catch(err =>{
+    //         res.status(500).json({
+    //             message : 'failed',
+    //             err,
+    //         });
+    //     })
+    // }
 
     // get by id
     @Get('get/:oder_id')

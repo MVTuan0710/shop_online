@@ -87,7 +87,7 @@ export class SaleService {
             });
             
             if (voucher_code){
-                throw new HttpException('Voucher already exist',400);
+                throw new HttpException('Voucher already exist',HttpStatus.BAD_REQUEST);
             };
 
             // save sale

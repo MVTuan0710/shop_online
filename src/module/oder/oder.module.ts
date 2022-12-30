@@ -5,7 +5,6 @@ import {OderEntity} from "./oder.entity";
 import {OderService} from "./oder.service";
 import { UserModule } from "../users/user.module";
 import { OderDetailModule } from "../oder-detail/oder-detail.module";
-import { ItemModule } from "../item/item.module";
 import { WareHouseModule } from "../ware-house/ware-house.module";
 import { SaleModule } from "../sale/sale.module";
 import { SaleItemModule } from "../sale-item/sale-item.module";
@@ -14,7 +13,6 @@ import { SaleItemModule } from "../sale-item/sale-item.module";
 @Module({
     imports : [TypeOrmModule.forFeature([OderEntity]),
     forwardRef(()=> UserModule),
-    forwardRef(()=> ItemModule),
     forwardRef(()=> OderDetailModule),
     forwardRef(()=> WareHouseModule),
     forwardRef(()=> SaleModule),

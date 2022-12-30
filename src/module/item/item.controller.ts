@@ -1,7 +1,7 @@
 import {Body, Controller, Delete, Get, Param, Post, Put, Req, Res, UseGuards} from "@nestjs/common";
-import {ItemService} from "./item.service";
-import {CreateItemDTO, GetItemDTO} from "./item.dto";
-import {GuardsJwt} from "../auth/guard/guards.jwt";
+import { ItemService } from "./item.service";
+import { CreateItemDTO, GetItemDTO } from "./item.dto";
+import { GuardsJwt } from "../auth/guard/guards.jwt";
 import { RolesGuard } from "../role/guards/role.guards";
 import { Roles } from '../decorator/role.decorator';
 import { EnumRole } from '../constant/role/role.constant'
@@ -15,8 +15,8 @@ export class ItemController{
     // get all 
     @Get('get-all')
     async getAll(@Res() res: Response,@Req()req: Request) : Promise<any>{
-        const role = req['user'].role_id;
-        return this.itemService.find(role).then(result =>{
+        const role_id = req['user'].role_id;
+        return this.itemService.find(role_id).then(result =>{
             res.status(200).json({
                 message : 'success',
                 result,
@@ -25,14 +25,16 @@ export class ItemController{
             res.status(500).json({
                 message : 'failed',
                 err,
-            });
+            })
         })
     }
 
     // get by Id
-    @Get('/get-id')
-    async getByID(@Res() res,@Body()data: GetItemDTO, @Req()req: Request) : Promise<any>{
+    @Get('/get-id/:item_id')
+    async getByID(@Res() res,@Body()data: GetItemDTO, @Req()req: Request, @Param('item_id')
+    item_id : string) : Promise<any>{
         data.role_id = req['user'].role_id;
+        data.item_id =item_id
         return this.itemService.getById(data).then(result =>{
             res.status(200).json({
                 message : 'success',
@@ -63,7 +65,6 @@ export class ItemController{
             })
         })
     }
-
 
     // update item
     @Roles(EnumRole.super_admin, EnumRole.business_manager)

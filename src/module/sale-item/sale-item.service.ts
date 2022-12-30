@@ -148,7 +148,6 @@ export class SaleItemService {
                         new_sale_item.amount = new_sale_item.amount - oder_item[i].quantity;
                     }
                     if(new_sale_item.amount < oder_item[i].quantity){
-    
                         new_sale_item.amount = 0; 
                     }
                    
@@ -162,6 +161,7 @@ export class SaleItemService {
         }
        
     }
+
     // update sale-item
     async update(sale_item_id : string, data: CreateSaleItemDTO): Promise<any> {
        try {

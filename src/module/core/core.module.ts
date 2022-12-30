@@ -38,7 +38,7 @@ import { MetadataEntity } from "../metadata/metadata.entity";
                 username: 'postgres',
                 password: '123',
                 database: 'test_db_shop_online',
-                entities: [UserEntity, RoleEntity, WareHouseEntity,
+                entities:   [UserEntity, RoleEntity, WareHouseEntity,
                             ItemEntity, CategoryEntity, OderDetailEntity,
                             OderDetailLogEntity, OderEntity, ItemLogEntity,
                             WareHouseLogEntity, UserLogEntity,SaleEntity, 

@@ -11,8 +11,6 @@ import {UserLogEntity} from "../user-log/user-log.entity";
 import {UserLogService} from "../user-log/user-log.service";
 
 
-
-
 @Injectable()
 export class UserService {
     public userEntity = new UserEntity();
@@ -77,7 +75,6 @@ export class UserService {
             console.log(err);
             throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
-        
     }
 
     async getById(user_id : string): Promise<UserEntity> {
@@ -143,7 +140,7 @@ export class UserService {
             // check email exists
             const user_is_exist = await this.userRepository.findOne({where: {email: data.email}});
             if (user_is_exist){
-                throw new HttpException('user is exist',500);
+                throw new HttpException('user is exist',HttpStatus.BAD_REQUEST);
             }
             const user  = await this.userRepository.findOne({where : {user_id :data.user_id}});
                 if(user.roleEntity.role_id === 1){
@@ -211,10 +208,10 @@ export class UserService {
     
     async register(data: CreateAccountDTO): Promise<UserEntity> {
         try {
-                const user  = await this.userRepository.findOne({where : {email :data.email}});
-                if (user){
-                    throw new HttpException('User is exist',500);
-                }
+            const user  = await this.userRepository.findOne({where : {email :data.email}});
+            if (user){
+                throw new HttpException('User is exist',HttpStatus.BAD_REQUEST);
+            }
             
                 const userEntity = new UserEntity();
                 userEntity.email = data.email;
@@ -223,7 +220,7 @@ export class UserService {
                 userEntity.phone = data.phone;
                 userEntity.verify_token = uuidv4();
     
-                const result = await this.userRepository.save(userEntity);
+            const result = await this.userRepository.save(userEntity);
 
                 const userLogEntity = new UserLogEntity();
                 userLogEntity.email = result.email;
@@ -231,8 +228,8 @@ export class UserService {
                 userLogEntity.phone = result.phone;
                 userLogEntity.userEntity = result; 
 
-                await this.userLogService.create(userLogEntity);
-                return result;
+            await this.userLogService.create(userLogEntity);
+            return result;
 
         }catch(err){
             console.log(err);
@@ -243,8 +240,9 @@ export class UserService {
         try {
             // check account exists
             const account = await this.userRepository.findOne({where : {user_id : user_id}});
-            if (!account)
-                throw console.log('The account is not found');
+            if (!account){
+                throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+            }
 
             // update account
             const result= await this.userRepository.update(user_id, data);
@@ -259,8 +257,10 @@ export class UserService {
         try {
             // check account exists
             const account = await this.userRepository.findOne({where : {user_id : user_id}});
-            if (!account)
-                throw console.log('The account is not found');
+            if (!account){
+                throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+            }
+            
 
             // update account
             const result = await this.userRepository.update(user_id, data);
@@ -276,10 +276,11 @@ export class UserService {
     async updateAccount(user_id : string, data: CreateAccountDTO): Promise<UpdateResult> {
        try {
            // check account exists
-           const account = await this.userRepository.findOne({where : {user_id : user_id}});
-           if (!account)
-               throw console.log('Can`t found Account by account_id');
-
+            const account = await this.userRepository.findOne({where : {user_id : user_id}});
+            if (!account){
+                throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+            }
+               
             const role = await this.roleService.findById(data.role_id);
             
                 const userEntity = new UserEntity();
@@ -288,14 +289,16 @@ export class UserService {
                 userEntity.password = hashSync(data.password, 6);
                 userEntity.phone = data.phone;
                 userEntity.roleEntity = role;
+                userEntity.address = data.address;
                 userEntity.verify_token = uuidv4();
     
             // update account
-           const result = await this.userRepository.update(user_id, userEntity);
+            const result = await this.userRepository.update(user_id, userEntity);
 
-           const user = await this.userRepository.findOne({where:{user_id: user_id}});
+            const user = await this.userRepository.findOne({where:{user_id: user_id}});
 
                 const userLogEntity = new UserLogEntity();
+                userLogEntity.address = userEntity.address;
                 userLogEntity.email = data.email;
                 userLogEntity.name = data.name;
                 userLogEntity.phone = data.phone;
@@ -318,7 +321,6 @@ export class UserService {
             if (!Account)
                 throw console.log('Can`t found Account by account_id');
         
-
             const _token = token.authorization.split(" ");
             const payload = this.jwtService.verify(_token[1]); 
 

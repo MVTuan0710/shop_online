@@ -67,7 +67,7 @@ export class OderDetailController{
     }
 
     // get by id
-    @Get('get/:oder_detail_id')
+    @Get('get-by-id/:oder_detail_id')
     async getById(@Res() res, @Param('oder_detail_id') oder_detail_id : string){
         return this.oderDetailService.getById(oder_detail_id).then(result =>{
             res.status(200).json({

@@ -101,8 +101,7 @@ export class OderDetailService {
             new_oder_detail_log.oderDetailEntity = oder_detail;
 
             await queryRunner.manager.save(OderDetailLogEntity,new_oder_detail_log);
-        }
-       
+        } 
     }
 
     async createForCustomer(oder : OderEntity,queryRunner: QueryRunner): Promise<any>  {
@@ -128,7 +127,7 @@ export class OderDetailService {
                             new_oder_detail.item_id = oder.oderDetailEntity[i].item_id;
                             new_oder_detail.oderEntity = oder;
                             new_oder_detail.quantity = sale_item.amount;
-                            new_oder_detail.oder_price = (sale_item.amount * item.price)- ( sale_item.amount*sale_item.saleEntity.value);
+                            new_oder_detail.oder_price = (sale_item.amount * item.price) - ( sale_item.amount*sale_item.saleEntity.value);
                             new_oder_detail.origin_price = sale_item.amount * item.price;
                             new_oder_detail.item_info = JSON.stringify(item);
             
@@ -172,7 +171,9 @@ export class OderDetailService {
                         oder_price = origin_price;
                     }
                 }
-                    
+                if(!oder.voucher_code){
+                    oder_price = origin_price;
+                }
                 
 
                 const new_oder_detail = new OderDetailEntity();
@@ -193,7 +194,6 @@ export class OderDetailService {
                 new_oder_detail_log.oderDetailEntity = oder_detail;
 
                 await queryRunner.manager.save(OderDetailLogEntity,new_oder_detail);
-
             }
       
         }catch(err){

@@ -30,7 +30,6 @@ export class AuthService{
         }
     }
 
-
     // verify token
     async verifyAccount(token : string) : Promise<UserEntity>{
        try {
