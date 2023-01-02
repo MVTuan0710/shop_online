@@ -1,0 +1,52 @@
+import {
+    BaseEntity,
+    CreateDateColumn,
+    DeleteDateColumn,
+    Entity,
+    PrimaryGeneratedColumn,
+    JoinColumn,
+    ManyToOne,
+    UpdateDateColumn,
+    OneToMany,
+    Column
+} from "typeorm";
+import { OderDetailEntity } from "../oder-detail/oder-detail.entity";
+import { UserEntity } from "../users/user.entity";
+
+
+@Entity({name: 'oder'})
+export class OderEntity extends BaseEntity{
+    @PrimaryGeneratedColumn('uuid')
+    oder_id : string;
+
+    @Column({name : 'voucher_code', type : 'varchar', nullable : true})
+    voucher_code : string;
+
+    @Column({name : 'discount', type : 'integer', nullable : true})
+    discount : number;
+
+    @Column({name : 'original_total_money', type : 'integer', nullable : true})
+    original_total_money : number;
+
+    @Column({name : 'total_money', type : 'integer', nullable : true})
+    total_money : number;
+
+    @Column({name : 'shipping_info',  type : 'varchar' , nullable : true})
+    shipping_info : string;
+
+    @OneToMany((type)=> OderDetailEntity, (oderDetailEntity)=>oderDetailEntity.oderEntity)
+    oderDetailEntity: OderDetailEntity[];
+
+    @ManyToOne((type)=> UserEntity, (userEntity)=>userEntity.oderEntity)
+    @JoinColumn({name : 'user_id'})
+    userEntity : UserEntity;
+
+    @CreateDateColumn({name : 'created_at', type : 'timestamp with time zone', nullable : true})
+    created_at: Date;
+
+    @UpdateDateColumn({name : 'updated_at', type : 'timestamp with time zone', nullable : true})
+    updated_at : Date;
+
+    @DeleteDateColumn({name : 'deleted_at', type : 'timestamp with time zone', nullable : true})
+    deleted_at : Date;
+}

@@ -1,0 +1,27 @@
+Các Guards có một single responsibility. 
+Họ xác định xem một request nhất định sẽ được xử lý bởi route handler hay không.
+Nhưng middleware, về bản chất nó không biết handler nào sẽ được thực thi sau khi gọi hàm next(). 
+Mặt khác, Guards có quyền truy cập vào instance ExecutionContext 
+và do đó biết chính xác những gì sẽ được thực thi tiếp theo.
+
+The forFeature(), you are expecting to use the configuration of a dynamic module's forRoot 
+but need to modify some configuration specific to the calling module's needs
+(i.e. which repository this module should have access to, or the context that a logger should use.)
+
+The forwardRef() utility to resolve the circular dependency. 
+Otherwise Nest won't instantiate them because all of the essential metadata won't be available
+
+we define a provider. The @Injectable() decorator marks the CatsService class as a provider.
+
+* JoinColumn decorator used on one-to-one relations to specify owner side of relationship.
+* It also can be used on both one-to-one and many-to-one relations to specify custom column name
+* or custom referenced column.
+
+The @Injectable() decorator marks the CatsService class as a provider.
+
+The AuthGuard that we'll build now assumes an authenticated user (and that, therefore, a token is attached to the request headers). 
+It will extract and validate the token, and use the extracted information to determine whether the request can proceed or not.
+
+Every guard must implement a canActivate() function. This function should return a boolean, indicating whether the current request is allowed or not. It can return the response either synchronously or asynchronously (via a Promise or Observable). Nest uses the return value to control the next action:
+if it returns true, the request will be processed.
+if it returns false, Nest will deny the request.
