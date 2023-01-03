@@ -15,6 +15,7 @@ export class CreateOderDetailDTO{
     oder_price: number;
     origin_price: number;
     item_info: string;
+    ware_house: string;
 }
 export interface UpdateOderDetailDTO{
     oder_detail_id: string;
@@ -24,4 +25,5 @@ export interface UpdateOderDetailDTO{
     oder_price: number;
     origin_price: number;
     item_info: string;
+    ware_house: string;
 }

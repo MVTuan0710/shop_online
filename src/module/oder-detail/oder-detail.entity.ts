@@ -31,9 +31,6 @@ export class OderDetailEntity extends BaseEntity{
     @Column({name : 'item_info',  type : 'varchar' , nullable : true})
     item_info : string;
 
-    @Column({name : 'ware_house_id',  type : 'varchar' , nullable : true})
-    ware_house_id : string;
-
     @Column({name : 'item_id',  type : 'varchar' , nullable : true})
     item_id : string;
 

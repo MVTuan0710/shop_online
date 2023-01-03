@@ -3,7 +3,7 @@ import {OderDetailService} from "./oder-detail.service";
 import {GuardsJwt} from "../auth/guard/guards.jwt";
 import {RolesGuard} from "../role/guards/role.guards";
 import {EnumRole} from "../constant/role/role.constant";
-import {CreateOderDetailDTO, UpdateOderDetailDTO} from "./oder-detail.dto";
+import {UpdateOderDetailDTO} from "./oder-detail.dto";
 import { Request } from "express";
 import { Roles } from "../decorator/role.decorator";
 

@@ -7,6 +7,8 @@ import { ItemService } from "../item/item.service";
 import { SaleService } from "../sale/sale.service";
 import { OderDetailEntity } from "../oder-detail/oder-detail.entity";
 import { GetSaleItemDTO } from "../sale/sale.dto";
+import { OderEntity } from "../oder/oder.entity";
+import { SaleEntity } from "../sale/sale.entity";
 
 
 @Injectable()
@@ -131,8 +133,24 @@ export class SaleItemService {
             throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
-    
-    async updateSaleItemByOder(voucher_code: string, oder_item:OderDetailEntity[],  queryRunner: QueryRunner):Promise<any>{
+    async updateSaleItemByCancelOder(oder: OderEntity, queryRunner: QueryRunner):Promise<any>{
+        for(let i = 0; i < oder.oderDetailEntity.length; i++){
+            if(oder.oderDetailEntity[i].oder_price != oder.oderDetailEntity[i].origin_price){
+                const sale_item =  await this.saleItemRepository.findOne({
+                    where: {
+                        itemEntity: {item_id: oder.oderDetailEntity[i].item_id},
+                        saleEntity: {voucher_code: oder.voucher_code}
+                    }
+                });
+                let new_sale_item = new SaleItemEntity();
+                new_sale_item = sale_item;
+                new_sale_item.amount = sale_item.amount + oder.oderDetailEntity[i].quantity;
+                
+                await queryRunner.manager.update(SaleItemEntity,sale_item.sale_item_id,new_sale_item);
+            }
+        }
+    }
+    async updateSaleItemByCreateOder(voucher_code: string, oder_item:OderDetailEntity[], queryRunner: QueryRunner):Promise<any>{
         try{
             for(let i = 0; i< oder_item.length; i++){
                 const sale_item =  await this.saleItemRepository.findOne({
@@ -160,6 +178,7 @@ export class SaleItemService {
         }
        
     }
+
 
     // update sale-item
     async update(sale_item_id : string, data: CreateSaleItemDTO): Promise<any> {

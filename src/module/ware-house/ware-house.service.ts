@@ -9,6 +9,7 @@ import { OderDetailEntity } from "../oder-detail/oder-detail.entity";
 import {WareHouseLogEntity} from "../ware-house-log/ware-house-log.entity";
 import {WareHouseLogService} from "../ware-house-log/ware-house-log.servic";
 import * as moment from 'moment';
+import { OderEntity } from "../oder/oder.entity";
 
 
 @Injectable()
@@ -102,11 +103,33 @@ export class WareHouseService {
             throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
+   async updateByCancelOder(oder:OderEntity, queryRunner: QueryRunner):Promise<any> {
+    for(let i = 0; i < oder.ware_house_info.length; i++) {
+        const ware_house = await this.wareHouseRepository.findOne({where: {ware_house_id : oder.ware_house_info[i].ware_house_id}})
+        ware_house.quantity += oder.ware_house_info[i].quantity;
+
+        const new_warehouse = new WareHouseEntity();
+        new_warehouse.itemEntity = ware_house.itemEntity;
+        new_warehouse.userEntity = ware_house.userEntity;
+        new_warehouse.quantity = ware_house.quantity + oder.ware_house_info[i].quantity;
+        new_warehouse.expiry = ware_house.expiry;
+
+        const result = await queryRunner.manager.update(WareHouseEntity, oder.ware_house_info[i].ware_house_id, new_warehouse);
+
+        const new_wareHouseLogEntity = new WareHouseLogEntity();
+            new_wareHouseLogEntity.expiry = new_warehouse.expiry;
+            new_wareHouseLogEntity.quantity= new_warehouse.quantity;
+            new_wareHouseLogEntity.wareHouseEntity = ware_house;
+
+            await this.wareHouseLogService.create(new_wareHouseLogEntity)
+    }
+    
+   }
 
     // cap nhat nay se khong cap nhat lai user da tao record ware house
     // => kh co truong user_id
     // quantity can mua
-    async updateByOder(data: OderDetailEntity[], queryRunner: QueryRunner): Promise<any>{
+    async updateByCreateOder(data: OderDetailEntity[], queryRunner: QueryRunner): Promise<any>{
         try{  
             const month = moment().add(30, 'days');
             let result:ArrayWarehouse[] = [];
@@ -137,6 +160,7 @@ export class WareHouseService {
                         new_array_warehouse.ware_house_id = ware_house[j].ware_house_id;
                         new_array_warehouse.item_id = data[i].item_id;
                         new_array_warehouse.quantity = ware_house[j].quantity;
+
                         result.push (new_array_warehouse);
 
                         quantity = quantity - ware_house[j].quantity;
@@ -157,6 +181,7 @@ export class WareHouseService {
                         new_array_warehouse.ware_house_id = ware_house[j].ware_house_id;
                         new_array_warehouse.item_id = data[i].item_id;
                         new_array_warehouse.quantity = quantity;
+
                         result.push (new_array_warehouse);
                         
                         quantity = 0;
@@ -177,6 +202,7 @@ export class WareHouseService {
                         new_array_warehouse.ware_house_id = ware_house[j].ware_house_id;
                         new_array_warehouse.item_id = data[i].item_id;
                         new_array_warehouse.quantity = quantity;
+                        
                         result.push (new_array_warehouse);
 
                         ware_house[j].quantity = ware_house[j].quantity - quantity ;
@@ -190,7 +216,7 @@ export class WareHouseService {
 
                         await queryRunner.manager.update(WareHouseEntity, ware_house[j].ware_house_id, new_ware_house);
                         break;
-                    }  
+                    }
                 }
                 if(quantity > 0){
                     throw new HttpException(`Out of strock`, HttpStatus.BAD_REQUEST);

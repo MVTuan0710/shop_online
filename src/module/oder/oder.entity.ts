@@ -12,6 +12,7 @@ import {
 } from "typeorm";
 import { OderDetailEntity } from "../oder-detail/oder-detail.entity";
 import { UserEntity } from "../users/user.entity";
+import { WareHouseInfoDTO } from "./oder.dto";
 
 
 @Entity({name: 'oder'})
@@ -31,8 +32,14 @@ export class OderEntity extends BaseEntity{
     @Column({name : 'total_money', type : 'integer', nullable : true})
     total_money : number;
 
+    @Column({name : 'ware_house_info', type : 'jsonb', nullable : true})
+    ware_house_info : WareHouseInfoDTO[];
+
     @Column({name : 'shipping_info',  type : 'varchar' , nullable : true})
     shipping_info : string;
+
+    @Column({name : 'status',  default : 'create' })
+    status : string;
 
     @OneToMany((type)=> OderDetailEntity, (oderDetailEntity)=>oderDetailEntity.oderEntity)
     oderDetailEntity: OderDetailEntity[];
