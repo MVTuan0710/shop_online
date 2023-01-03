@@ -30,24 +30,6 @@ export class OderDetailController{
         })
     }
 
-    // create 
-    @Roles(EnumRole.super_admin)
-    @Post('create')
-    async create(@Res() res, @Body() data: CreateOderDetailDTO){
-        return this.oderDetailService.create(data).then(result =>{
-            res.status(200).json({
-                message : 'success',
-                result,
-            });
-        }).catch(err =>{
-
-            res.status(500).json({
-                message : 'failed',
-                err,
-            });
-        })
-    }
-
     // update
     @Roles(EnumRole.super_admin)
     @Put('update')

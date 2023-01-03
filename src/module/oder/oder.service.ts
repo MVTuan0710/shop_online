@@ -94,9 +94,8 @@ export class OderService {
                 new_oder.oderDetailEntity = await this.oderDetailService.createForStaff(new_oder,queryRunner);
                 
             }else{
-                const new_oder_detail = await this.oderDetailService.createForCustomer(new_oder,queryRunner);
-                new_oder.oderDetailEntity = new_oder_detail;
-                
+                new_oder.oderDetailEntity = await this.oderDetailService.createForCustomer(new_oder,queryRunner);
+        
                 if(new_oder.voucher_code){
                     await this.saleItemService.updateSaleItemByOder(data.voucher_code, data.oderDetailEntity, queryRunner);
                 }
@@ -110,10 +109,9 @@ export class OderService {
 
             new_oder.discount = new_oder.original_total_money - new_oder.total_money;
             const result = await queryRunner.manager.save(OderEntity,new_oder); 
-            for(){
-                OderDetailEntity
-            }
-
+         
+            await this.oderDetailService.create(result,queryRunner);  
+           
             await queryRunner.commitTransaction();
             return result;
         

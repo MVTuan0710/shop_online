@@ -67,8 +67,31 @@ export class OderDetailService {
     }
 
     // create oder-detail
-    async create (data: CreateOderDetailDTO): Promise<any> {
+    async create (data: OderEntity, queryRunner: QueryRunner): Promise<any> {
         try{
+            for(let i = 0; i< data.oderDetailEntity.length; i++){
+                const new_oder_detail = new OderDetailEntity();
+                new_oder_detail.oderEntity = data;
+                new_oder_detail.ware_house_id = data.oderDetailEntity[i].ware_house_id;
+                new_oder_detail.item_id = data.oderDetailEntity[i].item_id;
+                new_oder_detail.item_info = data.oderDetailEntity[i].item_info;
+                new_oder_detail.oder_price = data.oderDetailEntity[i].oder_price;
+                new_oder_detail.origin_price = data.oderDetailEntity[i].origin_price;
+                new_oder_detail.quantity = data.oderDetailEntity[i].quantity;
+                const oder_detail = await queryRunner.manager.save(OderDetailEntity, new_oder_detail);
+
+                const new_oder_detail_log = new OderDetailLogEntity();
+                new_oder_detail_log.oderDetailEntity = oder_detail;
+                new_oder_detail_log.item_info = oder_detail.item_info;
+                new_oder_detail_log.oder_price = oder_detail.oder_price;
+                new_oder_detail_log.origin_price = oder_detail.origin_price;
+                new_oder_detail_log.quantity = oder_detail.quantity;
+
+                await queryRunner.manager.save(OderDetailLogEntity, new_oder_detail_log);
+                
+            }
+            
+
             const result = await this.oderDetailRepository.save(data);
             return result;
 
@@ -114,8 +137,9 @@ export class OderDetailService {
                     get_sale_item.voucher_code = oder.voucher_code;
 
                     const sale_item = await this.saleItemService.getByOderDetail(get_sale_item);
-                       
+              
                     if(sale_item){
+                        
                         if(sale_item.amount - oder.oderDetailEntity[i].quantity < 0){
                             
                             // use voucher
@@ -127,8 +151,9 @@ export class OderDetailService {
                             new_oder_detail.oder_price = (sale_item.amount * item.price) - ( sale_item.amount*sale_item.saleEntity.value);
                             new_oder_detail.origin_price = sale_item.amount * item.price;
                             new_oder_detail.item_info = JSON.stringify(item);
-            
+
                             result.push(new_oder_detail);
+                            
                             // can't use voucher
                             const _new_oder_detail = new OderDetailEntity();
                             _new_oder_detail.item_id = oder.oderDetailEntity[i].item_id;
@@ -138,7 +163,8 @@ export class OderDetailService {
                             _new_oder_detail.oder_price = (oder.oderDetailEntity[i].quantity - sale_item.amount) * item.price;
                             _new_oder_detail.origin_price = (oder.oderDetailEntity[i].quantity - sale_item.amount)* item.price;
                             _new_oder_detail.item_info = JSON.stringify(item);
-                            
+
+                            sale_item.amount = 0;
                             result.push(new_oder_detail);
                             continue;
                         }
@@ -159,6 +185,7 @@ export class OderDetailService {
                 new_oder_detail.item_id = oder.oderDetailEntity[i].item_id;
                 new_oder_detail.oderEntity = oder;
                 new_oder_detail.quantity = oder.oderDetailEntity[i].quantity;
+                new_oder_detail.ware_house_id = oder.oderDetailEntity[i].ware_house_id;
                 new_oder_detail.oder_price = oder_price;
                 new_oder_detail.origin_price = origin_price;
                 new_oder_detail.item_info = JSON.stringify(item);

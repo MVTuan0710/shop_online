@@ -148,6 +148,7 @@ export class WareHouseService {
                         new_ware_house.itemEntity= ware_house[j].itemEntity;
                         new_ware_house.userEntity = ware_house[j].userEntity;
 
+                        await queryRunner.manager.update(WareHouseEntity, ware_house[j].ware_house_id, new_ware_house);
                         continue;
                     }
                     
@@ -167,6 +168,7 @@ export class WareHouseService {
                         new_ware_house.itemEntity= ware_house[j].itemEntity;
                         new_ware_house.userEntity = ware_house[j].userEntity;
 
+                        await queryRunner.manager.update(WareHouseEntity, ware_house[j].ware_house_id, new_ware_house);
                         break;
                     }
 
@@ -186,6 +188,7 @@ export class WareHouseService {
                         new_ware_house.itemEntity= ware_house[j].itemEntity;
                         new_ware_house.userEntity = ware_house[j].userEntity;
 
+                        await queryRunner.manager.update(WareHouseEntity, ware_house[j].ware_house_id, new_ware_house);
                         break;
                     }  
                 }
