@@ -97,7 +97,7 @@ export class OderDetailService {
         }
     }
 
-    async createForStaff(oder : OderEntity,queryRunner: QueryRunner): Promise<any>{
+    async createForStaff(oder : OderEntity): Promise<any>{
         let result:OderDetailEntity[] = [];
         for(let i = 0; i < oder.oderDetailEntity.length; i++){
             const item = await this.itemService.getByIdNormal(oder.oderDetailEntity[i].item_id);
@@ -115,7 +115,7 @@ export class OderDetailService {
         return result;
     }
 
-    async createForCustomer(oder : OderEntity,queryRunner: QueryRunner): Promise<any>  {
+    async createForCustomer(oder : OderEntity): Promise<any>  {
         try{
             let result:OderDetailEntity[] = [];
             for(let i = 0; i < oder.oderDetailEntity.length; i++){
@@ -151,7 +151,6 @@ export class OderDetailService {
                             _new_oder_detail.oder_price = (oder.oderDetailEntity[i].quantity - sale_item.amount) * item.price;
                             _new_oder_detail.origin_price = (oder.oderDetailEntity[i].quantity - sale_item.amount)* item.price;
                             _new_oder_detail.item_info = JSON.stringify(item);
-
                         
                             result.push(_new_oder_detail);
                             continue;

@@ -59,10 +59,9 @@ export class OderService {
     
     // create 
     async create (data: CreateOderDTO):Promise<any> {
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
         await queryRunner.startTransaction();
-        
         try{
             const user = await this.userService.getById(data.user_id);
             
@@ -72,12 +71,14 @@ export class OderService {
             new_oder.total_money = 0;
             new_oder.voucher_code = data.voucher_code;
             new_oder.oderDetailEntity =data.oderDetailEntity;
+
             // cau 8
             if(user.roleEntity.role_id == 5){
                 if(!data.shipping_info){
                     throw new HttpException(`Shipping info is empty`, HttpStatus.BAD_REQUEST);
                 }
                 new_oder.shipping_info = JSON.stringify(data.shipping_info);
+
             }else{
                 if(!data.shipping_info){
                     new_oder.shipping_info = user.address;
@@ -89,12 +90,11 @@ export class OderService {
             
             new_oder.ware_house_info  = await this.wareHouserService.updateByCreateOder(data.oderDetailEntity, queryRunner);
             
-
             if(user.roleEntity.role_id == 1|| user.roleEntity.role_id == 2|| user.roleEntity.role_id == 3){
-                new_oder.oderDetailEntity = await this.oderDetailService.createForStaff(new_oder,queryRunner);
+                new_oder.oderDetailEntity = await this.oderDetailService.createForStaff(new_oder);
                 
             }else{
-                new_oder.oderDetailEntity = await this.oderDetailService.createForCustomer(new_oder,queryRunner);
+                new_oder.oderDetailEntity = await this.oderDetailService.createForCustomer(new_oder);
         
                 if(new_oder.voucher_code){
                     await this.saleItemService.updateSaleItemByCreateOder(data.voucher_code, data.oderDetailEntity, queryRunner);
@@ -126,28 +126,29 @@ export class OderService {
 
     // cancel
     async cancel(oder_id: string): Promise<any> {
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
         await queryRunner.startTransaction();
-        
         try{
             // productRefund
-            const oder = await this.oderRepository.findOne({where: {oder_id: oder_id},relations: {oderDetailEntity: true}});
+            const oder = await this.oderRepository.findOne({
+                where: {oder_id: oder_id},
+                relations: {oderDetailEntity: true}
+            });
+            if(oder.status == 'cancel'){
+                throw new HttpException('Oder is canceled',HttpStatus.BAD_REQUEST);
+            }
             if(oder.status == 'create'){
                 await this.wareHouserService.updateByCancelOder(oder, queryRunner);
 
                 await this.saleItemService.updateSaleItemByCancelOder(oder, queryRunner);
 
                 oder.status = 'cancel';
-                const result =await queryRunner.manager.save(OderEntity,oder);  
+                const result =await queryRunner.manager.save(OderEntity,oder); 
+
                 await queryRunner.commitTransaction();
                 return result;
-                
-            } 
-            if(oder.status == 'cancel'){
-                throw new HttpException('Oder is canceled',HttpStatus.BAD_REQUEST);
             }
-    
 
         }catch(err){
             await queryRunner.rollbackTransaction();

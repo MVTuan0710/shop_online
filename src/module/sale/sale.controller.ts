@@ -13,7 +13,7 @@ export class SaleController{
     constructor(private saleService : SaleService) {}
 
     // find all 
-    @Roles(EnumRole.super_admin)
+    @Roles(EnumRole.super_admin, EnumRole.business_manager)
     @Get('get-all')
     async getAll(@Res() res){
         return this.saleService.find().then(result =>{
@@ -30,7 +30,7 @@ export class SaleController{
     }
 
     // create
-    @Roles(EnumRole.super_admin)
+    @Roles(EnumRole.super_admin, EnumRole.business_manager)
     @Post('create')
     async create(@Res() res, @Body() data: CreateSaleDTO){
         return this.saleService.create(data).then(result =>{
@@ -47,6 +47,7 @@ export class SaleController{
     }
 
     // delete
+    @Roles(EnumRole.super_admin, EnumRole.business_manager)
     @Delete('delete/:sale_id')
     async delete(@Res() res, @Param('sale_id')sale_id:string){
         return this.saleService.delete(sale_id).then(result =>{
@@ -63,6 +64,7 @@ export class SaleController{
     }
 
     // update
+    @Roles(EnumRole.super_admin, EnumRole.business_manager)
     @Put('update/:sale_id')
     async update(@Res() res, @Param('sale_id')sale_id:string, @Body()data:CreateSaleDTO){
         return this.saleService.update(sale_id,data).then(result =>{

@@ -37,7 +37,6 @@ export class WareHouseService {
             console.log(err);
             throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
-
     }
 
     async getByItemId(item_id: string): Promise<WareHouseEntity[]>{
@@ -65,8 +64,7 @@ export class WareHouseService {
         }catch(err){
             console.log(err);
             throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
-        }
-        
+        } 
     }
     
     // create warehouse
@@ -103,28 +101,35 @@ export class WareHouseService {
             throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
     }
-   async updateByCancelOder(oder:OderEntity, queryRunner: QueryRunner):Promise<any> {
-    for(let i = 0; i < oder.ware_house_info.length; i++) {
-        const ware_house = await this.wareHouseRepository.findOne({where: {ware_house_id : oder.ware_house_info[i].ware_house_id}})
-        ware_house.quantity += oder.ware_house_info[i].quantity;
 
-        const new_warehouse = new WareHouseEntity();
-        new_warehouse.itemEntity = ware_house.itemEntity;
-        new_warehouse.userEntity = ware_house.userEntity;
-        new_warehouse.quantity = ware_house.quantity + oder.ware_house_info[i].quantity;
-        new_warehouse.expiry = ware_house.expiry;
+    async updateByCancelOder(oder:OderEntity, queryRunner: QueryRunner):Promise<any> {
+        try{
+            for(let i = 0; i < oder.ware_house_info.length; i++) {
+            const ware_house = await this.wareHouseRepository.findOne({where: {ware_house_id : oder.ware_house_info[i].ware_house_id}})
 
-        const result = await queryRunner.manager.update(WareHouseEntity, oder.ware_house_info[i].ware_house_id, new_warehouse);
+            const new_warehouse = new WareHouseEntity();
+            new_warehouse.itemEntity = ware_house.itemEntity;
+            new_warehouse.userEntity = ware_house.userEntity;
+            new_warehouse.quantity = ware_house.quantity + oder.ware_house_info[i].quantity;
+            new_warehouse.expiry = ware_house.expiry;
 
-        const new_wareHouseLogEntity = new WareHouseLogEntity();
+            const result = await queryRunner.manager.update(WareHouseEntity, oder.ware_house_info[i].ware_house_id, new_warehouse);
+
+            const new_wareHouseLogEntity = new WareHouseLogEntity();
             new_wareHouseLogEntity.expiry = new_warehouse.expiry;
             new_wareHouseLogEntity.quantity= new_warehouse.quantity;
             new_wareHouseLogEntity.wareHouseEntity = ware_house;
 
-            await this.wareHouseLogService.create(new_wareHouseLogEntity)
+            await this.wareHouseLogService.create(new_wareHouseLogEntity);
+            }
+            return 0;
+
+        }catch(err){
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
+        }
+        
     }
-    
-   }
 
     // cap nhat nay se khong cap nhat lai user da tao record ware house
     // => kh co truong user_id
@@ -133,8 +138,6 @@ export class WareHouseService {
         try{  
             const month = moment().add(30, 'days');
             let result:ArrayWarehouse[] = [];
-            // const oder = await this.oderService.getByOderId(oder_id);
-            // const oder = await this.oderService.getByOderId(oder_id);
 
             for(let i = 0; i< data.length; i++){
                 let quantity = data[i].quantity;
@@ -238,7 +241,6 @@ export class WareHouseService {
                 throw console.log('Not found',HttpStatus.NOT_FOUND);
             }
                
-
             const _user = await this.userService.getById(data.create_at);
             const _item = await this.itemService.getByIdNormal(data.item_id);
             

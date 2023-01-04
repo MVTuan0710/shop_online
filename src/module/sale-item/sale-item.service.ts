@@ -134,21 +134,29 @@ export class SaleItemService {
         }
     }
     async updateSaleItemByCancelOder(oder: OderEntity, queryRunner: QueryRunner):Promise<any>{
-        for(let i = 0; i < oder.oderDetailEntity.length; i++){
-            if(oder.oderDetailEntity[i].oder_price != oder.oderDetailEntity[i].origin_price){
-                const sale_item =  await this.saleItemRepository.findOne({
-                    where: {
-                        itemEntity: {item_id: oder.oderDetailEntity[i].item_id},
-                        saleEntity: {voucher_code: oder.voucher_code}
-                    }
-                });
-                let new_sale_item = new SaleItemEntity();
-                new_sale_item = sale_item;
-                new_sale_item.amount = sale_item.amount + oder.oderDetailEntity[i].quantity;
-                
-                await queryRunner.manager.update(SaleItemEntity,sale_item.sale_item_id,new_sale_item);
+        try{
+            for(let i = 0; i < oder.oderDetailEntity.length; i++){
+                if(oder.oderDetailEntity[i].oder_price != oder.oderDetailEntity[i].origin_price){
+                    const sale_item =  await this.saleItemRepository.findOne({
+                        where: {
+                            itemEntity: {item_id: oder.oderDetailEntity[i].item_id},
+                            saleEntity: {voucher_code: oder.voucher_code}
+                        }
+                    });
+                    let new_sale_item = new SaleItemEntity();
+                    new_sale_item = sale_item;
+                    new_sale_item.amount = sale_item.amount + oder.oderDetailEntity[i].quantity;
+                    
+                    await queryRunner.manager.update(SaleItemEntity,sale_item.sale_item_id,new_sale_item);
+                }
             }
+            return 0;
+            
+        }catch(err){
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
+       
     }
     async updateSaleItemByCreateOder(voucher_code: string, oder_item:OderDetailEntity[], queryRunner: QueryRunner):Promise<any>{
         try{
