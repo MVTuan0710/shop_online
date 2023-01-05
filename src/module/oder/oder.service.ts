@@ -94,11 +94,7 @@ export class OderService {
                 new_oder.oderDetailEntity = await this.oderDetailService.createForStaff(new_oder);
                 
             }else{
-                new_oder.oderDetailEntity = await this.oderDetailService.createForCustomer(new_oder);
-        
-                if(new_oder.voucher_code){
-                    await this.saleItemService.updateSaleItemByCreateOder(data.voucher_code, data.oderDetailEntity, queryRunner);
-                }
+                new_oder.oderDetailEntity = await this.oderDetailService.createForCustomer(new_oder, queryRunner);
             }
         
             for(let i = 0; i < new_oder.oderDetailEntity.length; i++){

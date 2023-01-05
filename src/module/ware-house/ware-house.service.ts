@@ -113,7 +113,7 @@ export class WareHouseService {
             new_warehouse.quantity = ware_house.quantity + oder.ware_house_info[i].quantity;
             new_warehouse.expiry = ware_house.expiry;
 
-            const result = await queryRunner.manager.update(WareHouseEntity, oder.ware_house_info[i].ware_house_id, new_warehouse);
+            await queryRunner.manager.update(WareHouseEntity, oder.ware_house_info[i].ware_house_id, new_warehouse);
 
             const new_wareHouseLogEntity = new WareHouseLogEntity();
             new_wareHouseLogEntity.expiry = new_warehouse.expiry;
@@ -156,8 +156,6 @@ export class WareHouseService {
                 }))
                 
                 for(let j = 0; j < ware_house.length; j++){
-                    console.log(ware_house[j].quantity);
-                    
                     if(quantity- ware_house[j].quantity > 0){
                         const new_array_warehouse = new ArrayWarehouse();
                         new_array_warehouse.ware_house_id = ware_house[j].ware_house_id;
@@ -167,11 +165,10 @@ export class WareHouseService {
                         result.push (new_array_warehouse);
 
                         quantity = quantity - ware_house[j].quantity;
-                        ware_house[j].quantity = 0;
 
                         const new_ware_house = new WareHouseEntity();
                         new_ware_house.expiry = ware_house[j].expiry;
-                        new_ware_house.quantity = ware_house[j].quantity;
+                        new_ware_house.quantity = 0;
                         new_ware_house.itemEntity= ware_house[j].itemEntity;
                         new_ware_house.userEntity = ware_house[j].userEntity;
 
@@ -186,13 +183,11 @@ export class WareHouseService {
                         new_array_warehouse.quantity = quantity;
 
                         result.push (new_array_warehouse);
-                        
                         quantity = 0;
-                        ware_house[j].quantity = 0;
-
+                        
                         const new_ware_house = new WareHouseEntity();
                         new_ware_house.expiry = ware_house[j].expiry;
-                        new_ware_house.quantity = ware_house[j].quantity;
+                        new_ware_house.quantity = 0;
                         new_ware_house.itemEntity= ware_house[j].itemEntity;
                         new_ware_house.userEntity = ware_house[j].userEntity;
 
@@ -207,13 +202,11 @@ export class WareHouseService {
                         new_array_warehouse.quantity = quantity;
                         
                         result.push (new_array_warehouse);
-
-                        ware_house[j].quantity = ware_house[j].quantity - quantity ;
-                        quantity= 0;
+                        quantity = 0;
 
                         const new_ware_house = new WareHouseEntity();
                         new_ware_house.expiry = ware_house[j].expiry;
-                        new_ware_house.quantity = ware_house[j].quantity;
+                        new_ware_house.quantity = ware_house[j].quantity - quantity;
                         new_ware_house.itemEntity= ware_house[j].itemEntity;
                         new_ware_house.userEntity = ware_house[j].userEntity;
 
@@ -221,6 +214,7 @@ export class WareHouseService {
                         break;
                     }
                 }
+                // trường hợp khi đi hết tất cả các ware house nhưng số lượng cần mua vẫn còn, quantity bị trừ chưa hết
                 if(quantity > 0){
                     throw new HttpException(`Out of strock`, HttpStatus.BAD_REQUEST);
                 }

@@ -8,7 +8,6 @@ import { SaleService } from "../sale/sale.service";
 import { OderDetailEntity } from "../oder-detail/oder-detail.entity";
 import { GetSaleItemDTO } from "../sale/sale.dto";
 import { OderEntity } from "../oder/oder.entity";
-import { SaleEntity } from "../sale/sale.entity";
 
 
 @Injectable()

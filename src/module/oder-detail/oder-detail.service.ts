@@ -115,7 +115,7 @@ export class OderDetailService {
         return result;
     }
 
-    async createForCustomer(oder : OderEntity): Promise<any>  {
+    async createForCustomer(oder : OderEntity, queryRunner: QueryRunner): Promise<any>  {
         try{
             let result:OderDetailEntity[] = [];
             for(let i = 0; i < oder.oderDetailEntity.length; i++){
@@ -153,11 +153,22 @@ export class OderDetailService {
                             _new_oder_detail.item_info = JSON.stringify(item);
                         
                             result.push(_new_oder_detail);
+
+                            // update sale item
+                            let new_sale_item = new SaleItemEntity();
+                            new_sale_item = sale_item;
+                            new_sale_item.amount = 0;
+                            await queryRunner.manager.update(SaleItemEntity,sale_item.sale_item_id,new_sale_item);
+
                             continue;
                         }
                         if(sale_item.amount - oder.oderDetailEntity[i].quantity >= 0){
                             oder_price = origin_price - (oder.oderDetailEntity[i].quantity * sale_item.saleEntity.value);
-              
+
+                            let new_sale_item = new SaleItemEntity();
+                            new_sale_item = sale_item;
+                            new_sale_item.amount -= oder.oderDetailEntity[i].quantity;
+                            await queryRunner.manager.update(SaleItemEntity,sale_item.sale_item_id,new_sale_item);
                         }
                     }
                     if(!sale_item){
