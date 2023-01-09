@@ -111,6 +111,8 @@ export class WareHouseService {
             new_warehouse.itemEntity = ware_house.itemEntity;
             new_warehouse.userEntity = ware_house.userEntity;
             new_warehouse.quantity = ware_house.quantity + oder.ware_house_info[i].quantity;
+            new_warehouse.pre_ordered_quantity = ware_house.pre_ordered_quantity - oder.ware_house_info[i].quantity;
+            new_warehouse.sold_quantity = ware_house.sold_quantity;
             new_warehouse.expiry = ware_house.expiry;
 
             await queryRunner.manager.update(WareHouseEntity, oder.ware_house_info[i].ware_house_id, new_warehouse);
@@ -118,6 +120,8 @@ export class WareHouseService {
             const new_wareHouseLogEntity = new WareHouseLogEntity();
             new_wareHouseLogEntity.expiry = new_warehouse.expiry;
             new_wareHouseLogEntity.quantity= new_warehouse.quantity;
+            new_wareHouseLogEntity.pre_ordered_quantity = new_warehouse.pre_ordered_quantity;
+            new_wareHouseLogEntity.sold_quantity = new_warehouse.sold_quantity;                                       
             new_wareHouseLogEntity.wareHouseEntity = ware_house;
 
             await this.wareHouseLogService.create(new_wareHouseLogEntity);
@@ -131,29 +135,59 @@ export class WareHouseService {
         
     }
 
+    async updateByConfirmOder(oder:OderEntity, queryRunner: QueryRunner):Promise<any> {
+        try{
+            for(let i = 0; i < oder.ware_house_info.length; i++) {
+            const ware_house = await this.wareHouseRepository.findOne({where: {ware_house_id : oder.ware_house_info[i].ware_house_id}})
+
+            const new_warehouse = new WareHouseEntity();
+            new_warehouse.itemEntity = ware_house.itemEntity;
+            new_warehouse.userEntity = ware_house.userEntity;
+            new_warehouse.quantity = ware_house.quantity;
+            new_warehouse.pre_ordered_quantity = ware_house.pre_ordered_quantity - oder.ware_house_info[i].quantity;
+            new_warehouse.sold_quantity = ware_house.sold_quantity + oder.ware_house_info[i].quantity;
+            new_warehouse.expiry = ware_house.expiry;
+
+            await queryRunner.manager.update(WareHouseEntity, oder.ware_house_info[i].ware_house_id, new_warehouse);
+
+            const new_wareHouseLogEntity = new WareHouseLogEntity();
+            new_wareHouseLogEntity.expiry = new_warehouse.expiry;
+            new_wareHouseLogEntity.quantity= new_warehouse.quantity;
+            new_wareHouseLogEntity.pre_ordered_quantity = new_warehouse.pre_ordered_quantity;
+            new_wareHouseLogEntity.sold_quantity = new_warehouse.sold_quantity;                                       
+            new_wareHouseLogEntity.wareHouseEntity = ware_house;
+
+            await queryRunner.manager.save(WareHouseLogEntity, new_wareHouseLogEntity);
+            }
+            return 0;
+
+        }catch(err){
+            console.log(err);
+            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
+        }
+        
+    }
     // cap nhat nay se khong cap nhat lai user da tao record ware house
     // => kh co truong user_id
     // quantity can mua
     async updateByCreateOder(data: OderDetailEntity[], queryRunner: QueryRunner): Promise<any>{
         try{  
-            const month = moment().add(30, 'days');
+            const month = moment().add(30, 'days').toISOString();
             let result:ArrayWarehouse[] = [];
 
             for(let i = 0; i< data.length; i++){
                 let quantity = data[i].quantity;
 
-                const ware_house = await this.wareHouseRepository.find(({
-                    where: {
-                        itemEntity: {item_id: data[i].item_id},
-                        quantity: MoreThan(0),
-                        expiry: Raw((alias) => `${alias} > :date`, { date: month })
-                    },
-                    
-                    relations: { itemEntity: true},
-                    order:{
-                        expiry: "ASC"
-                    }
-                }))
+                const ware_house = await this.wareHouseRepository.query(`select * from (select it.item_id, cast(sum (wh.quantity) as int)  as total
+                from public.item as it join public.ware_house as wh on it.item_id = wh.item_id 
+                where wh.quantity > 0 and it.item_id = '${data[i].item_id}' and wh.expiry > '${month}'
+                group by it.item_id)
+                as res inner join public.ware_house as wh1 on wh1.item_id = res.item_id
+				order by expiry ASC `)
+                
+                if (ware_house.total < quantity){
+                    throw new HttpException(`Out of strock`, HttpStatus.BAD_REQUEST);
+                }
                 
                 for(let j = 0; j < ware_house.length; j++){
                     if(quantity- ware_house[j].quantity > 0){
@@ -161,6 +195,7 @@ export class WareHouseService {
                         new_array_warehouse.ware_house_id = ware_house[j].ware_house_id;
                         new_array_warehouse.item_id = data[i].item_id;
                         new_array_warehouse.quantity = ware_house[j].quantity;
+                        
 
                         result.push (new_array_warehouse);
 
@@ -169,6 +204,8 @@ export class WareHouseService {
                         const new_ware_house = new WareHouseEntity();
                         new_ware_house.expiry = ware_house[j].expiry;
                         new_ware_house.quantity = 0;
+                        new_ware_house.pre_ordered_quantity = ware_house[j].pre_ordered_quantity + ware_house[j].quantity;
+                        new_ware_house.sold_quantity = ware_house[j].sold_quantity;
                         new_ware_house.itemEntity= ware_house[j].itemEntity;
                         new_ware_house.userEntity = ware_house[j].userEntity;
 
@@ -183,11 +220,12 @@ export class WareHouseService {
                         new_array_warehouse.quantity = quantity;
 
                         result.push (new_array_warehouse);
-                        quantity = 0;
-                        
+                    
                         const new_ware_house = new WareHouseEntity();
                         new_ware_house.expiry = ware_house[j].expiry;
                         new_ware_house.quantity = 0;
+                        new_ware_house.pre_ordered_quantity = ware_house[j].pre_ordered_quantity + quantity;
+                        new_ware_house.sold_quantity = ware_house[j].sold_quantity;
                         new_ware_house.itemEntity= ware_house[j].itemEntity;
                         new_ware_house.userEntity = ware_house[j].userEntity;
 
@@ -202,22 +240,19 @@ export class WareHouseService {
                         new_array_warehouse.quantity = quantity;
                         
                         result.push (new_array_warehouse);
-                        quantity = 0;
 
                         const new_ware_house = new WareHouseEntity();
                         new_ware_house.expiry = ware_house[j].expiry;
                         new_ware_house.quantity = ware_house[j].quantity - quantity;
+                        new_ware_house.pre_ordered_quantity = ware_house[j].pre_ordered_quantity + quantity;
+                        new_ware_house.sold_quantity = ware_house[j].sold_quantity;
                         new_ware_house.itemEntity= ware_house[j].itemEntity;
                         new_ware_house.userEntity = ware_house[j].userEntity;
 
                         await queryRunner.manager.update(WareHouseEntity, ware_house[j].ware_house_id, new_ware_house);
                         break;
                     }
-                }
-                // trường hợp khi đi hết tất cả các ware house nhưng số lượng cần mua vẫn còn, quantity bị trừ chưa hết
-                if(quantity > 0){
-                    throw new HttpException(`Out of strock`, HttpStatus.BAD_REQUEST);
-                }
+                }  
             }
             return result;
         }catch(err){

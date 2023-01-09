@@ -1,16 +1,17 @@
-import {Body, Controller, Get, Param, Post, Req, Res} from "@nestjs/common";
+import {Body, Controller, Get, Param, Post, Req, Res, UseGuards} from "@nestjs/common";
 import {CreateAccountDTO} from "../users/user.dto";
 import { BodyLogin } from "./auth.dto";
 import {AuthService} from "./auth.service";
-
+import { LocalAuthGuard } from './guard/guards.local'
 
 @Controller('auth')
 export class AuthController{
     constructor( private authService : AuthService ) {}
-
+    
+    @UseGuards(LocalAuthGuard)
     @Post('login')
-    async logIn(@Body() _data : BodyLogin, @Res() res) : Promise<any>{
-        return this.authService.LoginAccount(_data).then(result =>{
+    async logIn(@Body() data : BodyLogin, @Res() res) : Promise<any>{
+        return this.authService.LoginAccount(data).then(result =>{
             res.status(200).json({
                 message : 'successful',
                 result,

@@ -13,6 +13,9 @@ export class CreateWareHouseDTO{
 
     @IsNotEmpty()
     item_id : string;
+
+    pre_ordered_quantity: number;
+    sold_quantity: number;
 }
 
 export class UpdateWareHouseDTO{
@@ -21,6 +24,8 @@ export class UpdateWareHouseDTO{
     create_at: string;
     expiry: Date;
     item_id: string;
+    pre_ordered_quantity:number;
+    sold_quantity: number;
 }
 
 export class ArrayWarehouse{

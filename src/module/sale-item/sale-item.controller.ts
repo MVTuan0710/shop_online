@@ -13,7 +13,6 @@ export class SaleItemController{
     constructor(private saleItemService : SaleItemService) {}
 
     // find all 
-    @Roles(EnumRole.super_admin)
     @Get('get-all')
     async getAll(@Res() res){
         return this.saleItemService.find().then(result =>{
@@ -30,9 +29,10 @@ export class SaleItemController{
     }
 
     // create 
-    @Roles(EnumRole.super_admin)
+    @Roles(EnumRole.super_admin, EnumRole.business_manager)
     @Post('create')
     async create(@Res() res, @Body() data: CreateSaleItemDTO, @Req()req){
+        data.user_id = req['user'].id;
         return this.saleItemService.create(data).then(result =>{
             res.status(200).json({
                 message : 'success',
@@ -47,6 +47,7 @@ export class SaleItemController{
     }
 
     // delete
+    @Roles(EnumRole.super_admin, EnumRole.business_manager)
     @Delete('delete/:sale_id')
     async delete(@Res() res, @Param('sale_id')sale_id:string){
         return this.saleItemService.delete(sale_id).then(result =>{
@@ -63,9 +64,11 @@ export class SaleItemController{
     }
 
     // update
+    @Roles(EnumRole.super_admin, EnumRole.business_manager)
     @Put('update/:sale_id')
-    async update(@Res() res, @Param('sale_id')sale_id:string, @Body()data:CreateSaleItemDTO){
-        return this.saleItemService.update(sale_id,data).then(result =>{
+    async update(@Res() res, @Param('sale_item_id')sale_item_id: string, @Body()data:CreateSaleItemDTO, @Req()req){
+        data.user_id = req['user'].id;
+        return this.saleItemService.update(sale_item_id,data).then(result =>{
             res.status(200).json({
                 message : 'success',
                 result,

@@ -135,71 +135,41 @@ export class UserService {
     }
 
     // create account
-    async createAccount(data: CreateAccountDTO): Promise<UserEntity> {
+    async  createAccount(data: CreateAccountDTO): Promise<UserEntity> {
         try {
             // check email exists
             const user_is_exist = await this.userRepository.findOne({where: {email: data.email}});
             if (user_is_exist){
                 throw new HttpException('user is exist',HttpStatus.BAD_REQUEST);
             }
-            const user  = await this.userRepository.findOne({where : {user_id :data.user_id}});
-                if(user.roleEntity.role_id === 1){
-                    if(data.role_id === 3 || data.role_id === 2){
-    
-                    const role = await this.roleService.findById(data.role_id);
-    
-                    const userEntity = new UserEntity();
-                    userEntity.email = data.email;
-                    userEntity.name = data.name;
-                    userEntity.password = hashSync(data.password, 6);
-                    userEntity.phone = data.phone;
-                    userEntity.roleEntity = role;
-                    userEntity.verify_token = uuidv4();
-    
-                    const result = await this.userRepository.save(userEntity);
+               
+                if(data.role_id === 3 || data.role_id === 2){
 
-                    const userLogEntity = new UserLogEntity();
-                    userLogEntity.email = result.email;
-                    userLogEntity.phone = result.phone;
-                    userLogEntity.name = result.name;
-                    userLogEntity.userEntity = result;
-            
-                    await this.userLogService.create(userLogEntity );
-                    return result;
-    
-                    }else{
-                        throw console.log("failed");
-                    }
+                const role = await this.roleService.findById(data.role_id);
+
+                const userEntity = new UserEntity();
+                userEntity.email = data.email;
+                userEntity.name = data.name;
+                userEntity.password = hashSync(data.password, 6);
+                userEntity.phone = data.phone;
+                userEntity.roleEntity = role;
+                userEntity.verify_token = uuidv4();
+
+                const result = await this.userRepository.save(userEntity);
+
+                const userLogEntity = new UserLogEntity();
+                userLogEntity.email = result.email;
+                userLogEntity.phone = result.phone;
+                userLogEntity.name = result.name;
+                userLogEntity.userEntity = result;
+        
+                await this.userLogService.create(userLogEntity );
+                return result;
+
                 }else{
-
-                    if(user.roleEntity.role_id === 4 && data.role_id === 4){
-                
-                        const role = await this.roleService.findById(data.role_id);
-        
-                        const userEntity = new UserEntity();
-                        userEntity.email = data.email;
-                        userEntity.name = data.name;
-                        userEntity.password = hashSync(data.password, 6);
-                        userEntity.phone = data.phone;
-                        userEntity.roleEntity = role;
-                        userEntity.verify_token = uuidv4();
-        
-                        const result = await this.userRepository.save(userEntity);
-
-                        const userLogEntity = new UserLogEntity();
-                        userLogEntity.email = result.email;
-                        userLogEntity.phone = result.phone;
-                        userLogEntity.name = result.name;
-                        userLogEntity.userEntity = result;
-                
-                        await this.userLogService.create(userLogEntity );
-                        return result;
-        
-                    }else{
-                        throw console.log("failed");
-                    }
+                    throw new HttpException(`You can't create account for user`,HttpStatus.BAD_REQUEST);
                 }
-            
+
         }catch(err){
             console.log(err);
             throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);

@@ -19,11 +19,17 @@ export class WareHouseEntity extends BaseEntity{
     @PrimaryGeneratedColumn('uuid')
     ware_house_id : string;
 
-    @Column({name : 'quantity',  type : 'integer' , nullable : true})
+    @Column({name : 'quantity', type : 'integer' , nullable : true})
     quantity : number;
 
     @Column({name : 'expiry', type : 'timestamp with time zone', nullable : true})
     expiry : Date;
+
+    @Column({name: 'pre_ordered_quantity', type: 'integer', nullable: true})
+    pre_ordered_quantity: number;
+
+    @Column({name: 'sold_quantity', type: 'integer', nullable: true})
+    sold_quantity: number;
 
     @ManyToOne((type) => UserEntity, (userEntity)=> userEntity.wareHouseEntity)
     @JoinColumn({name : 'create_at'})

@@ -157,35 +157,8 @@ export class SaleItemService {
         }
        
     }
-    async updateSaleItemByCreateOder(voucher_code: string, oder_item:OderDetailEntity[], queryRunner: QueryRunner):Promise<any>{
-        try{
-            for(let i = 0; i< oder_item.length; i++){
-                const sale_item =  await this.saleItemRepository.findOne({
-                    where: {
-                        itemEntity: {item_id: oder_item[i].item_id},
-                        saleEntity: {voucher_code: voucher_code}
-                    }
-                });
-                if(sale_item){
-                    let new_sale_item = new SaleItemEntity();
-                    new_sale_item = sale_item;
-                    if(new_sale_item.amount >= oder_item[i].quantity){
-                        new_sale_item.amount = new_sale_item.amount - oder_item[i].quantity;
-                    }
-                    if(new_sale_item.amount < oder_item[i].quantity){
-                        new_sale_item.amount = 0; 
-                    }
-                    await queryRunner.manager.update(SaleItemEntity,sale_item.sale_item_id,new_sale_item);
-                }
-            }
 
-        }catch(err){
-            console.log(err);
-            throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
-        }
-       
-    }
-
+    
 
     // update sale-item
     async update(sale_item_id : string, data: CreateSaleItemDTO): Promise<any> {
@@ -207,13 +180,14 @@ export class SaleItemService {
                 throw new HttpException('Not Found',404);
             };
             
-            const saleItemEntity = new SaleItemEntity();
-            saleItemEntity.amount = data.amount;
-            saleItemEntity.itemEntity = item;
-            saleItemEntity.saleEntity = sale;
+            // const saleItemEntity = new SaleItemEntity();
+        
+            sale_item.amount = data.amount;
+            sale_item.itemEntity = item;
+            sale_item.saleEntity = sale;
 
             // update sale-item
-            await this.saleItemRepository.update(sale_item_id,saleItemEntity);
+            await this.saleItemRepository.update(sale_item.sale_item_id,sale_item);
             const result =  await this.saleItemRepository.findOne({where: {sale_item_id: sale_item_id}})
             return result;
 

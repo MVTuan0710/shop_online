@@ -55,7 +55,6 @@ export class OderService {
         }
         
     }
-
     
     // create 
     async create (data: CreateOderDTO):Promise<any> {
@@ -131,21 +130,53 @@ export class OderService {
                 where: {oder_id: oder_id},
                 relations: {oderDetailEntity: true}
             });
-            if(oder.status == 'cancel'){
-                throw new HttpException('Oder is canceled',HttpStatus.BAD_REQUEST);
-            }
-            if(oder.status == 'create'){
-                await this.wareHouserService.updateByCancelOder(oder, queryRunner);
-
-                await this.saleItemService.updateSaleItemByCancelOder(oder, queryRunner);
-
-                oder.status = 'cancel';
-                const result =await queryRunner.manager.save(OderEntity,oder); 
-
-                await queryRunner.commitTransaction();
-                return result;
+            if(oder.status == 'cancel' || oder.status == 'confirm'){
+                throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
             }
 
+            await this.wareHouserService.updateByCancelOder(oder, queryRunner);
+
+            await this.saleItemService.updateSaleItemByCancelOder(oder, queryRunner);
+
+            oder.status = 'cancel';
+            const result =await queryRunner.manager.save(OderEntity,oder); 
+
+            await queryRunner.commitTransaction();
+            return result;
+
+        }catch(err){
+            await queryRunner.rollbackTransaction();
+            console.log(err)
+            throw new HttpException(err,HttpStatus.BAD_REQUEST);
+        
+        } finally {
+            await queryRunner.release();
+        }
+        
+    }
+
+    async confirm(oder_id: string): Promise<any> {
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+        try{
+            // productRefund
+            const oder = await this.oderRepository.findOne({
+                where: {oder_id: oder_id},
+                relations: {oderDetailEntity: true}
+            });
+            if(oder.status == 'cancel' || oder.status == 'confirm'){
+                throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
+            }
+        
+            await this.wareHouserService.updateByConfirmOder(oder, queryRunner);
+
+            oder.status = 'confirm';
+            const result =await queryRunner.manager.save(OderEntity,oder); 
+
+            await queryRunner.commitTransaction();
+            return result;
+    
         }catch(err){
             await queryRunner.rollbackTransaction();
             console.log(err)

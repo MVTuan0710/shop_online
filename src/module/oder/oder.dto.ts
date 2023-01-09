@@ -16,6 +16,7 @@ export class CreateOderDTO{
     total_money: number;
     
     discount : number; 
+    role_id: string;
     
     oderDetailEntity: OderDetailEntity[];
 }

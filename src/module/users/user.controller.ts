@@ -47,10 +47,9 @@ export class UserController{
         })
     }
     
-    @Roles(EnumRole.super_admin, EnumRole.user)
+    @Roles(EnumRole.super_admin)
     @Post('/create')
     async create(@Res() res, @Body()data: CreateAccountDTO, @Req() req) : Promise<any>{
-        data.user_id = req['user'].id
         return this.userService.createAccount(data).then(result =>{
             res.status(200).json({
                 message : 'success',

@@ -8,7 +8,7 @@ import {CreateRoleDTO} from "./role.dto";
 
 
 @Controller('role')
-// @UseGuards(GuardsJwt, RolesGuard)
+@UseGuards(GuardsJwt, RolesGuard)
 export class RoleController{
     constructor(private roleService : RoleService) {}
 

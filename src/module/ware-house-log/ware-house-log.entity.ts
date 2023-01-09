@@ -23,6 +23,12 @@ export class WareHouseLogEntity extends BaseEntity{
     @Column({name : 'expiry', type : 'timestamp with time zone', nullable : true})
     expiry : Date;
 
+    @Column({name: 'pre_ordered_quantity', type: 'integer', nullable: true})
+    pre_ordered_quantity: number;
+
+    @Column({name: 'sold_quantity', type: 'integer', nullable: true})
+    sold_quantity: number;
+
     @ManyToOne((type) => WareHouseEntity, (wareHouseEntity)=> wareHouseEntity.wareHouseLogEntity)
     @JoinColumn({name : 'ware_house_id'})
     wareHouseEntity : WareHouseEntity;

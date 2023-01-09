@@ -78,7 +78,7 @@ export class AuthService{
             role : data.roleEntity
         }
 
-        const jwtToken = this.jwtService.sign(payload)
+        const jwtToken = this.jwtService.sign(payload);
 
         return{
             access_token : jwtToken,
