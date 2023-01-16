@@ -8,12 +8,12 @@ import {CreateRoleDTO} from "./role.dto";
 
 
 @Controller('role')
-@UseGuards(GuardsJwt, RolesGuard)
+// @UseGuards(GuardsJwt, RolesGuard)
 export class RoleController{
     constructor(private roleService : RoleService) {}
 
     // get all role
-    @Roles(EnumRole.super_admin)
+    // @Roles(EnumRole.super_admin)
     @Get('/get-all')
     async getAllRole(@Res() res){
         return this.roleService.getAllRole().then(result =>{
@@ -31,7 +31,7 @@ export class RoleController{
 
     // @Roles(EnumRole.super_admin)
     @Post('/create')
-    async createRole(@Res() res, @Body() body: CreateRoleDTO){
+     async createRole(@Res() res, @Body() body: CreateRoleDTO){
         return this.roleService.createRole(body).then(result =>{
             res.status(200).json({
                 message : 'success',

@@ -9,7 +9,7 @@ const dataSource = new DataSource({
   port: 5432,
   username: 'postgres',
   password: "123",
-  database: "test_db_shop_online",
+  database: "postgres",
   synchronize : true,
   logging : false,
   entities: ['src/module/**/*.entity.ts'],

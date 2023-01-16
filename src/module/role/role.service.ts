@@ -3,7 +3,7 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {RoleEntity} from "./role.entity";
 import {Repository} from "typeorm";
 import { CreateRoleDTO } from "./role.dto";
-
+import * as Sentry from '@sentry/node';
 @Injectable()
 export class RoleService{
     constructor(@InjectRepository(RoleEntity) private roleRepository : Repository<RoleEntity>) {}
@@ -31,17 +31,18 @@ export class RoleService{
 
     async createRole(_data: CreateRoleDTO): Promise<RoleEntity>{
         try{
-            const role = await this.roleRepository.findOne({where : {role_id : _data.role_id}});
+            const role = await this.roleRepository.findOne({where : {role_id : 1}});
             if (role){
-                throw console.log('The role is exsit');
+                throw new HttpException('The role is exsit',HttpStatus.BAD_REQUEST);
             }
 
             const result = await this.roleRepository.save(_data);
             return result;
         }catch(err){
             console.log(err);
+            //@ts-ignore
+            Sentry.captureException(err)
             throw new HttpException('Bad req',HttpStatus.BAD_REQUEST);
         }
-       
     }
 }

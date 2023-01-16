@@ -37,7 +37,7 @@ import { MetadataEntity } from "../metadata/metadata.entity";
                 port: 5432,
                 username: 'postgres',
                 password: '123',
-                database: 'test_db_shop_online',
+                database: 'postgres',
                 entities:   [UserEntity, RoleEntity, WareHouseEntity,
                             ItemEntity, CategoryEntity, OderDetailEntity,
                             OderDetailLogEntity, OderEntity, ItemLogEntity,
